@@ -1,6 +1,3 @@
-'use client';
-
-import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { FaInstagram, FaFacebookF, FaTiktok } from 'react-icons/fa';
 
@@ -29,7 +26,7 @@ export default function Footer() {
   return (
     <footer className='w-full bg-black/80 backdrop-blur-sm border-t border-[#E4DD3B]/30 text-white/70'>
       <div className='w-full px-6 py-3 md:px-8 md:py-4 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-0 text-sm tracking-wide'>
-        {/* Left: email + nav */}
+        {/* Left: email */}
         <div className='flex flex-wrap items-center justify-center md:justify-start gap-3 md:gap-4'>
           <a
             href='mailto:info@kluub.ee'
@@ -37,24 +34,6 @@ export default function Footer() {
           >
             info@kluub.ee
           </a>
-
-          <span className='hidden md:inline text-white/20'>•</span>
-
-          <Link
-            href='/contact'
-            className='hidden md:inline hover:text-[#E4DD3B] transition-colors duration-300 whitespace-nowrap'
-          >
-            {t('contact')}
-          </Link>
-
-          <span className='hidden md:inline text-white/20'>•</span>
-
-          <Link
-            href='/auth?mode=login'
-            className='hidden md:inline hover:text-[#E4DD3B] transition-colors duration-300 whitespace-nowrap'
-          >
-            {t('signIn')}
-          </Link>
         </div>
 
         {/* Right: socials + year + privacy */}
@@ -76,12 +55,12 @@ export default function Footer() {
 
           <div className='flex items-center gap-3 text-xs md:text-sm text-white/40'>
             <span>© Kluub {year}</span>
-            <Link
-              href='/privacy'
+            <a
+              href='#'
               className='hover:text-[#E4DD3B] transition-colors duration-300'
             >
               {t('privacy')}
-            </Link>
+            </a>
           </div>
         </div>
       </div>
