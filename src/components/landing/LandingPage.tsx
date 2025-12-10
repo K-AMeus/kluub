@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import BackgroundEffects from './BackgroundEffects';
 import HoneycombPattern from './honeycomb/HoneycombPattern';
 import CityCard from './CityCard';
+import Header from '@/components/shared/Header';
 import Footer from '@/components/shared/Footer';
 
 const ParticleField = dynamic(() => import('./ParticleField'), {
@@ -33,7 +34,9 @@ export default function LandingPage() {
         <ParticleField />
       </div>
 
-      <div className='relative z-10 grow flex flex-col items-center justify-center px-4 md:px-6 pb-20 md:pb-16'>
+      <Header />
+
+      <div className='relative z-10 grow flex flex-col items-center justify-center px-4 md:px-6 pb-20 pt-24 md:pt-32 md:pb-16'>
         <div
           className={`text-center max-w-3xl mb-8 md:mb-20 transform transition-all duration-1000 ease-out ${
             mounted ? 'translate-y-0 opacity-100' : '-translate-y-8 opacity-0'
