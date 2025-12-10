@@ -1,3 +1,5 @@
+import LandingPage from '@/components/landing/LandingPage';
+
 export default function Home() {
-  return <div>Kluub app</div>;
+  return <LandingPage />;
 }
