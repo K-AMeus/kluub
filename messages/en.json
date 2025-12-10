@@ -12,5 +12,20 @@
     "contact": "Contact",
     "signIn": "Sign In",
     "privacy": "Privacy Policy"
+  },
+  "eventsPage": {
+    "backToEvents": "Back to Events",
+    "readMore": "Read More",
+    "loadMore": "Load More",
+    "noEvents": "No events found",
+    "free": "Free",
+    "facebookEvent": "Facebook Event",
+    "topPicks": "Top Picks",
+    "events": "Events",
+    "today": "Today",
+    "tomorrow": "Tomorrow"
+  },
+  "eventDetail": {
+    "backToEvents": "Back to Events"
   }
 }

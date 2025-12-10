@@ -12,5 +12,20 @@
     "contact": "Kontakt",
     "signIn": "Logi sisse",
     "privacy": "Privaatsuspoliitika"
+  },
+  "eventsPage": {
+    "backToEvents": "Tagasi sündmuste juurde",
+    "readMore": "Loe lähemalt",
+    "loadMore": "Lae veel",
+    "noEvents": "Sündmusi ei leitud",
+    "free": "Tasuta",
+    "facebookEvent": "Facebooki sündmus",
+    "topPicks": "Kluubi valik",
+    "events": "Sündmused",
+    "today": "Täna",
+    "tomorrow": "Homme"
+  },
+  "eventDetail": {
+    "backToEvents": "Tagasi sündmuste juurde"
   }
 }
