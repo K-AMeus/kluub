@@ -1,0 +1,16 @@
+{
+  "landingPage": {
+    "title": "Discover the perfect event for every occasion",
+    "subtitle": "Choose your location and find the perfect match."
+  },
+  "cityCard": {
+    "selectCity": "Select {city}",
+    "comingSoon": "{city} - coming soon",
+    "soon": "Soon"
+  },
+  "footer": {
+    "contact": "Contact",
+    "signIn": "Sign In",
+    "privacy": "Privacy Policy"
+  }
+}

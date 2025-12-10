@@ -1,0 +1,16 @@
+{
+  "landingPage": {
+    "title": "Leia sündmus, mis sobib igasse hetke.",
+    "subtitle": "Vali asukoht ja alusta avastamist"
+  },
+  "cityCard": {
+    "selectCity": "Vali {city}",
+    "comingSoon": "{city} - tulemas varsti",
+    "soon": "Varsti"
+  },
+  "footer": {
+    "contact": "Kontakt",
+    "signIn": "Logi sisse",
+    "privacy": "Privaatsuspoliitika"
+  }
+}
