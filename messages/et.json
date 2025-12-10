@@ -1,7 +1,7 @@
 {
   "landingPage": {
-    "title": "Leia sündmus, mis sobib igasse hetke.",
-    "subtitle": "Vali asukoht ja alusta avastamist"
+    "title": "Leia sündmus, mis sobib igasse hetke",
+    "subtitle": "Vali asukoht ja alusta avastamist."
   },
   "cityCard": {
     "selectCity": "Vali {city}",
