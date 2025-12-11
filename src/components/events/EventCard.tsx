@@ -57,7 +57,7 @@ export default function EventCard({ event, translations }: EventCardProps) {
             src={imageUrl}
             alt={event.title}
             fill
-            className='object-cover md:border-2 md:border-[#E4DD3B]'
+            className='object-cover'
             sizes='(max-width: 768px) 112px, 25vw'
             loading='lazy'
           />
