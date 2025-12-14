@@ -1,6 +1,6 @@
 {
-  "name": "MyWebSite",
-  "short_name": "MySite",
+  "name": "Kluub - Discover Events in Estonia",
+  "short_name": "Kluub",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
