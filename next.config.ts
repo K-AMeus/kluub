@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: '/manifest.json',
+        source: '/(manifest.json|favicon.ico|apple-icon.png)',
         headers: [
           {
             key: 'Cache-Control',
