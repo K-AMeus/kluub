@@ -4,6 +4,9 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'Kluub - Discover Events',
   description: 'Discover the perfect event for every occasion',
+  appleWebApp: {
+    title: 'Kluub',
+  },
 };
 
 export default function RootLayout({
