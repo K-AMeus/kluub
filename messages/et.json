@@ -27,5 +27,22 @@
   },
   "eventDetail": {
     "backToEvents": "Tagasi sündmuste juurde"
+  },
+  "backstage": {
+    "title": "Backstage",
+    "subtitle": "Ürituste haldusportaal",
+    "email": "E-post",
+    "emailPlaceholder": "sinu@email.ee",
+    "password": "Parool",
+    "passwordPlaceholder": "Sisesta parool",
+    "signIn": "Logi sisse",
+    "or": "või",
+    "googleSignIn": "Jätka Google'iga",
+    "backToSite": "Tagasi avalehele",
+    "loginError": "Vale e-post või parool. Palun proovi uuesti.",
+    "welcomeTitle": "Tere tulemast!",
+    "welcomeSubtitle": "Oled edukalt sisse loginud.",
+    "welcomeMessage": "Toimumiskoha juhtpaneel on peagi tulemas. Siin saad hallata oma sündmusi.",
+    "signOut": "Logi välja"
   }
 }

@@ -27,5 +27,22 @@
   },
   "eventDetail": {
     "backToEvents": "Back to Events"
+  },
+  "backstage": {
+    "title": "Backstage",
+    "subtitle": "Event management portal",
+    "email": "Email",
+    "emailPlaceholder": "your@email.com",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "signIn": "Sign In",
+    "or": "or",
+    "googleSignIn": "Continue with Google",
+    "backToSite": "Back to homepage",
+    "loginError": "Invalid email or password. Please try again.",
+    "welcomeTitle": "Welcome!",
+    "welcomeSubtitle": "You have successfully signed in.",
+    "welcomeMessage": "The venue dashboard is coming soon. You'll be able to manage your events here.",
+    "signOut": "Sign Out"
   }
 }
