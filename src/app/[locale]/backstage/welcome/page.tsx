@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { createBrowserSupabaseClient } from '@/supabase/client';
 import BackstageBackground from '@/components/backstage/BackstageBackground';
+import Link from 'next/link';
 
 export default function WelcomePage() {
   const t = useTranslations('backstage');
+  const locale = useLocale();
   const [mounted, setMounted] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const supabase = createBrowserSupabaseClient();
@@ -75,6 +77,15 @@ export default function WelcomePage() {
             )}
 
             <p className='text-white/40 text-sm mb-8'>{t('welcomeMessage')}</p>
+
+            <div className='flex flex-col sm:flex-row gap-3 justify-center items-center mb-4'>
+              <Link
+                href={`/${locale}/backstage/events/upload`}
+                className='w-full sm:w-auto px-6 py-3 bg-[#E4DD3B] hover:bg-[#E4DD3B]/90 text-black font-semibold rounded-lg transition-all duration-200 text-center'
+              >
+                {t('uploadNewEvent')}
+              </Link>
+            </div>
 
             <button
               onClick={handleSignOut}
