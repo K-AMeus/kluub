@@ -32,6 +32,48 @@ export default function EventUploadForm() {
 
   const supabase = createBrowserSupabaseClient();
 
+  // Check for duplicated event data in localStorage
+  useEffect(() => {
+    const duplicateData = localStorage.getItem('duplicateEvent');
+    if (duplicateData) {
+      try {
+        const event = JSON.parse(duplicateData);
+
+        // Pre-fill form fields
+        setTitle(event.title);
+        setDescription(event.description);
+        setPriceTier(event.priceTier);
+        setVenueId(event.venueId);
+        setCity(event.city);
+        setImageUrl(event.imageUrl || '');
+        setFacebookUrl(event.facebookUrl || '');
+
+        // Format dates for datetime-local input
+        const formatDateTime = (isoString: string) => {
+          const date = new Date(isoString);
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          const hours = String(date.getHours()).padStart(2, '0');
+          const minutes = String(date.getMinutes()).padStart(2, '0');
+          return `${year}-${month}-${day}T${hours}:${minutes}`;
+        };
+
+        setStartTime(formatDateTime(event.startTime));
+        setEndTime(formatDateTime(event.endTime));
+
+        // Clear localStorage after loading
+        localStorage.removeItem('duplicateEvent');
+
+        // Show success message
+        setSuccess(t('eventDuplicated'));
+        setTimeout(() => setSuccess(null), 3000);
+      } catch (err) {
+        console.error('Error parsing duplicate event data:', err);
+      }
+    }
+  }, [t]);
+
   // Fetch user's venues on mount
   useEffect(() => {
     const fetchUserVenues = async () => {
