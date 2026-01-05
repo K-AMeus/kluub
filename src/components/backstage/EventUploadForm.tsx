@@ -450,50 +450,53 @@ export default function EventUploadForm() {
               )}
             </div>
 
-            {/* Venue Selector */}
-            <div>
-              <label
-                htmlFor='venue'
-                className='block text-white/70 text-sm mb-2'
-              >
-                {t('venue')} <span className='text-red-400'>*</span>
-              </label>
-              <select
-                id='venue'
-                value={venueId}
-                onChange={(e) => handleVenueChange(e.target.value)}
-                required
-                disabled={isSubmitting}
-                className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
-              >
-                <option value='' className='bg-black'>
-                  {t('venueSelect')}
-                </option>
-                {userVenues.map((venue) => (
-                  <option key={venue.id} value={venue.id} className='bg-black'>
-                    {venue.name} - {venue.city}
+            {/* Venue and City (Same Row - 2/3 and 1/3) */}
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+              {/* Venue Selector - 2/3 width */}
+              <div className='md:col-span-2'>
+                <label
+                  htmlFor='venue'
+                  className='block text-white/70 text-sm mb-2'
+                >
+                  {t('venue')} <span className='text-red-400'>*</span>
+                </label>
+                <select
+                  id='venue'
+                  value={venueId}
+                  onChange={(e) => handleVenueChange(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                >
+                  <option value='' className='bg-black'>
+                    {t('venueSelect')}
                   </option>
-                ))}
-              </select>
-              {validationErrors.venueId && (
-                <p className='mt-1 text-sm text-red-400'>
-                  {validationErrors.venueId}
-                </p>
-              )}
-            </div>
+                  {userVenues.map((venue) => (
+                    <option key={venue.id} value={venue.id} className='bg-black'>
+                      {venue.name}
+                    </option>
+                  ))}
+                </select>
+                {validationErrors.venueId && (
+                  <p className='mt-1 text-sm text-red-400'>
+                    {validationErrors.venueId}
+                  </p>
+                )}
+              </div>
 
-            {/* City (Read-only) */}
-            <div>
-              <label htmlFor='city' className='block text-white/70 text-sm mb-2'>
-                {t('city')}
-              </label>
-              <input
-                id='city'
-                type='text'
-                value={city}
-                disabled
-                className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white/50 cursor-not-allowed'
-              />
+              {/* City (Read-only) - 1/3 width */}
+              <div className='md:col-span-1'>
+                <label htmlFor='city' className='block text-white/70 text-sm mb-2'>
+                  {t('city')}
+                </label>
+                <input
+                  id='city'
+                  type='text'
+                  value={city}
+                  disabled
+                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white/50 cursor-not-allowed'
+                />
+              </div>
             </div>
 
             {/* Price Tier */}
@@ -527,52 +530,55 @@ export default function EventUploadForm() {
               </select>
             </div>
 
-            {/* Start Time */}
-            <div>
-              <label
-                htmlFor='startTime'
-                className='block text-white/70 text-sm mb-2'
-              >
-                {t('startTime')} <span className='text-red-400'>*</span>
-              </label>
-              <input
-                id='startTime'
-                type='datetime-local'
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                required
-                disabled={isSubmitting}
-                className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
-              />
-              {validationErrors.startTime && (
-                <p className='mt-1 text-sm text-red-400'>
-                  {validationErrors.startTime}
-                </p>
-              )}
-            </div>
+            {/* Start Time and End Time (Same Row) */}
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              {/* Start Time */}
+              <div>
+                <label
+                  htmlFor='startTime'
+                  className='block text-white/70 text-sm mb-2'
+                >
+                  {t('startTime')} <span className='text-red-400'>*</span>
+                </label>
+                <input
+                  id='startTime'
+                  type='datetime-local'
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                />
+                {validationErrors.startTime && (
+                  <p className='mt-1 text-sm text-red-400'>
+                    {validationErrors.startTime}
+                  </p>
+                )}
+              </div>
 
-            {/* End Time */}
-            <div>
-              <label
-                htmlFor='endTime'
-                className='block text-white/70 text-sm mb-2'
-              >
-                {t('endTime')} <span className='text-red-400'>*</span>
-              </label>
-              <input
-                id='endTime'
-                type='datetime-local'
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                required
-                disabled={isSubmitting}
-                className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
-              />
-              {validationErrors.endTime && (
-                <p className='mt-1 text-sm text-red-400'>
-                  {validationErrors.endTime}
-                </p>
-              )}
+              {/* End Time */}
+              <div>
+                <label
+                  htmlFor='endTime'
+                  className='block text-white/70 text-sm mb-2'
+                >
+                  {t('endTime')} <span className='text-red-400'>*</span>
+                </label>
+                <input
+                  id='endTime'
+                  type='datetime-local'
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                />
+                {validationErrors.endTime && (
+                  <p className='mt-1 text-sm text-red-400'>
+                    {validationErrors.endTime}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Image URL */}
