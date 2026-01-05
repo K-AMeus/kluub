@@ -6,6 +6,7 @@ import { createBrowserSupabaseClient } from '@/supabase/client';
 import BackstageLayout from '@/components/backstage/BackstageLayout';
 import Link from 'next/link';
 import type { Event } from '@/lib/types';
+import { formatDateTime } from '@/lib/event-utils';
 
 export default function WelcomePage() {
   const t = useTranslations('backstage');
@@ -127,15 +128,6 @@ export default function WelcomePage() {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     window.location.href = '/backstage';
-  };
-
-  const formatDateTime = (isoString: string) => {
-    const date = new Date(isoString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${day}/${month} ${hours}:${minutes}`;
   };
 
   return (

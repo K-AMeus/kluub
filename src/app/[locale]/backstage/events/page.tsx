@@ -6,6 +6,7 @@ import { createBrowserSupabaseClient } from '@/supabase/client';
 import BackstageLayout from '@/components/backstage/BackstageLayout';
 import EventEditModal from '@/components/backstage/EventEditModal';
 import type { Event, Venue } from '@/lib/types';
+import { formatDateTimeWithYear } from '@/lib/event-utils';
 
 export default function MyEventsPage() {
   const t = useTranslations('backstage');
@@ -161,16 +162,6 @@ export default function MyEventsPage() {
     fetchEvents();
   };
 
-  const formatDateTime = (isoString: string) => {
-    const date = new Date(isoString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
-  };
-
   const eventsToShow = activeTab === 'upcoming' ? upcomingEvents : pastEvents;
 
   return (
@@ -290,7 +281,7 @@ export default function MyEventsPage() {
                     >
                       <div className='flex flex-col h-full'>
                         <div className='text-[#E4DD3B] text-sm mb-2'>
-                          {formatDateTime(event.startTime)}
+                          {formatDateTimeWithYear(event.startTime)}
                         </div>
                         <h3 className='text-white font-semibold text-lg mb-2 group-hover:text-[#E4DD3B] transition-colors'>
                           {event.title}

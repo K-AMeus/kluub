@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { createBrowserSupabaseClient } from '@/supabase/client';
 import type { City, PriceTier, Venue } from '@/lib/types';
+import { formatDateTimeForInput } from '@/lib/event-utils';
 
 export default function EventUploadForm() {
   const t = useTranslations('backstage');
@@ -49,18 +50,8 @@ export default function EventUploadForm() {
         setFacebookUrl(event.facebookUrl || '');
 
         // Format dates for datetime-local input
-        const formatDateTime = (isoString: string) => {
-          const date = new Date(isoString);
-          const year = date.getFullYear();
-          const month = String(date.getMonth() + 1).padStart(2, '0');
-          const day = String(date.getDate()).padStart(2, '0');
-          const hours = String(date.getHours()).padStart(2, '0');
-          const minutes = String(date.getMinutes()).padStart(2, '0');
-          return `${year}-${month}-${day}T${hours}:${minutes}`;
-        };
-
-        setStartTime(formatDateTime(event.startTime));
-        setEndTime(formatDateTime(event.endTime));
+        setStartTime(formatDateTimeForInput(event.startTime));
+        setEndTime(formatDateTimeForInput(event.endTime));
 
         // Clear localStorage after loading
         localStorage.removeItem('duplicateEvent');

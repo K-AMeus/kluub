@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { createBrowserSupabaseClient } from '@/supabase/client';
 import type { City, PriceTier, Event, Venue } from '@/lib/types';
 import { useRouter } from 'next/navigation';
+import { formatDateTimeForInput } from '@/lib/event-utils';
 
 interface EventEditModalProps {
   event: Event;
@@ -50,18 +51,8 @@ export default function EventEditModal({
 
   // Convert ISO timestamps to datetime-local format
   useEffect(() => {
-    const formatDateTime = (isoString: string) => {
-      const date = new Date(isoString);
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      return `${year}-${month}-${day}T${hours}:${minutes}`;
-    };
-
-    setStartTime(formatDateTime(event.startTime));
-    setEndTime(formatDateTime(event.endTime));
+    setStartTime(formatDateTimeForInput(event.startTime));
+    setEndTime(formatDateTimeForInput(event.endTime));
   }, [event]);
 
   // Validation helper
