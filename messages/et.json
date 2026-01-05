@@ -44,7 +44,6 @@
     "welcomeSubtitle": "Oled edukalt sisse loginud.",
     "welcomeMessage": "Toimumiskoha juhtpaneel on peagi tulemas. Siin saad hallata oma sündmusi.",
     "signOut": "Logi välja",
-    "backToWelcome": "Tagasi tervitusse",
     "uploadEvent": "Laadi Üles Sündmus",
     "uploadEventSubtitle": "Loo uus sündmus oma toimumiskohale",
     "uploadNewEvent": "Laadi Üles Uus Sündmus",
@@ -113,7 +112,6 @@
     "venueRequired": "Palun vali toimumiskoht",
     "startTimeRequired": "Algusaeg on kohustuslik",
     "endTimeRequired": "Lõppaeg on kohustuslik",
-    "endTimeAfterStart": "Lõppaeg peab olema pärast algusaega",
     "invalidUrl": "Palun sisesta kehtiv URL"
   }
 }
