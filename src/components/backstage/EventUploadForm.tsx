@@ -83,17 +83,6 @@ export default function EventUploadForm() {
           return;
         }
 
-        console.log('Current user ID:', user.id);
-        console.log('Current user email:', user.email);
-
-        // First, test basic query without join
-        const { data: testData, error: testError } = await supabase
-          .from('venue_users')
-          .select('*')
-          .eq('user_id', user.id);
-
-        console.log('Basic venue_users query (no join):', { testData, testError });
-
         // Query venue_users table joined with venues
         const { data, error: venueError } = await supabase
           .from('venue_users')
@@ -112,10 +101,7 @@ export default function EventUploadForm() {
           )
           .eq('user_id', user.id);
 
-        console.log('Venue query result with join:', { data, error: venueError });
-
         if (venueError) {
-          console.error('Venue query error:', venueError);
           setError(t('venueLoadError'));
           setIsLoadingVenues(false);
           return;
@@ -126,9 +112,6 @@ export default function EventUploadForm() {
           ?.map((vu: any) => vu.venues)
           .filter(Boolean) || []) as Venue[];
 
-        console.log('Transformed venues:', venues);
-        console.log('Number of venues found:', venues.length);
-
         setUserVenues(venues);
 
         // Pre-select first venue if available
@@ -138,7 +121,6 @@ export default function EventUploadForm() {
         }
       } catch (err) {
         setError(t('unexpectedError'));
-        console.error('Error fetching venues:', err);
       } finally {
         setIsLoadingVenues(false);
       }
