@@ -432,7 +432,7 @@ export default function EventUploadForm() {
               )}
             </div>
 
-            {/* Venue and City (Same Row - 2/3 and 1/3) */}
+            {/* Venue and Price Tier (Same Row - 2/3 and 1/3) */}
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
               {/* Venue Selector - 2/3 width */}
               <div className='md:col-span-2'>
@@ -466,50 +466,36 @@ export default function EventUploadForm() {
                 )}
               </div>
 
-              {/* City (Read-only) - 1/3 width */}
+              {/* Price Tier - 1/3 width */}
               <div className='md:col-span-1'>
-                <label htmlFor='city' className='block text-white/70 text-sm mb-2'>
-                  {t('city')}
+                <label
+                  htmlFor='priceTier'
+                  className='block text-white/70 text-sm mb-2'
+                >
+                  {t('priceTier')} <span className='text-red-400'>*</span>
                 </label>
-                <input
-                  id='city'
-                  type='text'
-                  value={city}
-                  disabled
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white/50 cursor-not-allowed'
-                />
+                <select
+                  id='priceTier'
+                  value={priceTier}
+                  onChange={(e) => setPriceTier(Number(e.target.value) as PriceTier)}
+                  required
+                  disabled={isSubmitting}
+                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                >
+                  <option value={0} className='bg-black'>
+                    {t('priceTierFree')}
+                  </option>
+                  <option value={1} className='bg-black'>
+                    {t('priceTierLow')}
+                  </option>
+                  <option value={2} className='bg-black'>
+                    {t('priceTierMedium')}
+                  </option>
+                  <option value={3} className='bg-black'>
+                    {t('priceTierHigh')}
+                  </option>
+                </select>
               </div>
-            </div>
-
-            {/* Price Tier */}
-            <div>
-              <label
-                htmlFor='priceTier'
-                className='block text-white/70 text-sm mb-2'
-              >
-                {t('priceTier')} <span className='text-red-400'>*</span>
-              </label>
-              <select
-                id='priceTier'
-                value={priceTier}
-                onChange={(e) => setPriceTier(Number(e.target.value) as PriceTier)}
-                required
-                disabled={isSubmitting}
-                className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
-              >
-                <option value={0} className='bg-black'>
-                  {t('priceTierFree')}
-                </option>
-                <option value={1} className='bg-black'>
-                  {t('priceTierLow')}
-                </option>
-                <option value={2} className='bg-black'>
-                  {t('priceTierMedium')}
-                </option>
-                <option value={3} className='bg-black'>
-                  {t('priceTierHigh')}
-                </option>
-              </select>
             </div>
 
             {/* Start Time and End Time (Same Row) */}

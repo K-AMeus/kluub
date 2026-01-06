@@ -4,7 +4,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 
-export default function BackstageSidebar() {
+interface BackstageSidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function BackstageSidebar({ isOpen, onClose }: BackstageSidebarProps) {
   const pathname = usePathname();
   const locale = useLocale();
   const t = useTranslations('backstage');
@@ -93,39 +98,43 @@ export default function BackstageSidebar() {
   };
 
   return (
-    <aside className='w-64 border-r border-white/10 bg-black/40 backdrop-blur-sm flex flex-col'>
-      {/* Logo/Header */}
-      <div className='p-6 border-b border-white/10'>
-        <h2 className='font-display text-xl text-white tracking-wider'>
-          {t('title')}
-        </h2>
-        <p className='text-white/40 text-xs mt-1'>{t('subtitle')}</p>
-      </div>
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div
+          className='lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40'
+          onClick={onClose}
+        />
+      )}
 
-      {/* Navigation */}
-      <nav className='flex-1 p-4 space-y-2'>
-        {navItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-              isActive(item.href)
-                ? 'bg-[#E4DD3B]/10 text-[#E4DD3B] border border-[#E4DD3B]/30'
-                : 'text-white/70 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            {item.icon}
-            <span className='font-medium'>{item.name}</span>
-          </Link>
-        ))}
-      </nav>
-
-      {/* Footer - could add sign out here later */}
-      <div className='p-4 border-t border-white/10'>
-        <div className='text-white/40 text-xs text-center'>
-          Kluub Backstage
-        </div>
-      </div>
-    </aside>
+      {/* Sidebar */}
+      <aside
+        className={`
+          fixed lg:static top-14 md:top-16 lg:top-0 bottom-0 left-0 z-40
+          w-64 border-r border-white/10 bg-black/95 backdrop-blur-sm flex flex-col
+          transform transition-transform duration-300 ease-in-out
+          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
+      >
+        {/* Navigation */}
+        <nav className='flex-1 p-4 pt-6 space-y-2 overflow-y-auto'>
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onClose}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                isActive(item.href)
+                  ? 'bg-[#E4DD3B]/10 text-[#E4DD3B] border border-[#E4DD3B]/30'
+                  : 'text-white/70 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              {item.icon}
+              <span className='font-medium'>{item.name}</span>
+            </Link>
+          ))}
+        </nav>
+      </aside>
+    </>
   );
 }

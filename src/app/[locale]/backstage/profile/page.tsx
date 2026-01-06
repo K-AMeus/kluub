@@ -8,7 +8,7 @@ export default function MyProfilePage() {
 
   return (
     <BackstageLayout>
-      <div className='flex items-center justify-center min-h-screen px-4 py-12'>
+      <div className='flex items-center justify-center min-h-[calc(100vh-3.5rem)] md:min-h-[calc(100vh-4rem)] px-4 py-8 md:py-12'>
         <div className='text-center max-w-md'>
           <div className='mb-6 inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#E4DD3B]/10 border border-[#E4DD3B]/30'>
             <svg
