@@ -34,7 +34,7 @@ export default function BackstageLayout({ children }: BackstageLayoutProps) {
         />
 
         {/* Main content area */}
-        <main className='flex-1 w-full lg:w-auto'>
+        <main className='flex-1 w-full lg:ml-64'>
           {children}
         </main>
       </div>
