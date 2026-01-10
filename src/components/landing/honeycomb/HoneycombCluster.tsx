@@ -32,7 +32,9 @@ export default function HoneycombCluster({
           const angle = (Math.PI / 3) * i;
           const px = offsetX + size * Math.cos(angle);
           const py = offsetY + size * Math.sin(angle);
-          points.push(`${px},${py}`);
+          points.push(
+            `${Math.round(px * 100) / 100},${Math.round(py * 100) / 100}`
+          );
         }
 
         hexagons.push(
