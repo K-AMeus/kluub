@@ -6,6 +6,7 @@ import { createBrowserSupabaseClient } from '@/supabase/client';
 import type { City, PriceTier, Event, Venue } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { formatDateTimeForInput } from '@/lib/event-utils';
+import { refreshEventsCache } from '@/app/actions';
 
 interface EventEditModalProps {
   event: Event;
@@ -141,6 +142,8 @@ export default function EventEditModal({
         return;
       }
 
+      await refreshEventsCache();
+
       setSuccess(t('eventUpdated'));
       setTimeout(() => {
         onEventUpdated();
@@ -193,6 +196,8 @@ export default function EventEditModal({
         return;
       }
 
+      await refreshEventsCache();
+
       setSuccess(t('eventDeleted'));
       setTimeout(() => {
         onEventDeleted();
@@ -222,8 +227,18 @@ export default function EventEditModal({
             onClick={onClose}
             className='absolute top-4 right-4 text-white/40 hover:text-white transition-colors'
           >
-            <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+            <svg
+              className='w-6 h-6'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M6 18L18 6M6 6l12 12'
+              />
             </svg>
           </button>
 
@@ -239,7 +254,7 @@ export default function EventEditModal({
             {error && (
               <div className='mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm flex items-start gap-3'>
                 <svg
-                  className='w-5 h-5 flex-shrink-0 mt-0.5'
+                  className='w-5 h-5 shrink-0 mt-0.5'
                   fill='none'
                   stroke='currentColor'
                   viewBox='0 0 24 24'
@@ -259,7 +274,7 @@ export default function EventEditModal({
             {success && (
               <div className='mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-green-400 text-sm flex items-start gap-3'>
                 <svg
-                  className='w-5 h-5 flex-shrink-0 mt-0.5'
+                  className='w-5 h-5 shrink-0 mt-0.5'
                   fill='none'
                   stroke='currentColor'
                   viewBox='0 0 24 24'
@@ -279,7 +294,10 @@ export default function EventEditModal({
             <form onSubmit={handleUpdate} className='space-y-6'>
               {/* Title */}
               <div>
-                <label htmlFor='title' className='block text-white/70 text-sm mb-2'>
+                <label
+                  htmlFor='title'
+                  className='block text-white/70 text-sm mb-2'
+                >
                   {t('eventTitle')} <span className='text-red-400'>*</span>
                 </label>
                 <input
@@ -293,14 +311,20 @@ export default function EventEditModal({
                   placeholder={t('eventTitlePlaceholder')}
                 />
                 {validationErrors.title && (
-                  <p className='mt-1 text-sm text-red-400'>{validationErrors.title}</p>
+                  <p className='mt-1 text-sm text-red-400'>
+                    {validationErrors.title}
+                  </p>
                 )}
               </div>
 
               {/* Description */}
               <div>
-                <label htmlFor='description' className='block text-white/70 text-sm mb-2'>
-                  {t('eventDescription')} <span className='text-red-400'>*</span>
+                <label
+                  htmlFor='description'
+                  className='block text-white/70 text-sm mb-2'
+                >
+                  {t('eventDescription')}{' '}
+                  <span className='text-red-400'>*</span>
                 </label>
                 <textarea
                   id='description'
@@ -313,13 +337,18 @@ export default function EventEditModal({
                   placeholder={t('eventDescriptionPlaceholder')}
                 />
                 {validationErrors.description && (
-                  <p className='mt-1 text-sm text-red-400'>{validationErrors.description}</p>
+                  <p className='mt-1 text-sm text-red-400'>
+                    {validationErrors.description}
+                  </p>
                 )}
               </div>
 
               {/* Venue Selector */}
               <div>
-                <label htmlFor='venue' className='block text-white/70 text-sm mb-2'>
+                <label
+                  htmlFor='venue'
+                  className='block text-white/70 text-sm mb-2'
+                >
                   {t('venue')} <span className='text-red-400'>*</span>
                 </label>
                 <select
@@ -331,19 +360,28 @@ export default function EventEditModal({
                   className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
                 >
                   {venues.map((venue) => (
-                    <option key={venue.id} value={venue.id} className='bg-black'>
+                    <option
+                      key={venue.id}
+                      value={venue.id}
+                      className='bg-black'
+                    >
                       {venue.name} - {venue.city}
                     </option>
                   ))}
                 </select>
                 {validationErrors.venueId && (
-                  <p className='mt-1 text-sm text-red-400'>{validationErrors.venueId}</p>
+                  <p className='mt-1 text-sm text-red-400'>
+                    {validationErrors.venueId}
+                  </p>
                 )}
               </div>
 
               {/* City (Read-only) */}
               <div>
-                <label htmlFor='city' className='block text-white/70 text-sm mb-2'>
+                <label
+                  htmlFor='city'
+                  className='block text-white/70 text-sm mb-2'
+                >
                   {t('city')}
                 </label>
                 <input
@@ -357,27 +395,43 @@ export default function EventEditModal({
 
               {/* Price Tier */}
               <div>
-                <label htmlFor='priceTier' className='block text-white/70 text-sm mb-2'>
+                <label
+                  htmlFor='priceTier'
+                  className='block text-white/70 text-sm mb-2'
+                >
                   {t('priceTier')} <span className='text-red-400'>*</span>
                 </label>
                 <select
                   id='priceTier'
                   value={priceTier}
-                  onChange={(e) => setPriceTier(Number(e.target.value) as PriceTier)}
+                  onChange={(e) =>
+                    setPriceTier(Number(e.target.value) as PriceTier)
+                  }
                   required
                   disabled={isSubmitting || isDeleting}
                   className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
                 >
-                  <option value={0} className='bg-black'>{t('priceTierFree')}</option>
-                  <option value={1} className='bg-black'>{t('priceTierLow')}</option>
-                  <option value={2} className='bg-black'>{t('priceTierMedium')}</option>
-                  <option value={3} className='bg-black'>{t('priceTierHigh')}</option>
+                  <option value={0} className='bg-black'>
+                    {t('priceTierFree')}
+                  </option>
+                  <option value={1} className='bg-black'>
+                    {t('priceTierLow')}
+                  </option>
+                  <option value={2} className='bg-black'>
+                    {t('priceTierMedium')}
+                  </option>
+                  <option value={3} className='bg-black'>
+                    {t('priceTierHigh')}
+                  </option>
                 </select>
               </div>
 
               {/* Start Time */}
               <div>
-                <label htmlFor='startTime' className='block text-white/70 text-sm mb-2'>
+                <label
+                  htmlFor='startTime'
+                  className='block text-white/70 text-sm mb-2'
+                >
                   {t('startTime')} <span className='text-red-400'>*</span>
                 </label>
                 <input
@@ -390,13 +444,18 @@ export default function EventEditModal({
                   className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
                 />
                 {validationErrors.startTime && (
-                  <p className='mt-1 text-sm text-red-400'>{validationErrors.startTime}</p>
+                  <p className='mt-1 text-sm text-red-400'>
+                    {validationErrors.startTime}
+                  </p>
                 )}
               </div>
 
               {/* End Time */}
               <div>
-                <label htmlFor='endTime' className='block text-white/70 text-sm mb-2'>
+                <label
+                  htmlFor='endTime'
+                  className='block text-white/70 text-sm mb-2'
+                >
                   {t('endTime')} <span className='text-red-400'>*</span>
                 </label>
                 <input
@@ -409,13 +468,18 @@ export default function EventEditModal({
                   className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
                 />
                 {validationErrors.endTime && (
-                  <p className='mt-1 text-sm text-red-400'>{validationErrors.endTime}</p>
+                  <p className='mt-1 text-sm text-red-400'>
+                    {validationErrors.endTime}
+                  </p>
                 )}
               </div>
 
               {/* Image URL */}
               <div>
-                <label htmlFor='imageUrl' className='block text-white/70 text-sm mb-2'>
+                <label
+                  htmlFor='imageUrl'
+                  className='block text-white/70 text-sm mb-2'
+                >
                   {t('imageUrl')}
                 </label>
                 <input
@@ -428,13 +492,18 @@ export default function EventEditModal({
                   placeholder={t('imageUrlPlaceholder')}
                 />
                 {validationErrors.imageUrl && (
-                  <p className='mt-1 text-sm text-red-400'>{validationErrors.imageUrl}</p>
+                  <p className='mt-1 text-sm text-red-400'>
+                    {validationErrors.imageUrl}
+                  </p>
                 )}
               </div>
 
               {/* Facebook URL */}
               <div>
-                <label htmlFor='facebookUrl' className='block text-white/70 text-sm mb-2'>
+                <label
+                  htmlFor='facebookUrl'
+                  className='block text-white/70 text-sm mb-2'
+                >
                   {t('facebookUrl')}
                 </label>
                 <input
@@ -447,7 +516,9 @@ export default function EventEditModal({
                   placeholder={t('facebookUrlPlaceholder')}
                 />
                 {validationErrors.facebookUrl && (
-                  <p className='mt-1 text-sm text-red-400'>{validationErrors.facebookUrl}</p>
+                  <p className='mt-1 text-sm text-red-400'>
+                    {validationErrors.facebookUrl}
+                  </p>
                 )}
               </div>
 
@@ -460,9 +531,24 @@ export default function EventEditModal({
                 >
                   {isSubmitting ? (
                     <>
-                      <svg className='w-5 h-5 animate-spin' fill='none' viewBox='0 0 24 24'>
-                        <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
-                        <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z' />
+                      <svg
+                        className='w-5 h-5 animate-spin'
+                        fill='none'
+                        viewBox='0 0 24 24'
+                      >
+                        <circle
+                          className='opacity-25'
+                          cx='12'
+                          cy='12'
+                          r='10'
+                          stroke='currentColor'
+                          strokeWidth='4'
+                        />
+                        <path
+                          className='opacity-75'
+                          fill='currentColor'
+                          d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                        />
                       </svg>
                       {t('updatingEvent')}
                     </>
@@ -477,8 +563,18 @@ export default function EventEditModal({
                   disabled={isSubmitting || isDeleting}
                   className='px-6 py-3 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 hover:border-blue-500/50 text-blue-400 font-semibold rounded-lg transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
                 >
-                  <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z' />
+                  <svg
+                    className='w-5 h-5'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z'
+                    />
                   </svg>
                   {t('duplicateEvent')}
                 </button>
@@ -529,9 +625,24 @@ export default function EventEditModal({
               >
                 {isDeleting ? (
                   <>
-                    <svg className='w-4 h-4 animate-spin' fill='none' viewBox='0 0 24 24'>
-                      <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
-                      <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z' />
+                    <svg
+                      className='w-4 h-4 animate-spin'
+                      fill='none'
+                      viewBox='0 0 24 24'
+                    >
+                      <circle
+                        className='opacity-25'
+                        cx='12'
+                        cy='12'
+                        r='10'
+                        stroke='currentColor'
+                        strokeWidth='4'
+                      />
+                      <path
+                        className='opacity-75'
+                        fill='currentColor'
+                        d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                      />
                     </svg>
                     {t('deletingEvent')}
                   </>

@@ -1,5 +1,8 @@
-import { createClient } from '@/supabase/server';
+import { unstable_cache } from 'next/cache';
+import { createStaticClient } from '@/supabase/server';
 import { Event, City, PriceTier } from './types';
+
+const CACHE_REVALIDATE_SECONDS = 3600;
 
 interface EventDbRow {
   id: string;
@@ -33,8 +36,8 @@ function transformEvent(row: EventDbRow): Event {
   };
 }
 
-export async function getEventsByCity(city: City): Promise<Event[]> {
-  const supabase = await createClient();
+async function fetchEventsByCity(city: City): Promise<Event[]> {
+  const supabase = createStaticClient();
 
   const { data, error } = await supabase
     .from('events')
@@ -68,8 +71,14 @@ export async function getEventsByCity(city: City): Promise<Event[]> {
   );
 }
 
-export async function getTopPicks(city: City): Promise<Event[]> {
-  const supabase = await createClient();
+export const getEventsByCity = (city: City) =>
+  unstable_cache(fetchEventsByCity, ['events-by-city', city], {
+    revalidate: CACHE_REVALIDATE_SECONDS,
+    tags: ['events'],
+  })(city);
+
+async function fetchTopPicks(city: City): Promise<Event[]> {
+  const supabase = createStaticClient();
 
   const { data, error } = await supabase
     .from('events')
@@ -104,8 +113,14 @@ export async function getTopPicks(city: City): Promise<Event[]> {
   );
 }
 
-export async function getEventById(id: string): Promise<Event | null> {
-  const supabase = await createClient();
+export const getTopPicks = (city: City) =>
+  unstable_cache(fetchTopPicks, ['top-picks', city], {
+    revalidate: CACHE_REVALIDATE_SECONDS,
+    tags: ['events'],
+  })(city);
+
+async function fetchEventById(id: string): Promise<Event | null> {
+  const supabase = createStaticClient();
 
   const { data, error } = await supabase
     .from('events')
@@ -134,4 +149,15 @@ export async function getEventById(id: string): Promise<Event | null> {
   }
 
   return transformEvent(data as unknown as EventDbRow);
+}
+
+export const getEventById = (id: string) =>
+  unstable_cache(fetchEventById, ['event-by-id', id], {
+    revalidate: CACHE_REVALIDATE_SECONDS,
+    tags: ['events'],
+  })(id);
+
+export async function revalidateEvents() {
+  const { revalidateTag } = await import('next/cache');
+  revalidateTag('events', 'max');
 }

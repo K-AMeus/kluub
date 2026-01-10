@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { createBrowserSupabaseClient } from '@/supabase/client';
 import type { City, PriceTier, Venue } from '@/lib/types';
 import { formatDateTimeForInput } from '@/lib/event-utils';
+import { refreshEventsCache } from '@/app/actions';
 
 export default function EventUploadForm() {
   const t = useTranslations('backstage');
-  const locale = useLocale();
 
   // Form fields
   const [title, setTitle] = useState('');
@@ -108,9 +108,8 @@ export default function EventUploadForm() {
         }
 
         // Transform the data
-        const venues = (data
-          ?.map((vu: any) => vu.venues)
-          .filter(Boolean) || []) as Venue[];
+        const venues = (data?.map((vu: any) => vu.venues).filter(Boolean) ||
+          []) as Venue[];
 
         setUserVenues(venues);
 
@@ -237,10 +236,8 @@ export default function EventUploadForm() {
         return;
       }
 
-      // Success!
+      await refreshEventsCache();
       setSuccess(t('eventCreated'));
-
-      // Reset form
       resetForm();
 
       // Scroll to top to show success message
@@ -344,7 +341,7 @@ export default function EventUploadForm() {
           {error && (
             <div className='mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm flex items-start gap-3'>
               <svg
-                className='w-5 h-5 flex-shrink-0 mt-0.5'
+                className='w-5 h-5 shrink-0 mt-0.5'
                 fill='none'
                 stroke='currentColor'
                 viewBox='0 0 24 24'
@@ -364,7 +361,7 @@ export default function EventUploadForm() {
           {success && (
             <div className='mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-green-400 text-sm flex items-start gap-3'>
               <svg
-                className='w-5 h-5 flex-shrink-0 mt-0.5'
+                className='w-5 h-5 shrink-0 mt-0.5'
                 fill='none'
                 stroke='currentColor'
                 viewBox='0 0 24 24'
@@ -454,7 +451,11 @@ export default function EventUploadForm() {
                     {t('venueSelect')}
                   </option>
                   {userVenues.map((venue) => (
-                    <option key={venue.id} value={venue.id} className='bg-black'>
+                    <option
+                      key={venue.id}
+                      value={venue.id}
+                      className='bg-black'
+                    >
                       {venue.name}
                     </option>
                   ))}
@@ -468,7 +469,10 @@ export default function EventUploadForm() {
 
               {/* City (Read-only) - 1/3 width */}
               <div className='md:col-span-1'>
-                <label htmlFor='city' className='block text-white/70 text-sm mb-2'>
+                <label
+                  htmlFor='city'
+                  className='block text-white/70 text-sm mb-2'
+                >
                   {t('city')}
                 </label>
                 <input
@@ -492,7 +496,9 @@ export default function EventUploadForm() {
               <select
                 id='priceTier'
                 value={priceTier}
-                onChange={(e) => setPriceTier(Number(e.target.value) as PriceTier)}
+                onChange={(e) =>
+                  setPriceTier(Number(e.target.value) as PriceTier)
+                }
                 required
                 disabled={isSubmitting}
                 className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
