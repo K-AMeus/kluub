@@ -48,12 +48,15 @@ export default function EventDetail({ event, translations }: EventDetailProps) {
       ? translations.free
       : formatPriceTier(event.priceTier);
 
+  const citySlug = event.city.toLowerCase();
+  const backHref = `/events/${citySlug}`;
+
   return (
     <div className='bg-black text-white pb-8 md:pb-12'>
       {/* Back Button */}
       <div className='px-4 md:px-8 lg:px-12 max-w-5xl mx-auto py-4 md:py-6'>
         <Link
-          href='/events'
+          href={backHref}
           className='group inline-flex items-center gap-2 text-white/70 hover:text-[#E4DD3B] transition-colors font-sans text-sm'
         >
           <ArrowLeftIcon

@@ -7,7 +7,7 @@ import EventDetail from '@/components/events/EventDetail';
 import { getEventById } from '@/lib/db';
 
 interface EventDetailPageProps {
-  params: Promise<{ eventId: string }>;
+  params: Promise<{ city: string; eventId: string }>;
 }
 
 export default async function EventDetailPage({

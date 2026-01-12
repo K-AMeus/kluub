@@ -2,7 +2,7 @@ import { unstable_cache } from 'next/cache';
 import { createStaticClient } from '@/supabase/server';
 import { Event, City, PriceTier } from './types';
 
-const CACHE_REVALIDATE_SECONDS = 3600;
+const CACHE_REVALIDATE_SECONDS = 86400;
 
 interface EventDbRow {
   id: string;

@@ -38,6 +38,8 @@ export default function EventCard({ event, translations }: EventCardProps) {
       ? translations.free
       : formatPriceTier(event.priceTier);
 
+  const citySlug = event.city.toLowerCase();
+
   return (
     <article className='relative group'>
       {/* Desktop only */}
@@ -46,7 +48,7 @@ export default function EventCard({ event, translations }: EventCardProps) {
       <div className='relative bg-[#060606] border border-white/20 md:border-white/30 md:group-hover:border-[#E4DD3B] transition-colors duration-200 flex md:h-52 lg:h-56'>
         {/* Stretched Link */}
         <Link
-          href={`/events/${event.id}`}
+          href={`/events/${citySlug}/${event.id}`}
           className='absolute inset-0 z-10'
           aria-label={event.title}
         />
