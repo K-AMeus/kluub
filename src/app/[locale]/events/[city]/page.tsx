@@ -34,7 +34,7 @@ export async function generateStaticParams() {
   return [{ city: 'tartu' }];
 }
 
-export const revalidate = 3600; // 1 hour (more aggressive caching)
+export const revalidate = 86400;
 
 export default async function CityEventsPage({ params }: CityEventsPageProps) {
   const { city: cityParam } = await params;
