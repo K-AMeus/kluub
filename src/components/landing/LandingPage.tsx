@@ -60,7 +60,7 @@ export default function LandingPage() {
               <CityCard
                 name='Tartu'
                 isActive={true}
-                href='/events?city=Tartu'
+                href='/events/tartu'
                 delay={200}
               />
             </div>
@@ -75,7 +75,7 @@ export default function LandingPage() {
           <CityCard
             name='Tartu'
             isActive={true}
-            href='/events?city=Tartu'
+            href='/events/tartu'
             delay={200}
           />
           <CityCard name='Tallinn' isActive={false} delay={400} />

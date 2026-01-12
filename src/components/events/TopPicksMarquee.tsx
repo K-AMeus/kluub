@@ -20,9 +20,11 @@ function formatDate(dateString: string): string {
 }
 
 function TopPickCard({ event }: { event: Event }) {
+  const citySlug = event.city.toLowerCase();
+
   return (
     <Link
-      href={`/events/${event.id}`}
+      href={`/events/${citySlug}/${event.id}`}
       className='group mx-3 md:mx-4 cursor-pointer inline-block'
     >
       <div className='border-l-2 border-[#E4DD3B]/70 px-4 py-2.5 md:px-5 md:py-3 transition-colors group-hover:border-[#E4DD3B]'>
