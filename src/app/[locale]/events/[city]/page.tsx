@@ -30,11 +30,8 @@ function toCityDisplay(city: City): string {
   return names[city];
 }
 
-export async function generateStaticParams() {
-  return [{ city: 'tartu' }];
-}
-
 export const revalidate = 86400;
+export const dynamicParams = true;
 
 export default async function CityEventsPage({ params }: CityEventsPageProps) {
   const { city: cityParam } = await params;
