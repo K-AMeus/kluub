@@ -551,11 +551,7 @@ export default function EventUploadForm() {
                   onChange={(e) => setStartTime(e.target.value)}
                   required
                   disabled={isSubmitting}
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50 [color-scheme:dark]'
-                  style={{
-                    colorScheme: 'dark',
-                    WebkitColorScheme: 'dark',
-                  }}
+                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50'
                 />
                 {validationErrors.startTime && (
                   <p className='mt-1 text-sm text-red-400'>
@@ -579,11 +575,7 @@ export default function EventUploadForm() {
                   onChange={(e) => setEndTime(e.target.value)}
                   required
                   disabled={isSubmitting}
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50 [color-scheme:dark]'
-                  style={{
-                    colorScheme: 'dark',
-                    WebkitColorScheme: 'dark',
-                  }}
+                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50'
                 />
                 {validationErrors.endTime && (
                   <p className='mt-1 text-sm text-red-400'>
