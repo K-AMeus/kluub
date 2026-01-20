@@ -6,6 +6,7 @@ import { createBrowserSupabaseClient } from '@/supabase/client';
 import type { City, PriceTier, Venue } from '@/lib/types';
 import { formatDateTimeForInput } from '@/lib/event-utils';
 import { refreshEventsCache } from '@/app/actions';
+import PriceInfoTooltip from '@/components/shared/PriceInfoTooltip';
 
 export default function EventUploadForm() {
   const t = useTranslations('backstage');
@@ -30,7 +31,6 @@ export default function EventUploadForm() {
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string>
   >({});
-  const [showPriceInfo, setShowPriceInfo] = useState(false);
 
   const supabase = createBrowserSupabaseClient();
 
@@ -460,55 +460,14 @@ export default function EventUploadForm() {
               </div>
 
               {/* Price Tier - 1/3 width */}
-              <div className='md:col-span-1 relative'>
+              <div className='md:col-span-1'>
                 <label
                   htmlFor='priceTier'
                   className='block text-white/70 text-sm mb-2 flex items-center gap-1'
                 >
                   {t('priceTier')} <span className='text-red-400'>*</span>
-                  <button
-                    type='button'
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setShowPriceInfo(!showPriceInfo);
-                    }}
-                    className='inline-flex items-center justify-center w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 transition-colors'
-                  >
-                    <svg
-                      className='w-4 h-4 text-white/70'
-                      fill='currentColor'
-                      viewBox='0 0 20 20'
-                    >
-                      <path
-                        fillRule='evenodd'
-                        d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z'
-                        clipRule='evenodd'
-                      />
-                    </svg>
-                  </button>
+                  <PriceInfoTooltip size={16} />
                 </label>
-
-                {/* Price Info Tooltip */}
-                {showPriceInfo && (
-                  <>
-                    {/* Backdrop */}
-                    <div
-                      className='fixed inset-0 z-10'
-                      onClick={() => setShowPriceInfo(false)}
-                    />
-                    {/* Tooltip */}
-                    <div className='absolute top-8 left-0 z-20 bg-black/95 border border-[#E4DD3B]/30 rounded-lg p-3 min-w-[200px] shadow-xl'>
-                      <div className='text-xs text-white/90 space-y-1'>
-                        <div><strong>Free:</strong> 0 EUR</div>
-                        <div><strong>Low cost:</strong> 0-10 EUR</div>
-                        <div><strong>Medium cost:</strong> 10-20 EUR</div>
-                        <div><strong>High cost:</strong> 20+ EUR</div>
-                      </div>
-                      {/* Arrow */}
-                      <div className='absolute -top-2 left-4 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[8px] border-b-[#E4DD3B]/30'></div>
-                    </div>
-                  </>
-                )}
                 <select
                   id='priceTier'
                   value={priceTier}

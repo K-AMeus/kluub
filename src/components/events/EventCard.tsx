@@ -8,6 +8,7 @@ import {
   FacebookIcon,
   ChevronRightIcon,
 } from '@/components/shared/icons';
+import PriceInfoTooltip from '@/components/shared/PriceInfoTooltip';
 
 export interface EventCardTranslations {
   readMore: string;
@@ -98,6 +99,7 @@ export default function EventCard({ event, translations }: EventCardProps) {
             <div className='flex items-center gap-2 text-xs'>
               <TicketIcon size={14} className='text-[#E4DD3B]' />
               <span className='text-white/95'>{priceDisplay}</span>
+              <PriceInfoTooltip size={12} />
             </div>
             {event.facebookUrl && (
               <a
@@ -133,6 +135,7 @@ export default function EventCard({ event, translations }: EventCardProps) {
           <div className='flex items-center gap-2.5 text-sm'>
             <TicketIcon size={18} className='text-[#E4DD3B] shrink-0' />
             <span className='text-white/95'>{priceDisplay}</span>
+            <PriceInfoTooltip size={14} />
           </div>
           {event.facebookUrl && (
             <a

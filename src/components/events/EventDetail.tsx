@@ -9,6 +9,7 @@ import {
   ArrowLeftIcon,
   ChevronRightIcon,
 } from '@/components/shared/icons';
+import PriceInfoTooltip from '@/components/shared/PriceInfoTooltip';
 
 interface EventDetailTranslations {
   free: string;
@@ -135,6 +136,7 @@ export default function EventDetail({ event, translations }: EventDetailProps) {
                     <span className='text-white/95 font-sans text-sm'>
                       {priceDisplay}
                     </span>
+                    <PriceInfoTooltip size={14} />
                   </div>
                 </div>
 
@@ -222,6 +224,7 @@ export default function EventDetail({ event, translations }: EventDetailProps) {
                     <span className='text-white/95 font-sans text-sm'>
                       {priceDisplay}
                     </span>
+                    <PriceInfoTooltip size={12} />
                   </div>
                 </div>
 
