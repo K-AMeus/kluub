@@ -47,6 +47,7 @@ export default function EventEditModal({
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string>
   >({});
+  const [showPriceInfo, setShowPriceInfo] = useState(false);
 
   const supabase = createBrowserSupabaseClient();
 
@@ -214,7 +215,7 @@ export default function EventEditModal({
     <>
       {/* Modal Overlay */}
       <div
-        className='fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4'
+        className='fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-start justify-center p-4 pt-20'
         onClick={onClose}
       >
         {/* Modal Content */}
@@ -333,7 +334,7 @@ export default function EventEditModal({
                   required
                   disabled={isSubmitting || isDeleting}
                   rows={4}
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50 resize-none'
+                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50 min-h-[7.5rem]'
                   placeholder={t('eventDescriptionPlaceholder')}
                 />
                 {validationErrors.description && (
@@ -344,134 +345,169 @@ export default function EventEditModal({
               </div>
 
               {/* Venue Selector */}
-              <div>
-                <label
-                  htmlFor='venue'
-                  className='block text-white/70 text-sm mb-2'
-                >
-                  {t('venue')} <span className='text-red-400'>*</span>
-                </label>
-                <select
-                  id='venue'
-                  value={venueId}
-                  onChange={(e) => handleVenueChange(e.target.value)}
-                  required
-                  disabled={isSubmitting || isDeleting}
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
-                >
-                  {venues.map((venue) => (
-                    <option
-                      key={venue.id}
-                      value={venue.id}
-                      className='bg-black'
-                    >
-                      {venue.name} - {venue.city}
+              <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                {/* Venue Selector - 2/3 width */}
+                <div className='md:col-span-2'>
+                  <label
+                    htmlFor='venue'
+                    className='block text-white/70 text-sm mb-2'
+                  >
+                    {t('venue')} <span className='text-red-400'>*</span>
+                  </label>
+                  <select
+                    id='venue'
+                    value={venueId}
+                    onChange={(e) => handleVenueChange(e.target.value)}
+                    required
+                    disabled={isSubmitting || isDeleting}
+                    className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                  >
+                    <option value='' className='bg-black'>
+                      {t('venueSelect')}
                     </option>
-                  ))}
-                </select>
-                {validationErrors.venueId && (
-                  <p className='mt-1 text-sm text-red-400'>
-                    {validationErrors.venueId}
-                  </p>
-                )}
+                    {venues.map((venue) => (
+                      <option
+                        key={venue.id}
+                        value={venue.id}
+                        className='bg-black'
+                      >
+                        {venue.name}
+                      </option>
+                    ))}
+                  </select>
+                  {validationErrors.venueId && (
+                    <p className='mt-1 text-sm text-red-400'>
+                      {validationErrors.venueId}
+                    </p>
+                  )}
+                </div>
+
+                {/* Price Tier - 1/3 width */}
+                <div className='md:col-span-1 relative'>
+                  <label
+                    htmlFor='priceTier'
+                    className='block text-white/70 text-sm mb-2 flex items-center gap-1'
+                  >
+                    {t('priceTier')} <span className='text-red-400'>*</span>
+                    <button
+                      type='button'
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowPriceInfo(!showPriceInfo);
+                      }}
+                      className='inline-flex items-center justify-center w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 transition-colors'
+                    >
+                      <svg
+                        className='w-4 h-4 text-white/70'
+                        fill='currentColor'
+                        viewBox='0 0 20 20'
+                      >
+                        <path
+                          fillRule='evenodd'
+                          d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z'
+                          clipRule='evenodd'
+                        />
+                      </svg>
+                    </button>
+                  </label>
+
+                  {/* Price Info Tooltip */}
+                  {showPriceInfo && (
+                    <>
+                      {/* Backdrop */}
+                      <div
+                        className='fixed inset-0 z-10'
+                        onClick={() => setShowPriceInfo(false)}
+                      />
+                      {/* Tooltip */}
+                      <div className='absolute top-8 left-0 z-20 bg-black/95 border border-[#E4DD3B]/30 rounded-lg p-3 min-w-[200px] shadow-xl'>
+                        <div className='text-xs text-white/90 space-y-1'>
+                          <div><strong>Free:</strong> 0 EUR</div>
+                          <div><strong>Low cost:</strong> 0-10 EUR</div>
+                          <div><strong>Medium cost:</strong> 10-20 EUR</div>
+                          <div><strong>High cost:</strong> 20+ EUR</div>
+                        </div>
+                        {/* Arrow */}
+                        <div className='absolute -top-2 left-4 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[8px] border-b-[#E4DD3B]/30'></div>
+                      </div>
+                    </>
+                  )}
+                  <select
+                    id='priceTier'
+                    value={priceTier}
+                    onChange={(e) =>
+                      setPriceTier(Number(e.target.value) as PriceTier)
+                    }
+                    required
+                    disabled={isSubmitting || isDeleting}
+                    className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                  >
+                    <option value={0} className='bg-black'>
+                      {t('priceTierFree')}
+                    </option>
+                    <option value={1} className='bg-black'>
+                      {t('priceTierLow')}
+                    </option>
+                    <option value={2} className='bg-black'>
+                      {t('priceTierMedium')}
+                    </option>
+                    <option value={3} className='bg-black'>
+                      {t('priceTierHigh')}
+                    </option>
+                  </select>
+                </div>
               </div>
 
-              {/* City (Read-only) */}
-              <div>
-                <label
-                  htmlFor='city'
-                  className='block text-white/70 text-sm mb-2'
-                >
-                  {t('city')}
-                </label>
-                <input
-                  id='city'
-                  type='text'
-                  value={city}
-                  disabled
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white/50 cursor-not-allowed'
-                />
-              </div>
 
-              {/* Price Tier */}
-              <div>
-                <label
-                  htmlFor='priceTier'
-                  className='block text-white/70 text-sm mb-2'
-                >
-                  {t('priceTier')} <span className='text-red-400'>*</span>
-                </label>
-                <select
-                  id='priceTier'
-                  value={priceTier}
-                  onChange={(e) =>
-                    setPriceTier(Number(e.target.value) as PriceTier)
-                  }
-                  required
-                  disabled={isSubmitting || isDeleting}
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
-                >
-                  <option value={0} className='bg-black'>
-                    {t('priceTierFree')}
-                  </option>
-                  <option value={1} className='bg-black'>
-                    {t('priceTierLow')}
-                  </option>
-                  <option value={2} className='bg-black'>
-                    {t('priceTierMedium')}
-                  </option>
-                  <option value={3} className='bg-black'>
-                    {t('priceTierHigh')}
-                  </option>
-                </select>
-              </div>
+              {/* Start Time and End Time (Same Row) */}
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                {/* Start Time */}
+                <div>
+                  <label
+                    htmlFor='startTime'
+                    className='block text-white/70 text-sm mb-2'
+                  >
+                    {t('startTime')} <span className='text-red-400'>*</span>
+                  </label>
+                  <input
+                    id='startTime'
+                    type='datetime-local'
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                    required
+                    disabled={isSubmitting || isDeleting}
+                    className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50'
+                  />
+                  {validationErrors.startTime && (
+                    <p className='mt-1 text-sm text-red-400'>
+                      {validationErrors.startTime}
+                    </p>
+                  )}
+                </div>
 
-              {/* Start Time */}
-              <div>
-                <label
-                  htmlFor='startTime'
-                  className='block text-white/70 text-sm mb-2'
-                >
-                  {t('startTime')} <span className='text-red-400'>*</span>
-                </label>
-                <input
-                  id='startTime'
-                  type='datetime-local'
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  required
-                  disabled={isSubmitting || isDeleting}
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
-                />
-                {validationErrors.startTime && (
-                  <p className='mt-1 text-sm text-red-400'>
-                    {validationErrors.startTime}
-                  </p>
-                )}
-              </div>
-
-              {/* End Time */}
-              <div>
-                <label
-                  htmlFor='endTime'
-                  className='block text-white/70 text-sm mb-2'
-                >
-                  {t('endTime')} <span className='text-red-400'>*</span>
-                </label>
-                <input
-                  id='endTime'
-                  type='datetime-local'
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                  required
-                  disabled={isSubmitting || isDeleting}
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
-                />
-                {validationErrors.endTime && (
-                  <p className='mt-1 text-sm text-red-400'>
-                    {validationErrors.endTime}
-                  </p>
-                )}
+                {/* End Time */}
+                <div>
+                  <label
+                    htmlFor='endTime'
+                    className='block text-white/70 text-sm mb-2'
+                  >
+                    {t('endTime')} <span className='text-red-400'>*</span>
+                  </label>
+                  <input
+                    id='endTime'
+                    type='datetime-local'
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                    required
+                    disabled={isSubmitting || isDeleting}
+                    className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50'
+                  />
+                  {validationErrors.endTime && (
+                    <p className='mt-1 text-sm text-red-400'>
+                      {validationErrors.endTime}
+                    </p>
+                  )}
+                </div>
               </div>
 
               {/* Image URL */}
