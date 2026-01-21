@@ -44,14 +44,17 @@ export default function DateHeader({
   return (
     <div
       className={`
-        py-3 md:py-4
+        py-4 md:py-4
         ${isSticky ? 'sticky top-14 md:top-16 z-40' : ''}
       `}
     >
-      <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-2.5 bg-[#E4DD3B] px-4 py-2 md:px-5 md:py-2.5'>
-          <CalendarIcon size={18} className='text-black' />
-          <h3 className='text-black font-display text-base md:text-lg tracking-wide uppercase font-bold'>
+      <div className='flex items-center gap-2'>
+        <div className='flex items-center gap-1.5 md:gap-2.5 bg-[#E4DD3B] px-2.5 py-1.5 md:px-5 md:py-2.5 rounded-sm'>
+          <CalendarIcon
+            size={14}
+            className='text-black md:w-[18px] md:h-[18px]'
+          />
+          <h3 className='text-black font-display text-sm md:text-lg tracking-wide uppercase font-bold'>
             {displayText}
           </h3>
         </div>

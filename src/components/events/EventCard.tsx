@@ -8,6 +8,7 @@ import {
   FacebookIcon,
   ChevronRightIcon,
 } from '@/components/shared/icons';
+import { DEFAULT_EVENT_IMAGE } from '@/lib/constants';
 
 export interface EventCardTranslations {
   readMore: string;
@@ -28,11 +29,8 @@ function formatTime(dateString: string): string {
   });
 }
 
-const DEFAULT_IMAGE =
-  'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800';
-
 export default function EventCard({ event, translations }: EventCardProps) {
-  const imageUrl = event.imageUrl || DEFAULT_IMAGE;
+  const imageUrl = event.imageUrl || DEFAULT_EVENT_IMAGE;
   const priceDisplay =
     event.priceTier === 0
       ? translations.free
@@ -60,7 +58,7 @@ export default function EventCard({ event, translations }: EventCardProps) {
             alt={event.title}
             fill
             className='object-cover'
-            sizes='(max-width: 768px) 112px, 25vw'
+            sizes='(max-width: 768px) 256px, 320px'
             loading='lazy'
           />
         </div>

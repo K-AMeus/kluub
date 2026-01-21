@@ -23,7 +23,23 @@
     "topPicks": "Top Picks",
     "events": "Events",
     "today": "Today",
-    "tomorrow": "Tomorrow"
+    "tomorrow": "Tomorrow",
+    "allVenues": "All Venues",
+    "startDate": "Start",
+    "endDate": "End",
+    "clearFilters": "Clear",
+    "from": "From",
+    "until": "Until",
+    "selectEndDate": "Select end date",
+    "selectStartDate": "Select start date",
+    "apply": "Apply",
+    "pickDate": "Pick a date",
+    "pickVenue": "Pick a venue",
+    "done": "Done",
+    "loading": "Loading...",
+    "all": "All",
+    "date": "Date",
+    "venue": "Venue"
   },
   "eventDetail": {
     "backToEvents": "Back to Events"

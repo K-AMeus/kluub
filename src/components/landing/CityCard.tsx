@@ -34,14 +34,14 @@ export default function CityCard({ name, isActive, href }: CityCardProps) {
       )}
 
       <div
-        className={`relative px-8 py-4 md:px-16 md:py-8 rounded-lg border-2 transition-all duration-300 ${
+        className={`relative px-6 py-3 sm:px-8 sm:py-4 md:px-16 md:py-8 rounded-lg border-2 transition-all duration-300 ${
           isActive
             ? 'bg-black/60 border-[#E4DD3B] group-hover:bg-[#E4DD3B]/10 group-hover:border-[#E4DD3B] group-hover:shadow-[0_0_40px_rgba(228,221,59,0.4)]'
             : 'bg-black/30 border-white/20'
         }`}
       >
         <span
-          className={`font-display text-xl md:text-3xl tracking-wider uppercase transition-all duration-300 ${
+          className={`font-display text-lg sm:text-xl md:text-3xl tracking-wider uppercase transition-all duration-300 ${
             isActive ? 'text-[#E4DD3B] group-hover:text-white' : 'text-white/40'
           }`}
         >

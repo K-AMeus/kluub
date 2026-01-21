@@ -6,7 +6,7 @@ import { createBrowserSupabaseClient } from '@/supabase/client';
 import type { City, PriceTier, Event, Venue } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { formatDateTimeForInput } from '@/lib/event-utils';
-import { refreshEventsCache } from '@/app/actions';
+import { revalidateEvents } from '@/lib/db';
 
 interface EventEditModalProps {
   event: Event;
@@ -142,7 +142,7 @@ export default function EventEditModal({
         return;
       }
 
-      await refreshEventsCache();
+      await revalidateEvents();
 
       setSuccess(t('eventUpdated'));
       setTimeout(() => {
@@ -196,7 +196,7 @@ export default function EventEditModal({
         return;
       }
 
-      await refreshEventsCache();
+      await revalidateEvents();
 
       setSuccess(t('eventDeleted'));
       setTimeout(() => {
