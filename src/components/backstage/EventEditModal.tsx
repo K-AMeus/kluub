@@ -596,7 +596,7 @@ export default function EventEditModal({
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div
-          className='fixed inset-0 bg-black/90 backdrop-blur-sm z-[60] flex items-center justify-center p-4'
+          className='fixed inset-0 bg-black/90 backdrop-blur-sm z-60 flex items-center justify-center p-4'
           onClick={() => setShowDeleteConfirm(false)}
         >
           <div
