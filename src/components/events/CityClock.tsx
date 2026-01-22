@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { formatTime } from '@/lib/date-utils';
 
 interface CityClockProps {
   city: string;
@@ -14,14 +15,7 @@ export default function CityClock({ city }: CityClockProps) {
     setMounted(true);
 
     const updateTime = () => {
-      const time = new Date().toLocaleTimeString('et-EE', {
-        timeZone: 'Europe/Tallinn',
-        hour12: false,
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-      });
-      setCurrentTime(time);
+      setCurrentTime(formatTime());
     };
 
     updateTime();
@@ -41,7 +35,7 @@ export default function CityClock({ city }: CityClockProps) {
             mounted ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          {currentTime || '00:00:00'}
+          {currentTime || '00:00'}
         </h2>
         <div className='mt-4 md:mt-4 w-56 md:w-80 border-t-2 border-[#E4DD3B]' />
       </div>

@@ -20,10 +20,26 @@
     "noEvents": "Sündmusi ei leitud",
     "free": "Tasuta",
     "facebookEvent": "Facebooki sündmus",
-    "topPicks": "Kluubi valik",
+    "topPicks": "Top pick",
     "events": "Sündmused",
     "today": "Täna",
-    "tomorrow": "Homme"
+    "tomorrow": "Homme",
+    "allVenues": "Kõik asukohad",
+    "startDate": "Algus",
+    "endDate": "Lõpp",
+    "clearFilters": "Tühjenda",
+    "from": "Alates",
+    "until": "Kuni",
+    "selectEndDate": "Vali lõppkuupäev",
+    "selectStartDate": "Vali alguskuupäev",
+    "apply": "Rakenda",
+    "pickDate": "Vali kuupäev",
+    "pickVenue": "Vali toimumiskoht",
+    "done": "Valmis",
+    "loading": "Laadimine...",
+    "all": "Kõik",
+    "date": "Kuupäev",
+    "venue": "Toimumiskoht"
   },
   "eventDetail": {
     "backToEvents": "Tagasi sündmuste juurde"

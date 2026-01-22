@@ -8,6 +8,8 @@ import {
   FacebookIcon,
   ChevronRightIcon,
 } from '@/components/shared/icons';
+import { DEFAULT_EVENT_IMAGE } from '@/lib/constants';
+import { formatTime } from '@/lib/date-utils';
 import PriceInfoTooltip from '@/components/shared/PriceInfoTooltip';
 
 export interface EventCardTranslations {
@@ -21,19 +23,8 @@ interface EventCardProps {
   translations: EventCardTranslations;
 }
 
-function formatTime(dateString: string): string {
-  return new Date(dateString).toLocaleTimeString('et-EE', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
-}
-
-const DEFAULT_IMAGE =
-  'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800';
-
 export default function EventCard({ event, translations }: EventCardProps) {
-  const imageUrl = event.imageUrl || DEFAULT_IMAGE;
+  const imageUrl = event.imageUrl || DEFAULT_EVENT_IMAGE;
   const priceDisplay =
     event.priceTier === 0
       ? translations.free
@@ -61,7 +52,7 @@ export default function EventCard({ event, translations }: EventCardProps) {
             alt={event.title}
             fill
             className='object-cover'
-            sizes='(max-width: 768px) 112px, 25vw'
+            sizes='(max-width: 768px) 256px, 320px'
             loading='lazy'
           />
         </div>

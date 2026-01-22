@@ -2,7 +2,6 @@ import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import Header from '@/components/shared/Header';
 import Footer from '@/components/shared/Footer';
-import CityClock from '@/components/events/CityClock';
 import TopPicksMarquee from '@/components/events/TopPicksMarquee';
 import EventList from '@/components/events/EventList';
 import EventsBackground from '@/components/events/background/EventsBackground';
@@ -21,15 +20,6 @@ function toCityEnum(city: string): City | null {
   return null;
 }
 
-function toCityDisplay(city: City): string {
-  const names: Record<City, string> = {
-    TARTU: 'Tartu',
-    TALLINN: 'Tallinn',
-    PÄRNU: 'Pärnu',
-  };
-  return names[city];
-}
-
 export const revalidate = 86400;
 export const dynamicParams = true;
 
@@ -40,8 +30,6 @@ export default async function CityEventsPage({ params }: CityEventsPageProps) {
   if (!city) {
     notFound();
   }
-
-  const cityDisplay = toCityDisplay(city);
 
   const [events, topPicks] = await Promise.all([
     getEventsByCity(city),
@@ -66,17 +54,21 @@ export default async function CityEventsPage({ params }: CityEventsPageProps) {
       <div className='relative z-10 flex flex-col min-h-screen'>
         <Header />
 
-        <div className='mt-14 md:mt-16'>
-          <TopPicksMarquee events={topPicks} />
-        </div>
+        {topPicks.length > 0 && (
+          <section className='mt-12 md:mt-16'>
+            <TopPicksMarquee events={topPicks} />
+          </section>
+        )}
 
-        <CityClock city={cityDisplay} />
-
-        <main className='flex-1 px-4 md:px-8 lg:px-12 max-w-6xl mx-auto w-full'>
-          <EventList events={events} translations={translations} />
+        <main
+          className={`flex-1 px-4 md:px-8 lg:px-12 max-w-6xl mx-auto w-full ${
+            topPicks.length > 0 ? 'pt-2 md:pt-4' : 'mt-12 md:mt-16 pt-2 md:pt-4'
+          }`}
+        >
+          <EventList events={events} translations={translations} city={city} />
         </main>
 
-        <div className='mt-20 md:mt-32'>
+        <div className='mt-12 md:mt-32'>
           <Footer />
         </div>
       </div>

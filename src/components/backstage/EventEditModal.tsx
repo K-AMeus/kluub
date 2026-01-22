@@ -6,7 +6,7 @@ import { createBrowserSupabaseClient } from '@/supabase/client';
 import type { City, PriceTier, Event, Venue } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { formatDateTimeForInput } from '@/lib/event-utils';
-import { refreshEventsCache } from '@/app/actions';
+import { revalidateEvents } from '@/lib/db';
 import PriceInfoTooltip from '@/components/shared/PriceInfoTooltip';
 
 interface EventEditModalProps {
@@ -143,7 +143,7 @@ export default function EventEditModal({
         return;
       }
 
-      await refreshEventsCache();
+      await revalidateEvents();
 
       setSuccess(t('eventUpdated'));
       setTimeout(() => {
@@ -197,7 +197,7 @@ export default function EventEditModal({
         return;
       }
 
-      await refreshEventsCache();
+      await revalidateEvents();
 
       setSuccess(t('eventDeleted'));
       setTimeout(() => {
@@ -591,7 +591,7 @@ export default function EventEditModal({
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div
-          className='fixed inset-0 bg-black/90 backdrop-blur-sm z-[60] flex items-center justify-center p-4'
+          className='fixed inset-0 bg-black/90 backdrop-blur-sm z-60 flex items-center justify-center p-4'
           onClick={() => setShowDeleteConfirm(false)}
         >
           <div

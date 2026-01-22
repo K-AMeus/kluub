@@ -1,3 +1,5 @@
+'use server';
+
 import { unstable_cache } from 'next/cache';
 import { createStaticClient } from '@/supabase/server';
 import { Event, City, PriceTier } from './types';
@@ -71,11 +73,12 @@ async function fetchEventsByCity(city: City): Promise<Event[]> {
   );
 }
 
-export const getEventsByCity = (city: City) =>
-  unstable_cache(fetchEventsByCity, ['events-by-city', city], {
+export async function getEventsByCity(city: City) {
+  return unstable_cache(fetchEventsByCity, ['events-by-city', city], {
     revalidate: CACHE_REVALIDATE_SECONDS,
     tags: ['events'],
   })(city);
+}
 
 async function fetchTopPicks(city: City): Promise<Event[]> {
   const supabase = createStaticClient();
@@ -113,11 +116,12 @@ async function fetchTopPicks(city: City): Promise<Event[]> {
   );
 }
 
-export const getTopPicks = (city: City) =>
-  unstable_cache(fetchTopPicks, ['top-picks', city], {
+export async function getTopPicks(city: City) {
+  return unstable_cache(fetchTopPicks, ['top-picks', city], {
     revalidate: CACHE_REVALIDATE_SECONDS,
     tags: ['events'],
   })(city);
+}
 
 async function fetchEventById(id: string): Promise<Event | null> {
   const supabase = createStaticClient();
@@ -151,13 +155,43 @@ async function fetchEventById(id: string): Promise<Event | null> {
   return transformEvent(data as unknown as EventDbRow);
 }
 
-export const getEventById = (id: string) =>
-  unstable_cache(fetchEventById, ['event-by-id', id], {
+export async function getEventById(id: string) {
+  return unstable_cache(fetchEventById, ['event-by-id', id], {
     revalidate: CACHE_REVALIDATE_SECONDS,
     tags: ['events'],
   })(id);
+}
 
 export async function revalidateEvents() {
   const { revalidateTag } = await import('next/cache');
   revalidateTag('events', 'max');
+}
+
+export interface VenueOption {
+  id: string;
+  name: string;
+}
+
+async function fetchVenuesByCity(city: City): Promise<VenueOption[]> {
+  const supabase = createStaticClient();
+
+  const { data, error } = await supabase
+    .from('venues')
+    .select('id, name')
+    .eq('city', city)
+    .order('name', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching venues:', error);
+    return [];
+  }
+
+  return data ?? [];
+}
+
+export async function getVenuesByCity(city: City) {
+  return unstable_cache(fetchVenuesByCity, ['venues-by-city', city], {
+    revalidate: CACHE_REVALIDATE_SECONDS,
+    tags: ['venues'],
+  })(city);
 }

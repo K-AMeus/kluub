@@ -1,20 +1,20 @@
 import { useTranslations } from 'next-intl';
-import { FaInstagram, FaFacebookF, FaTiktok } from 'react-icons/fa';
+import { InstagramIcon, FacebookFIcon, TikTokIcon } from './icons';
 
 const SOCIAL_LINKS = [
   {
     href: 'https://instagram.com',
-    Icon: FaInstagram,
+    Icon: InstagramIcon,
     label: 'Instagram',
   },
   {
     href: 'https://facebook.com',
-    Icon: FaFacebookF,
+    Icon: FacebookFIcon,
     label: 'Facebook',
   },
   {
     href: 'https://tiktok.com',
-    Icon: FaTiktok,
+    Icon: TikTokIcon,
     label: 'TikTok',
   },
 ];
@@ -48,7 +48,7 @@ export default function Footer() {
                 aria-label={label}
                 className='text-white/60 hover:text-[#E4DD3B] transition-colors duration-300'
               >
-                <Icon className='h-5 w-5 md:h-6 md:w-6' />
+                <Icon size={24} className='h-5 w-5 md:h-6 md:w-6' />
               </a>
             ))}
           </div>

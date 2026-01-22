@@ -22,3 +22,14 @@ export function getEventDateKey(startTime: string): string {
   const date = new Date(startTime);
   return getTallinnDateString(date);
 }
+
+export function formatTime(dateString?: string): string {
+  const date = dateString ? new Date(dateString) : new Date();
+  return date.toLocaleTimeString('et-EE', {
+    timeZone: TIMEZONE,
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+}
+

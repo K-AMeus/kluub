@@ -9,6 +9,8 @@ import {
   ArrowLeftIcon,
   ChevronRightIcon,
 } from '@/components/shared/icons';
+import { DEFAULT_EVENT_IMAGE } from '@/lib/constants';
+import { formatTime } from '@/lib/date-utils';
 import PriceInfoTooltip from '@/components/shared/PriceInfoTooltip';
 
 interface EventDetailTranslations {
@@ -22,14 +24,6 @@ interface EventDetailProps {
   translations: EventDetailTranslations;
 }
 
-function formatTime(dateString: string): string {
-  return new Date(dateString).toLocaleTimeString('et-EE', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
-}
-
 function formatDateBubble(dateString: string): { day: string; month: string } {
   const date = new Date(dateString);
   return {
@@ -38,12 +32,9 @@ function formatDateBubble(dateString: string): { day: string; month: string } {
   };
 }
 
-const DEFAULT_IMAGE =
-  'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800';
-
 export default function EventDetail({ event, translations }: EventDetailProps) {
   const { day, month } = formatDateBubble(event.startTime);
-  const imageUrl = event.imageUrl || DEFAULT_IMAGE;
+  const imageUrl = event.imageUrl || DEFAULT_EVENT_IMAGE;
   const priceDisplay =
     event.priceTier === 0
       ? translations.free
@@ -84,7 +75,7 @@ export default function EventDetail({ event, translations }: EventDetailProps) {
                   alt={event.title}
                   fill
                   className='object-cover border-r-2 border-[#E4DD3B]'
-                  priority
+                  preload
                   sizes='(max-width: 1200px) 33vw, 400px'
                 />
                 {/* Date Badge */}
@@ -177,7 +168,7 @@ export default function EventDetail({ event, translations }: EventDetailProps) {
                   alt={event.title}
                   fill
                   className='object-cover'
-                  priority
+                  preload
                   sizes='100vw'
                 />
                 {/* Date Badge */}
