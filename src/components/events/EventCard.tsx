@@ -135,7 +135,6 @@ export default function EventCard({ event, translations }: EventCardProps) {
           <div className='flex items-center gap-2.5 text-sm'>
             <TicketIcon size={18} className='text-[#E4DD3B] shrink-0' />
             <span className='text-white/95'>{priceDisplay}</span>
-            <PriceInfoTooltip size={14} />
           </div>
           {event.facebookUrl && (
             <a
