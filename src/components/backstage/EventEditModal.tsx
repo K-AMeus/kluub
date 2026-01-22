@@ -7,6 +7,7 @@ import type { City, PriceTier, Event, Venue } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { formatDateTimeForInput } from '@/lib/event-utils';
 import { revalidateEvents } from '@/lib/db';
+import PriceInfoTooltip from '@/components/shared/PriceInfoTooltip';
 
 interface EventEditModalProps {
   event: Event;

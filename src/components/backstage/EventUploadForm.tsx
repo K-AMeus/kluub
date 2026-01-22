@@ -5,8 +5,8 @@ import { useTranslations } from 'next-intl';
 import { createBrowserSupabaseClient } from '@/supabase/client';
 import type { City, PriceTier, Venue } from '@/lib/types';
 import { formatDateTimeForInput } from '@/lib/event-utils';
-import { revalidateEvents } from '@/lib/db';
 import PriceInfoTooltip from '@/components/shared/PriceInfoTooltip';
+import { revalidateEvents } from '@/lib/db';
 
 export default function EventUploadForm() {
   const t = useTranslations('backstage');
