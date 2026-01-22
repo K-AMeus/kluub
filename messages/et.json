@@ -107,8 +107,12 @@
     "priceTierLow": "€ (Madal hind)",
     "priceTierMedium": "€€ (Keskmine hind)",
     "priceTierHigh": "€€€ (Kõrge hind)",
-    "imageUrl": "Pildi URL (valikuline)",
-    "imageUrlPlaceholder": "https://naide.ee/pilt.jpg",
+    "eventImage": "Sündmuse Pilt (valikuline)",
+    "imageDropzone": "Klõpsa või lohista pilt siia",
+    "imageDropzoneHint": "JPG, PNG, WebP või GIF (max 5MB)",
+    "imageUploading": "Üleslaadimine...",
+    "imageRemove": "Eemalda pilt",
+    "imageDragActive": "Aseta pilt siia",
     "facebookUrl": "Facebooki Sündmuse URL (valikuline)",
     "facebookUrlPlaceholder": "https://facebook.com/events/...",
     "startTime": "Algusaeg",
@@ -128,6 +132,7 @@
     "venueRequired": "Palun vali asukoht",
     "startTimeRequired": "Algusaeg on kohustuslik",
     "endTimeRequired": "Lõppaeg on kohustuslik",
+    "endTimeAfterStart": "Lõppaeg peab olema pärast algusaega",
     "invalidUrl": "Palun sisesta kehtiv URL"
   }
 }
