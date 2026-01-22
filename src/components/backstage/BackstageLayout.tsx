@@ -13,7 +13,7 @@ export default function BackstageLayout({ children }: BackstageLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className='h-screen w-full bg-black overflow-x-hidden overflow-y-auto'>
+    <div className='h-screen w-full bg-black overflow-hidden'>
       {/* Background */}
       <div className='fixed inset-0 overflow-hidden -z-10'>
         <BackstageBackground />
@@ -26,7 +26,7 @@ export default function BackstageLayout({ children }: BackstageLayoutProps) {
       />
 
       {/* Content with sidebar */}
-      <div className='relative z-10 flex w-full pt-14 md:pt-16 min-h-[calc(100vh-3.5rem)] md:min-h-[calc(100vh-4rem)]'>
+      <div className='relative z-10 flex w-full h-[calc(100vh-3.5rem)] md:h-[calc(100vh-4rem)] mt-14 md:mt-16 overflow-y-auto overflow-x-hidden'>
         {/* Sidebar */}
         <BackstageSidebar
           isOpen={isMobileMenuOpen}
