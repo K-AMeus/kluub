@@ -6,6 +6,7 @@ import { createBrowserSupabaseClient } from '@/supabase/client';
 import type { City, PriceTier, Venue } from '@/lib/types';
 import { formatDateTimeForInput } from '@/lib/event-utils';
 import { revalidateEvents } from '@/lib/db';
+import PriceInfoTooltip from '@/components/shared/PriceInfoTooltip';
 
 export default function EventUploadForm() {
   const t = useTranslations('backstage');
@@ -286,11 +287,7 @@ export default function EventUploadForm() {
   if (userVenues.length === 0) {
     return (
       <div className='w-full max-w-2xl'>
-        <div className='relative'>
-          {/* Glow effect */}
-          <div className='absolute -inset-1 bg-linear-to-r from-[#E4DD3B]/10 via-[#E4DD3B]/20 to-[#E4DD3B]/10 rounded-xl blur-xl opacity-50' />
-
-          <div className='relative bg-black/60 backdrop-blur-xl border border-[#E4DD3B]/30 rounded-xl p-8 md:p-12'>
+        <div className='relative bg-black/60 backdrop-blur-xl border border-[#E4DD3B]/30 rounded-xl p-8 md:p-12'>
             <div className='text-center max-w-md mx-auto'>
               <div className='mb-6 inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 border border-white/10'>
                 <svg
@@ -315,7 +312,6 @@ export default function EventUploadForm() {
               <p className='text-white/50 text-sm'>{t('noVenuesMessage')}</p>
             </div>
           </div>
-        </div>
       </div>
     );
   }
@@ -332,11 +328,7 @@ export default function EventUploadForm() {
       </div>
 
       {/* Form Card */}
-      <div className='relative'>
-        {/* Glow effect */}
-        <div className='absolute -inset-1 bg-linear-to-r from-[#E4DD3B]/10 via-[#E4DD3B]/20 to-[#E4DD3B]/10 rounded-xl blur-xl opacity-50' />
-
-        <div className='relative bg-black/60 backdrop-blur-xl border border-[#E4DD3B]/30 rounded-xl p-6 md:p-8'>
+      <div className='relative bg-black/60 backdrop-blur-xl border border-[#E4DD3B]/30 rounded-xl p-6 md:p-8'>
           {/* Error message */}
           {error && (
             <div className='mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm flex items-start gap-3'>
@@ -419,7 +411,7 @@ export default function EventUploadForm() {
                 required
                 disabled={isSubmitting}
                 rows={4}
-                className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50 resize-none'
+                className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50 min-h-[7.5rem]'
                 placeholder={t('eventDescriptionPlaceholder')}
               />
               {validationErrors.description && (
@@ -471,9 +463,10 @@ export default function EventUploadForm() {
               <div className='md:col-span-1'>
                 <label
                   htmlFor='priceTier'
-                  className='block text-white/70 text-sm mb-2'
+                  className='block text-white/70 text-sm mb-2 flex items-center gap-1'
                 >
                   {t('priceTier')} <span className='text-red-400'>*</span>
+                  <PriceInfoTooltip size={16} />
                 </label>
                 <select
                   id='priceTier'
@@ -499,38 +492,6 @@ export default function EventUploadForm() {
               </div>
             </div>
 
-            {/* Price Tier */}
-            <div>
-              <label
-                htmlFor='priceTier'
-                className='block text-white/70 text-sm mb-2'
-              >
-                {t('priceTier')} <span className='text-red-400'>*</span>
-              </label>
-              <select
-                id='priceTier'
-                value={priceTier}
-                onChange={(e) =>
-                  setPriceTier(Number(e.target.value) as PriceTier)
-                }
-                required
-                disabled={isSubmitting}
-                className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
-              >
-                <option value={0} className='bg-black'>
-                  {t('priceTierFree')}
-                </option>
-                <option value={1} className='bg-black'>
-                  {t('priceTierLow')}
-                </option>
-                <option value={2} className='bg-black'>
-                  {t('priceTierMedium')}
-                </option>
-                <option value={3} className='bg-black'>
-                  {t('priceTierHigh')}
-                </option>
-              </select>
-            </div>
 
             {/* Start Time and End Time (Same Row) */}
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -549,7 +510,7 @@ export default function EventUploadForm() {
                   onChange={(e) => setStartTime(e.target.value)}
                   required
                   disabled={isSubmitting}
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50'
                 />
                 {validationErrors.startTime && (
                   <p className='mt-1 text-sm text-red-400'>
@@ -573,7 +534,7 @@ export default function EventUploadForm() {
                   onChange={(e) => setEndTime(e.target.value)}
                   required
                   disabled={isSubmitting}
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50'
                 />
                 {validationErrors.endTime && (
                   <p className='mt-1 text-sm text-red-400'>
@@ -666,7 +627,6 @@ export default function EventUploadForm() {
             </button>
           </form>
         </div>
-      </div>
     </div>
   );
 }
