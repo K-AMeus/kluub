@@ -9,6 +9,7 @@ import {
   ChevronRightIcon,
 } from '@/components/shared/icons';
 import { DEFAULT_EVENT_IMAGE } from '@/lib/constants';
+import { formatTime } from '@/lib/date-utils';
 
 export interface EventCardTranslations {
   readMore: string;
@@ -19,14 +20,6 @@ export interface EventCardTranslations {
 interface EventCardProps {
   event: Event;
   translations: EventCardTranslations;
-}
-
-function formatTime(dateString: string): string {
-  return new Date(dateString).toLocaleTimeString('et-EE', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
 }
 
 export default function EventCard({ event, translations }: EventCardProps) {

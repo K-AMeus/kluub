@@ -10,6 +10,7 @@ import {
   ChevronRightIcon,
 } from '@/components/shared/icons';
 import { DEFAULT_EVENT_IMAGE } from '@/lib/constants';
+import { formatTime } from '@/lib/date-utils';
 
 interface EventDetailTranslations {
   free: string;
@@ -20,14 +21,6 @@ interface EventDetailTranslations {
 interface EventDetailProps {
   event: Event;
   translations: EventDetailTranslations;
-}
-
-function formatTime(dateString: string): string {
-  return new Date(dateString).toLocaleTimeString('et-EE', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
 }
 
 function formatDateBubble(dateString: string): { day: string; month: string } {

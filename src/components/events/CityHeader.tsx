@@ -1,19 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { TIMEZONE } from '@/lib/date-utils';
+import { formatTime } from '@/lib/date-utils';
 
 interface CityHeaderProps {
   city: string;
-}
-
-function formatTime(): string {
-  return new Date().toLocaleTimeString('et-EE', {
-    timeZone: TIMEZONE,
-    hour12: false,
-    hour: '2-digit',
-    minute: '2-digit',
-  });
 }
 
 export default function CityHeader({ city }: CityHeaderProps) {
