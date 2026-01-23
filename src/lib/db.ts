@@ -163,8 +163,11 @@ export async function getEventById(id: string) {
 }
 
 export async function revalidateEvents() {
-  const { revalidateTag } = await import('next/cache');
+  const { revalidateTag, revalidatePath } = await import('next/cache');
+
   revalidateTag('events', 'max');
+  revalidatePath('/et/events/tartu');
+  revalidatePath('/en/events/tartu');
 }
 
 export interface VenueOption {
