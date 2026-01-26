@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
+import { Readable } from 'stream';
+import { createClient } from '@/supabase/server';
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -9,6 +11,13 @@ cloudinary.config({
 
 export async function POST(request: Request) {
   try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const formData = await request.formData();
     const file = formData.get('file') as File;
 
@@ -16,20 +25,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
-    // Convert file to base64
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const base64 = `data:${file.type};base64,${buffer.toString('base64')}`;
 
-    // Upload to Cloudinary with optimization
-    const result = await cloudinary.uploader.upload(base64, {
-      folder: 'kluub-events',
-      resource_type: 'image',
-      transformation: [
-        { width: 1920, crop: 'limit' },  // Max width 1920px, preserve aspect ratio
-        { quality: 'auto:good' },         // Good quality with compression
-        { fetch_format: 'auto' },         // Serve as WebP/AVIF when supported
-      ],
+    const result = await new Promise<UploadApiResponse>((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'kluub-events',
+          resource_type: 'image',
+          transformation: [
+            { width: 1200, crop: 'limit' },
+            { quality: 'auto:good' },
+            { fetch_format: 'auto' },
+          ],
+        },
+        (error, result) => {
+          if (error || !result) reject(error);
+          else resolve(result);
+        }
+      );
+
+      Readable.from(buffer).pipe(uploadStream);
     });
 
     return NextResponse.json({ url: result.secure_url });

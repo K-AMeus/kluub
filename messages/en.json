@@ -110,7 +110,7 @@
     "priceTierHigh": "€€€ (High cost)",
     "eventImage": "Event Image (optional)",
     "imageDropzone": "Click or drag & drop to upload image",
-    "imageDropzoneHint": "JPG, PNG, WebP or GIF (max 5MB)",
+    "imageDropzoneHint": "JPG, PNG, WebP or HEIC (max 5MB)",
     "imageUploading": "Uploading...",
     "imageRemove": "Remove image",
     "imageDragActive": "Drop image here",

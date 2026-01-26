@@ -17,6 +17,19 @@ interface ImageUploadProps {
   };
 }
 
+const deleteFromCloudinary = async (url: string) => {
+  if (!url.includes('res.cloudinary.com')) return;
+  try {
+    await fetch('/api/cloudinary/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url }),
+    });
+  } catch {
+    // Silent fail - don't block UX for cleanup
+  }
+};
+
 export default function ImageUpload({
   value,
   onChange,
@@ -30,9 +43,9 @@ export default function ImageUpload({
   const dragCounter = useRef(0);
 
   const uploadFile = async (file: File) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
     if (!allowedTypes.includes(file.type)) {
-      setError('Please upload a JPG, PNG, WebP, or GIF image');
+      setError('Please upload a JPG, PNG, WebP, or HEIC image');
       return;
     }
 
@@ -45,6 +58,9 @@ export default function ImageUpload({
     setIsUploading(true);
 
     try {
+      // Delete old image if replacing
+      if (value) await deleteFromCloudinary(value);
+
       const formData = new FormData();
       formData.append('file', file);
 
@@ -62,6 +78,12 @@ export default function ImageUpload({
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const handleRemove = () => {
+    // Don't delete from Cloudinary here - only clear the form value
+    // Deletion happens only when replacing with a new image
+    onChange('');
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -121,7 +143,7 @@ export default function ImageUpload({
         {!disabled && (
           <button
             type="button"
-            onClick={() => onChange('')}
+            onClick={handleRemove}
             className="absolute top-2 right-2 p-2 bg-black/70 hover:bg-red-500/80 rounded-full text-white transition-colors"
             title={labels.removeImage}
           >
@@ -137,7 +159,7 @@ export default function ImageUpload({
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/gif"
+        accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
         onChange={handleFileSelect}
         className="hidden"
         disabled={disabled || isUploading}
