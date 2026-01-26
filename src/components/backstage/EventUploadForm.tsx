@@ -6,6 +6,7 @@ import { createBrowserSupabaseClient } from '@/supabase/client';
 import type { City, PriceTier, Venue } from '@/lib/types';
 import { formatDateTimeForInput } from '@/lib/event-utils';
 import PriceInfoTooltip from '@/components/shared/PriceInfoTooltip';
+import ImageUpload from '@/components/shared/ImageUpload';
 import { revalidateEvents } from '@/lib/db';
 
 export default function EventUploadForm() {
@@ -161,10 +162,6 @@ export default function EventUploadForm() {
     }
 
     // URL validation (if provided)
-    if (imageUrl && !isValidUrl(imageUrl)) {
-      errors.imageUrl = t('invalidUrl');
-    }
-
     if (facebookUrl && !isValidUrl(facebookUrl)) {
       errors.facebookUrl = t('invalidUrl');
     }
@@ -544,28 +541,23 @@ export default function EventUploadForm() {
               </div>
             </div>
 
-            {/* Image URL */}
+            {/* Image Upload */}
             <div>
-              <label
-                htmlFor='imageUrl'
-                className='block text-white/70 text-sm mb-2'
-              >
-                {t('imageUrl')}
+              <label className='block text-white/70 text-sm mb-2'>
+                {t('eventImage')}
               </label>
-              <input
-                id='imageUrl'
-                type='url'
+              <ImageUpload
                 value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
+                onChange={setImageUrl}
                 disabled={isSubmitting}
-                className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
-                placeholder={t('imageUrlPlaceholder')}
+                labels={{
+                  dropzone: t('imageDropzone'),
+                  dropzoneHint: t('imageDropzoneHint'),
+                  uploading: t('imageUploading'),
+                  removeImage: t('imageRemove'),
+                  dragActive: t('imageDragActive'),
+                }}
               />
-              {validationErrors.imageUrl && (
-                <p className='mt-1 text-sm text-red-400'>
-                  {validationErrors.imageUrl}
-                </p>
-              )}
             </div>
 
             {/* Facebook URL */}
