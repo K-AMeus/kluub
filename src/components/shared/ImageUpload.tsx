@@ -132,7 +132,7 @@ export default function ImageUpload({
 
   if (value) {
     return (
-      <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-white/5 border border-white/10">
+      <div className="relative w-full aspect-video overflow-hidden bg-white/5 border border-white/10">
         <Image
           src={value}
           alt="Event image"
@@ -144,7 +144,7 @@ export default function ImageUpload({
           <button
             type="button"
             onClick={handleRemove}
-            className="absolute top-2 right-2 p-2 bg-black/70 hover:bg-red-500/80 rounded-full text-white transition-colors"
+            className="absolute top-2 right-2 p-2 bg-black/70 hover:bg-red-500/80 text-white transition-colors"
             title={labels.removeImage}
           >
             <CloseIcon size={16} />
@@ -171,7 +171,7 @@ export default function ImageUpload({
         onDragOver={handleDragOver}
         onDrop={handleDrop}
         className={`
-          w-full aspect-video rounded-lg border-2 border-dashed transition-all
+          w-full aspect-video border-2 border-dashed transition-all
           flex flex-col items-center justify-center gap-3
           ${disabled || isUploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
           ${isDragging

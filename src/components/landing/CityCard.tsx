@@ -29,14 +29,10 @@ export default function CityCard({ name, isActive, href }: CityCardProps) {
 
   const cardContent = (
     <>
-      {isActive && (
-        <div className='absolute -inset-1 bg-linear-to-r from-[#E4DD3B]/20 via-[#E4DD3B]/40 to-[#E4DD3B]/20 rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500' />
-      )}
-
       <div
-        className={`relative px-6 py-3 sm:px-8 sm:py-4 md:px-16 md:py-8 rounded-lg border-2 transition-all duration-300 ${
+        className={`relative px-6 py-3 sm:px-8 sm:py-4 md:px-16 md:py-8 border-2 transition-all duration-300 ${
           isActive
-            ? 'bg-black/60 border-[#E4DD3B] group-hover:bg-[#E4DD3B]/10 group-hover:border-[#E4DD3B] group-hover:shadow-[0_0_40px_rgba(228,221,59,0.4)]'
+            ? 'bg-black/60 border-[#E4DD3B] group-hover:bg-[#E4DD3B]/10 group-hover:border-[#E4DD3B]'
             : 'bg-black/30 border-white/20'
         }`}
       >
@@ -49,7 +45,7 @@ export default function CityCard({ name, isActive, href }: CityCardProps) {
         </span>
 
         {!isActive && (
-          <span className='absolute -top-2 -right-2 px-2 py-0.5 bg-white/10 text-white/50 text-[10px] font-medium uppercase tracking-wider rounded-full backdrop-blur-sm'>
+          <span className='absolute -top-2 -right-2 px-2 py-0.5 bg-white/10 text-white/50 text-[10px] font-medium uppercase tracking-wider backdrop-blur-sm'>
             {t('soon')}
           </span>
         )}

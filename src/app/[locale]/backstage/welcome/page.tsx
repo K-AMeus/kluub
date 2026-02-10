@@ -142,7 +142,7 @@ export default function WelcomePage() {
           {/* Stats Cards */}
           <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mb-8'>
             {/* Total Events */}
-            <div className='bg-white/5 border border-white/10 rounded-lg p-6'>
+            <div className='bg-white/5 border border-white/10 p-6'>
               <div className='flex items-center justify-between'>
                 <div>
                   <p className='text-white/50 text-sm mb-1'>{t('totalEvents')}</p>
@@ -150,7 +150,7 @@ export default function WelcomePage() {
                     {isLoading ? '...' : stats.total}
                   </p>
                 </div>
-                <div className='w-12 h-12 bg-[#E4DD3B]/10 rounded-lg flex items-center justify-center'>
+                <div className='w-12 h-12 bg-[#E4DD3B]/10 flex items-center justify-center'>
                   <svg
                     className='w-6 h-6 text-[#E4DD3B]'
                     fill='none'
@@ -169,7 +169,7 @@ export default function WelcomePage() {
             </div>
 
             {/* Upcoming Events */}
-            <div className='bg-white/5 border border-white/10 rounded-lg p-6'>
+            <div className='bg-white/5 border border-white/10 p-6'>
               <div className='flex items-center justify-between'>
                 <div>
                   <p className='text-white/50 text-sm mb-1'>{t('upcomingCount')}</p>
@@ -177,7 +177,7 @@ export default function WelcomePage() {
                     {isLoading ? '...' : stats.upcoming}
                   </p>
                 </div>
-                <div className='w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center'>
+                <div className='w-12 h-12 bg-green-500/10 flex items-center justify-center'>
                   <svg
                     className='w-6 h-6 text-green-400'
                     fill='none'
@@ -196,7 +196,7 @@ export default function WelcomePage() {
             </div>
 
             {/* Past Events */}
-            <div className='bg-white/5 border border-white/10 rounded-lg p-6'>
+            <div className='bg-white/5 border border-white/10 p-6'>
               <div className='flex items-center justify-between'>
                 <div>
                   <p className='text-white/50 text-sm mb-1'>{t('pastCount')}</p>
@@ -204,7 +204,7 @@ export default function WelcomePage() {
                     {isLoading ? '...' : stats.past}
                   </p>
                 </div>
-                <div className='w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center'>
+                <div className='w-12 h-12 bg-blue-500/10 flex items-center justify-center'>
                   <svg
                     className='w-6 h-6 text-blue-400'
                     fill='none'
@@ -229,10 +229,10 @@ export default function WelcomePage() {
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <Link
                 href={`/${locale}/backstage/events/upload`}
-                className='bg-[#E4DD3B]/10 hover:bg-[#E4DD3B]/20 border border-[#E4DD3B]/30 rounded-lg p-6 transition-all duration-200 group'
+                className='bg-[#E4DD3B]/10 hover:bg-[#E4DD3B]/20 border border-[#E4DD3B]/30 p-6 transition-all duration-200 group'
               >
                 <div className='flex items-center gap-4'>
-                  <div className='w-12 h-12 bg-[#E4DD3B] rounded-lg flex items-center justify-center flex-shrink-0'>
+                  <div className='w-12 h-12 bg-[#E4DD3B] flex items-center justify-center flex-shrink-0'>
                     <svg
                       className='w-6 h-6 text-black'
                       fill='none'
@@ -258,10 +258,10 @@ export default function WelcomePage() {
 
               <Link
                 href={`/${locale}/backstage/events`}
-                className='bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg p-6 transition-all duration-200 group'
+                className='bg-white/5 hover:bg-white/10 border border-white/10 p-6 transition-all duration-200 group'
               >
                 <div className='flex items-center gap-4'>
-                  <div className='w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0'>
+                  <div className='w-12 h-12 bg-white/10 flex items-center justify-center flex-shrink-0'>
                     <svg
                       className='w-6 h-6 text-white'
                       fill='none'
@@ -304,7 +304,7 @@ export default function WelcomePage() {
                   <Link
                     key={event.id}
                     href={`/${locale}/backstage/events`}
-                    className='block bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#E4DD3B]/30 rounded-lg p-4 transition-all duration-200'
+                    className='block bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#E4DD3B]/30 p-4 transition-all duration-200'
                   >
                     <div className='flex items-center justify-between'>
                       <div className='flex-1'>

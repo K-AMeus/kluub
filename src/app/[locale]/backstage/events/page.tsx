@@ -205,7 +205,7 @@ export default function MyEventsPage() {
 
           {/* Error State */}
           {error && (
-            <div className='p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm'>
+            <div className='p-4 bg-red-500/10 border border-red-500/30 text-red-400 text-sm'>
               {error}
             </div>
           )}
@@ -213,7 +213,7 @@ export default function MyEventsPage() {
           {/* No Venues State */}
           {!isLoading && !error && userVenues.length === 0 && (
             <div className='text-center py-12'>
-              <div className='mb-6 inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 border border-white/10'>
+              <div className='mb-6 inline-flex items-center justify-center w-16 h-16 bg-white/5 border border-white/10'>
                 <svg
                   className='w-8 h-8 text-white/40'
                   fill='none'
@@ -277,7 +277,7 @@ export default function MyEventsPage() {
                     <div
                       key={event.id}
                       onClick={() => handleEventClick(event)}
-                      className='bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#E4DD3B]/30 rounded-lg p-4 transition-all duration-200 cursor-pointer group'
+                      className='bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#E4DD3B]/30 p-4 transition-all duration-200 cursor-pointer group'
                     >
                       <div className='flex flex-col h-full'>
                         <div className='text-[#E4DD3B] text-sm mb-2'>

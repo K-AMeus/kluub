@@ -18,7 +18,7 @@ export default function BackstagePage() {
         <div className='animate-fade-in-up'>
           <LoginForm />
           {hasError && (
-            <div className='mt-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm text-center'>
+            <div className='mt-4 p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-sm text-center'>
               Authentication failed. Please try again.
             </div>
           )}
