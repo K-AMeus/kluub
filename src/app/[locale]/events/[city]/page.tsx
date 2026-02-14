@@ -31,8 +31,16 @@ export default async function CityEventsPage({ params }: CityEventsPageProps) {
     notFound();
   }
 
-  const [events, topPicks] = await Promise.all([
-    getEventsByCity(city),
+  const defaultFilters = {
+    topPicks: false,
+    freeOnly: false,
+    venueId: null,
+    startDate: null,
+    endDate: null,
+  };
+
+  const [initialPage, topPicks] = await Promise.all([
+    getEventsByCity(city, defaultFilters, 0),
     getTopPicks(city),
   ]);
 
@@ -65,7 +73,12 @@ export default async function CityEventsPage({ params }: CityEventsPageProps) {
             topPicks.length > 0 ? 'pt-2 md:pt-4' : 'mt-12 md:mt-16 pt-2 md:pt-4'
           }`}
         >
-          <EventList events={events} translations={translations} city={city} />
+          <EventList
+            initialEvents={initialPage.events}
+            initialHasMore={initialPage.hasMore}
+            translations={translations}
+            city={city}
+          />
         </main>
 
         <div className='mt-12 md:mt-32'>
