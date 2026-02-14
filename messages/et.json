@@ -39,7 +39,9 @@
     "loading": "Laadimine...",
     "all": "Kõik",
     "date": "Kuupäev",
-    "venue": "Asukoht"
+    "venue": "Asukoht",
+    "loadError": "Midagi läks valesti. Palun proovi uuesti.",
+    "retry": "Proovi uuesti"
   },
   "eventDetail": {
     "backToEvents": "Tagasi ürituste juurde"

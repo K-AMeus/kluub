@@ -45,6 +45,14 @@ export interface EventFilterParams {
   endDate: string | null;
 }
 
+export const DEFAULT_EVENT_FILTERS: EventFilterParams = {
+  topPicks: false,
+  freeOnly: false,
+  venueId: null,
+  startDate: null,
+  endDate: null,
+};
+
 export interface EventsResult {
   events: Event[];
   hasMore: boolean;

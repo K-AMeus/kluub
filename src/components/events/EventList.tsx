@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { Event, City, EVENTS_PAGE_SIZE } from '@/lib/types';
+import { Event, City, EVENTS_PAGE_SIZE, DEFAULT_EVENT_FILTERS } from '@/lib/types';
 import { groupEventsByDate } from '@/lib/event-utils';
 import { getEventsByCity } from '@/lib/db';
 import EventCard, { EventCardTranslations } from './EventCard';
@@ -12,6 +12,9 @@ import CityHeader from './CityHeader';
 interface EventListTranslations extends EventCardTranslations {
   noEvents: string;
   loadMore: string;
+  loadError: string;
+  retry: string;
+  loading: string;
 }
 
 interface EventListProps {
@@ -30,13 +33,7 @@ function toCityDisplay(city: City): string {
   return names[city];
 }
 
-const defaultFilters: EventFilters = {
-  topPicks: false,
-  freeOnly: false,
-  venueId: null,
-  startDate: null,
-  endDate: null,
-};
+const defaultFilters: EventFilters = DEFAULT_EVENT_FILTERS;
 
 export default function EventList({
   initialEvents,
@@ -50,37 +47,66 @@ export default function EventList({
   const [page, setPage] = useState(0);
   const [filters, setFilters] = useState<EventFilters>(defaultFilters);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleFiltersChange = useCallback(
     async (newFilters: EventFilters) => {
       setFilters(newFilters);
       setPage(0);
       setIsLoading(true);
+      setError(null);
 
       try {
         const result = await getEventsByCity(city, newFilters, 0, EVENTS_PAGE_SIZE);
         setEvents(result.events);
         setHasMore(result.hasMore);
+      } catch {
+        setError(translations.loadError);
       } finally {
         setIsLoading(false);
       }
     },
-    [city]
+    [city, translations.loadError]
   );
 
   const loadMore = useCallback(async () => {
+    if (isLoading) return;
+
     const nextPage = page + 1;
     setPage(nextPage);
     setIsLoading(true);
+    setError(null);
 
     try {
       const result = await getEventsByCity(city, filters, nextPage, EVENTS_PAGE_SIZE);
       setEvents((prev) => [...prev, ...result.events]);
       setHasMore(result.hasMore);
+    } catch {
+      setPage(page);
+      setError(translations.loadError);
     } finally {
       setIsLoading(false);
     }
-  }, [city, filters, page]);
+  }, [city, filters, page, isLoading, translations.loadError]);
+
+  const retry = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const result = await getEventsByCity(city, filters, page, EVENTS_PAGE_SIZE);
+      if (page === 0) {
+        setEvents(result.events);
+      } else {
+        setEvents((prev) => [...prev, ...result.events]);
+      }
+      setHasMore(result.hasMore);
+    } catch {
+      setError(translations.loadError);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [city, filters, page, translations.loadError]);
 
   const groupedEvents = useMemo(() => {
     return groupEventsByDate(events);
@@ -98,7 +124,20 @@ export default function EventList({
         </div>
       </div>
 
-      {events.length === 0 && !isLoading ? (
+      {error && (
+        <div className='flex items-center justify-between gap-3 mt-4 px-4 py-3 border border-white/10 bg-white/5'>
+          <p className='text-white/60 font-sans text-sm'>{error}</p>
+          <button
+            onClick={retry}
+            disabled={isLoading}
+            className='shrink-0 px-4 py-1.5 text-xs font-sans font-semibold uppercase tracking-wide text-[#E4DD3B] border border-[#E4DD3B]/40 hover:border-[#E4DD3B] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
+          >
+            {translations.retry}
+          </button>
+        </div>
+      )}
+
+      {events.length === 0 && !isLoading && !error ? (
         <div className='flex items-center justify-center py-12 md:py-16'>
           <div className='text-center'>
             <p className='text-white/60 font-sans text-base md:text-lg'>
@@ -129,12 +168,14 @@ export default function EventList({
               <button
                 onClick={loadMore}
                 disabled={isLoading}
+                aria-label={isLoading ? translations.loading : translations.loadMore}
                 className='group relative px-8 md:px-12 py-3 md:py-4 border border-[#E4DD3B] bg-black/60 hover:bg-[#E4DD3B]/10 text-[#E4DD3B] hover:text-white font-display text-sm md:text-base uppercase tracking-wider transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-wait flex items-center justify-center gap-2'
               >
                 {isLoading ? (
                   <>
                     <svg
                       className='w-5 h-5 animate-spin text-[#E4DD3B]'
+                      aria-hidden='true'
                       fill='none'
                       viewBox='0 0 24 24'
                     >
@@ -158,6 +199,9 @@ export default function EventList({
                   translations.loadMore
                 )}
               </button>
+              <span className='sr-only' role='status' aria-live='polite'>
+                {isLoading ? translations.loading : ''}
+              </span>
             </div>
           )}
         </div>

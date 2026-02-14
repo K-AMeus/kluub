@@ -6,7 +6,7 @@ import TopPicksMarquee from '@/components/events/TopPicksMarquee';
 import EventList from '@/components/events/EventList';
 import EventsBackground from '@/components/events/background/EventsBackground';
 import { getEventsByCity, getTopPicks } from '@/lib/db';
-import { City } from '@/lib/types';
+import { City, DEFAULT_EVENT_FILTERS } from '@/lib/types';
 
 interface CityEventsPageProps {
   params: Promise<{ city: string }>;
@@ -31,16 +31,8 @@ export default async function CityEventsPage({ params }: CityEventsPageProps) {
     notFound();
   }
 
-  const defaultFilters = {
-    topPicks: false,
-    freeOnly: false,
-    venueId: null,
-    startDate: null,
-    endDate: null,
-  };
-
   const [initialPage, topPicks] = await Promise.all([
-    getEventsByCity(city, defaultFilters, 0),
+    getEventsByCity(city, DEFAULT_EVENT_FILTERS, 0),
     getTopPicks(city),
   ]);
 
@@ -51,6 +43,9 @@ export default async function CityEventsPage({ params }: CityEventsPageProps) {
     facebookEvent: t('facebookEvent'),
     noEvents: t('noEvents'),
     loadMore: t('loadMore'),
+    loadError: t('loadError'),
+    retry: t('retry'),
+    loading: t('loading'),
   };
 
   return (

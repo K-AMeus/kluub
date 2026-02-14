@@ -2,10 +2,9 @@
 
 import { useState, useEffect, useRef, ReactNode } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { City } from '@/lib/types';
+import { City, DEFAULT_EVENT_FILTERS, VenueOption } from '@/lib/types';
 import { TIMEZONE, getTodayInTallinn } from '@/lib/date-utils';
 import { ChevronDownIcon, CloseIcon } from '@/components/shared/icons';
-import { VenueOption } from '@/lib/types';
 import { getVenuesByCity } from '@/lib/db';
 
 export type { VenueOption };
@@ -23,13 +22,7 @@ interface EventFiltersProps {
   onFiltersChange: (filters: EventFilters) => void;
 }
 
-const initialFilters: EventFilters = {
-  topPicks: false,
-  freeOnly: false,
-  venueId: null,
-  startDate: null,
-  endDate: null,
-};
+const initialFilters: EventFilters = DEFAULT_EVENT_FILTERS;
 
 function formatDay(dateStr: string, locale: string): string {
   const dateLocale = locale === 'et' ? 'et-EE' : 'en-US';
@@ -154,6 +147,15 @@ function BottomSheet({
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
+          role='button'
+          aria-label={t('done')}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onClose();
+            }
+          }}
         >
           <div className='w-10 h-1 bg-white/20 rounded-full' />
         </div>

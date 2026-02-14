@@ -11,8 +11,18 @@ import {
   VenueOption,
   EVENTS_PAGE_SIZE,
 } from './types';
+import { TIMEZONE } from './date-utils';
 
 const CACHE_REVALIDATE_SECONDS = 86400;
+
+function toUTC(dateStr: string, timeStr: string): string {
+  const asUTC = new Date(`${dateStr}T${timeStr}Z`);
+  const inTallinn = new Date(
+    asUTC.toLocaleString('en-US', { timeZone: TIMEZONE })
+  );
+  const offsetMs = inTallinn.getTime() - asUTC.getTime();
+  return new Date(asUTC.getTime() - offsetMs).toISOString();
+}
 
 interface EventDbRow {
   id: string;
@@ -46,12 +56,13 @@ function transformEvent(row: EventDbRow): Event {
   };
 }
 
-export async function getEventsByCity(
+async function fetchEvents(
   city: City,
-  filters: EventFilterParams,
+  filtersJson: string,
   page: number,
-  pageSize: number = EVENTS_PAGE_SIZE
+  pageSize: number
 ): Promise<EventsResult> {
+  const filters: EventFilterParams = JSON.parse(filtersJson);
   const supabase = createStaticClient();
 
   const from = page * pageSize;
@@ -92,11 +103,11 @@ export async function getEventsByCity(
   }
 
   if (filters.startDate) {
-    query = query.gte('start_time', filters.startDate + 'T00:00:00');
+    query = query.gte('start_time', toUTC(filters.startDate, '00:00:00'));
   }
 
   if (filters.endDate) {
-    query = query.lte('start_time', filters.endDate + 'T23:59:59');
+    query = query.lte('start_time', toUTC(filters.endDate, '23:59:59'));
   }
 
   query = query.range(from, to);
@@ -116,6 +127,24 @@ export async function getEventsByCity(
     events: pageRows.map((row) => transformEvent(row as unknown as EventDbRow)),
     hasMore,
   };
+}
+
+export async function getEventsByCity(
+  city: City,
+  filters: EventFilterParams,
+  page: number,
+  pageSize: number = EVENTS_PAGE_SIZE
+): Promise<EventsResult> {
+  const filtersJson = JSON.stringify(filters);
+
+  return unstable_cache(
+    fetchEvents,
+    ['events', city, filtersJson, String(page), String(pageSize)],
+    {
+      revalidate: CACHE_REVALIDATE_SECONDS,
+      tags: ['events'],
+    }
+  )(city, filtersJson, page, pageSize);
 }
 
 async function fetchTopPicks(city: City): Promise<Event[]> {
