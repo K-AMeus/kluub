@@ -49,7 +49,7 @@ export default function DateHeader({
       `}
     >
       <div className='flex items-center gap-2'>
-        <div className='flex items-center gap-1.5 md:gap-2.5 bg-[#E4DD3B] px-2.5 py-1.5 md:px-5 md:py-2.5 rounded-sm'>
+        <div className='flex items-center gap-1.5 md:gap-2.5 bg-[#E4DD3B] px-2.5 py-1.5 md:px-5 md:py-2.5'>
           <CalendarIcon
             size={14}
             className='text-black md:w-[18px] md:h-[18px]'

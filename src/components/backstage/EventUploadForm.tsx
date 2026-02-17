@@ -251,7 +251,6 @@ export default function EventUploadForm() {
   // Loading state
   if (isLoadingVenues) {
     return (
-      <div className='w-full max-w-2xl'>
         <div className='flex items-center justify-center py-12'>
           <div className='text-center'>
             <svg
@@ -276,17 +275,15 @@ export default function EventUploadForm() {
             <p className='text-white/50'>{t('loadingVenues')}</p>
           </div>
         </div>
-      </div>
     );
   }
 
   // No venues state
   if (userVenues.length === 0) {
     return (
-      <div className='w-full max-w-2xl'>
-        <div className='relative bg-black/60 backdrop-blur-xl border border-[#E4DD3B]/30 rounded-xl p-8 md:p-12'>
+        <div className='relative bg-black/60 backdrop-blur-xl border border-[#E4DD3B]/30 p-8 md:p-12'>
             <div className='text-center max-w-md mx-auto'>
-              <div className='mb-6 inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 border border-white/10'>
+              <div className='mb-6 inline-flex items-center justify-center w-16 h-16 bg-white/5 border border-white/10'>
                 <svg
                   className='w-8 h-8 text-white/40'
                   fill='none'
@@ -309,26 +306,15 @@ export default function EventUploadForm() {
               <p className='text-white/50 text-sm'>{t('noVenuesMessage')}</p>
             </div>
           </div>
-      </div>
     );
   }
 
   // Form
   return (
-    <div className='w-full max-w-2xl'>
-      {/* Header */}
-      <div className='text-center mb-8'>
-        <h1 className='font-display text-2xl md:text-3xl text-white tracking-wider mb-2'>
-          {t('uploadEvent')}
-        </h1>
-        <p className='text-white/50 text-sm'>{t('uploadEventSubtitle')}</p>
-      </div>
-
-      {/* Form Card */}
-      <div className='relative bg-black/60 backdrop-blur-xl border border-[#E4DD3B]/30 rounded-xl p-6 md:p-8'>
+      <div className='relative bg-black/60 backdrop-blur-xl border border-[#E4DD3B]/30 p-6 md:p-8 max-w-2xl'>
           {/* Error message */}
           {error && (
-            <div className='mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm flex items-start gap-3'>
+            <div className='mb-6 p-4 bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-start gap-3'>
               <svg
                 className='w-5 h-5 shrink-0 mt-0.5'
                 fill='none'
@@ -348,7 +334,7 @@ export default function EventUploadForm() {
 
           {/* Success message */}
           {success && (
-            <div className='mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-green-400 text-sm flex items-start gap-3'>
+            <div className='mb-6 p-4 bg-green-500/10 border border-green-500/30 text-green-400 text-sm flex items-start gap-3'>
               <svg
                 className='w-5 h-5 shrink-0 mt-0.5'
                 fill='none'
@@ -383,7 +369,7 @@ export default function EventUploadForm() {
                 onChange={(e) => setTitle(e.target.value)}
                 required
                 disabled={isSubmitting}
-                className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
                 placeholder={t('eventTitlePlaceholder')}
               />
               {validationErrors.title && (
@@ -408,7 +394,7 @@ export default function EventUploadForm() {
                 required
                 disabled={isSubmitting}
                 rows={4}
-                className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50 min-h-[7.5rem]'
+                className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50 min-h-[7.5rem]'
                 placeholder={t('eventDescriptionPlaceholder')}
               />
               {validationErrors.description && (
@@ -434,7 +420,7 @@ export default function EventUploadForm() {
                   onChange={(e) => handleVenueChange(e.target.value)}
                   required
                   disabled={isSubmitting}
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                  className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
                 >
                   <option value='' className='bg-black'>
                     {t('venueSelect')}
@@ -471,7 +457,7 @@ export default function EventUploadForm() {
                   onChange={(e) => setPriceTier(Number(e.target.value) as PriceTier)}
                   required
                   disabled={isSubmitting}
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                  className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
                 >
                   <option value={0} className='bg-black'>
                     {t('priceTierFree')}
@@ -507,7 +493,7 @@ export default function EventUploadForm() {
                   onChange={(e) => setStartTime(e.target.value)}
                   required
                   disabled={isSubmitting}
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50'
+                  className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50'
                 />
                 {validationErrors.startTime && (
                   <p className='mt-1 text-sm text-red-400'>
@@ -531,7 +517,7 @@ export default function EventUploadForm() {
                   onChange={(e) => setEndTime(e.target.value)}
                   required
                   disabled={isSubmitting}
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50'
+                  className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50'
                 />
                 {validationErrors.endTime && (
                   <p className='mt-1 text-sm text-red-400'>
@@ -574,7 +560,7 @@ export default function EventUploadForm() {
                 value={facebookUrl}
                 onChange={(e) => setFacebookUrl(e.target.value)}
                 disabled={isSubmitting}
-                className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
                 placeholder={t('facebookUrlPlaceholder')}
               />
               {validationErrors.facebookUrl && (
@@ -588,7 +574,7 @@ export default function EventUploadForm() {
             <button
               type='submit'
               disabled={isSubmitting}
-              className='w-full py-3 bg-[#E4DD3B] hover:bg-[#E4DD3B]/90 text-black font-semibold rounded-lg transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
+              className='w-full py-3 bg-[#E4DD3B] hover:bg-[#E4DD3B]/90 text-black font-semibold transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
             >
               {isSubmitting ? (
                 <>
@@ -619,6 +605,5 @@ export default function EventUploadForm() {
             </button>
           </form>
         </div>
-    </div>
   );
 }

@@ -63,12 +63,12 @@ export default function LoginForm() {
       {/* Login Card */}
       <div className='relative'>
         {/* Glow effect */}
-        <div className='absolute -inset-1 bg-linear-to-r from-[#E4DD3B]/10 via-[#E4DD3B]/20 to-[#E4DD3B]/10 rounded-xl blur-xl opacity-50' />
+        <div className='absolute -inset-1 bg-linear-to-r from-[#E4DD3B]/10 via-[#E4DD3B]/20 to-[#E4DD3B]/10  blur-xl opacity-50' />
 
-        <div className='relative bg-black/60 backdrop-blur-xl border border-[#E4DD3B]/30 rounded-xl p-6 md:p-8'>
+        <div className='relative bg-black/60 backdrop-blur-xl border border-[#E4DD3B]/30  p-6 md:p-8'>
           {/* Error message */}
           {error && (
-            <div className='mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm text-center'>
+            <div className='mb-4 p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-sm text-center'>
               {error}
             </div>
           )}
@@ -89,7 +89,7 @@ export default function LoginForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={isLoading}
-                className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
                 placeholder={t('emailPlaceholder')}
               />
             </div>
@@ -108,7 +108,7 @@ export default function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={isLoading}
-                className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
                 placeholder={t('passwordPlaceholder')}
               />
             </div>
@@ -116,7 +116,7 @@ export default function LoginForm() {
             <button
               type='submit'
               disabled={isLoading}
-              className='w-full py-3 bg-[#E4DD3B] hover:bg-[#E4DD3B]/90 text-black font-semibold rounded-lg transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
+              className='w-full py-3 bg-[#E4DD3B] hover:bg-[#E4DD3B]/90 text-black font-semibold transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
             >
               {isLoading ? (
                 <svg
@@ -159,7 +159,7 @@ export default function LoginForm() {
             type='button'
             onClick={handleGoogleLogin}
             disabled={isLoading}
-            className='w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-medium rounded-lg transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3'
+            className='w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-medium transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3'
           >
             <svg className='w-5 h-5' viewBox='0 0 24 24'>
               <path

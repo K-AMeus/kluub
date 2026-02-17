@@ -82,25 +82,6 @@ export default function BackstageSidebar({ isOpen, onClose }: BackstageSidebarPr
         </svg>
       ),
     },
-    {
-      name: t('myProfile'),
-      href: `/${locale}/backstage/profile`,
-      icon: (
-        <svg
-          className='w-5 h-5'
-          fill='none'
-          stroke='currentColor'
-          viewBox='0 0 24 24'
-        >
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            strokeWidth={2}
-            d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
-          />
-        </svg>
-      ),
-    },
   ];
 
   const isActive = (href: string) => {
@@ -134,7 +115,7 @@ export default function BackstageSidebar({ isOpen, onClose }: BackstageSidebarPr
               key={item.href}
               href={item.href}
               onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+              className={`flex items-center gap-3 px-4 py-3 transition-all duration-200 ${
                 isActive(item.href)
                   ? 'bg-[#E4DD3B]/10 text-[#E4DD3B] border border-[#E4DD3B]/30'
                   : 'text-white/70 hover:text-white hover:bg-white/5'
@@ -150,7 +131,7 @@ export default function BackstageSidebar({ isOpen, onClose }: BackstageSidebarPr
         <div className='p-4 border-t border-white/10'>
           <button
             onClick={handleSignOut}
-            className='w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-red-400 hover:text-red-300 hover:bg-red-500/10'
+            className='w-full flex items-center gap-3 px-4 py-3 transition-all duration-200 text-red-400 hover:text-red-300 hover:bg-red-500/10'
           >
             <svg
               className='w-5 h-5'

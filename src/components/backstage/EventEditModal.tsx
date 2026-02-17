@@ -212,12 +212,12 @@ export default function EventEditModal({
     <>
       {/* Modal Overlay */}
       <div
-        className='fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-start justify-center p-4 pt-20'
+        className='fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-start justify-center p-4 pt-20 pb-8'
         onClick={onClose}
       >
         {/* Modal Content */}
         <div
-          className='relative bg-black/90 border border-[#E4DD3B]/30 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto'
+          className='relative bg-black/90 border border-[#E4DD3B]/30 w-full max-w-2xl max-h-[calc(100vh-7rem)] flex flex-col'
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close button */}
@@ -240,7 +240,7 @@ export default function EventEditModal({
             </svg>
           </button>
 
-          <div className='p-6 md:p-8'>
+          <div className='p-6 md:p-8 overflow-y-auto flex-1'>
             {/* Header */}
             <div className='mb-6'>
               <h2 className='font-display text-2xl text-white tracking-wider'>
@@ -250,7 +250,7 @@ export default function EventEditModal({
 
             {/* Error message */}
             {error && (
-              <div className='mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm flex items-start gap-3'>
+              <div className='mb-6 p-4 bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-start gap-3'>
                 <svg
                   className='w-5 h-5 shrink-0 mt-0.5'
                   fill='none'
@@ -270,7 +270,7 @@ export default function EventEditModal({
 
             {/* Success message */}
             {success && (
-              <div className='mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-green-400 text-sm flex items-start gap-3'>
+              <div className='mb-6 p-4 bg-green-500/10 border border-green-500/30 text-green-400 text-sm flex items-start gap-3'>
                 <svg
                   className='w-5 h-5 shrink-0 mt-0.5'
                   fill='none'
@@ -289,7 +289,7 @@ export default function EventEditModal({
             )}
 
             {/* Form */}
-            <form onSubmit={handleUpdate} className='space-y-6'>
+            <form id='edit-event-form' onSubmit={handleUpdate} className='space-y-6'>
               {/* Title */}
               <div>
                 <label
@@ -305,7 +305,7 @@ export default function EventEditModal({
                   onChange={(e) => setTitle(e.target.value)}
                   required
                   disabled={isSubmitting || isDeleting}
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                  className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
                   placeholder={t('eventTitlePlaceholder')}
                 />
                 {validationErrors.title && (
@@ -331,7 +331,7 @@ export default function EventEditModal({
                   required
                   disabled={isSubmitting || isDeleting}
                   rows={4}
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50 min-h-[7.5rem]'
+                  className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50 min-h-[7.5rem]'
                   placeholder={t('eventDescriptionPlaceholder')}
                 />
                 {validationErrors.description && (
@@ -357,7 +357,7 @@ export default function EventEditModal({
                     onChange={(e) => handleVenueChange(e.target.value)}
                     required
                     disabled={isSubmitting || isDeleting}
-                    className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                    className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
                   >
                     <option value='' className='bg-black'>
                       {t('venueSelect')}
@@ -396,7 +396,7 @@ export default function EventEditModal({
                     }
                     required
                     disabled={isSubmitting || isDeleting}
-                    className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                    className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
                   >
                     <option value={0} className='bg-black'>
                       {t('priceTierFree')}
@@ -432,7 +432,7 @@ export default function EventEditModal({
                     onChange={(e) => setStartTime(e.target.value)}
                     required
                     disabled={isSubmitting || isDeleting}
-                    className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50'
+                    className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50'
                   />
                   {validationErrors.startTime && (
                     <p className='mt-1 text-sm text-red-400'>
@@ -456,7 +456,7 @@ export default function EventEditModal({
                     onChange={(e) => setEndTime(e.target.value)}
                     required
                     disabled={isSubmitting || isDeleting}
-                    className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50'
+                    className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50'
                   />
                   {validationErrors.endTime && (
                     <p className='mt-1 text-sm text-red-400'>
@@ -499,7 +499,7 @@ export default function EventEditModal({
                   value={facebookUrl}
                   onChange={(e) => setFacebookUrl(e.target.value)}
                   disabled={isSubmitting || isDeleting}
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                  className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
                   placeholder={t('facebookUrlPlaceholder')}
                 />
                 {validationErrors.facebookUrl && (
@@ -509,73 +509,77 @@ export default function EventEditModal({
                 )}
               </div>
 
-              {/* Action Buttons */}
-              <div className='flex flex-col sm:flex-row gap-3 pt-4'>
-                <button
-                  type='submit'
-                  disabled={isSubmitting || isDeleting}
-                  className='flex-1 py-3 bg-[#E4DD3B] hover:bg-[#E4DD3B]/90 text-black font-semibold rounded-lg transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
-                >
-                  {isSubmitting ? (
-                    <>
-                      <svg
-                        className='w-5 h-5 animate-spin'
-                        fill='none'
-                        viewBox='0 0 24 24'
-                      >
-                        <circle
-                          className='opacity-25'
-                          cx='12'
-                          cy='12'
-                          r='10'
-                          stroke='currentColor'
-                          strokeWidth='4'
-                        />
-                        <path
-                          className='opacity-75'
-                          fill='currentColor'
-                          d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                        />
-                      </svg>
-                      {t('updatingEvent')}
-                    </>
-                  ) : (
-                    t('updateEvent')
-                  )}
-                </button>
-
-                <button
-                  type='button'
-                  onClick={handleDuplicate}
-                  disabled={isSubmitting || isDeleting}
-                  className='px-6 py-3 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 hover:border-blue-500/50 text-blue-400 font-semibold rounded-lg transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
-                >
-                  <svg
-                    className='w-5 h-5'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                  >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z'
-                    />
-                  </svg>
-                  {t('duplicateEvent')}
-                </button>
-
-                <button
-                  type='button'
-                  onClick={() => setShowDeleteConfirm(true)}
-                  disabled={isSubmitting || isDeleting}
-                  className='px-6 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 text-red-400 font-semibold rounded-lg transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
-                >
-                  {t('deleteEvent')}
-                </button>
-              </div>
             </form>
+          </div>
+
+          {/* Sticky Footer */}
+          <div className='sticky bottom-0 bg-black/90 border-t border-white/10 px-6 md:px-8 py-4'>
+            <div className='flex flex-col sm:flex-row gap-3'>
+              <button
+                type='submit'
+                form='edit-event-form'
+                disabled={isSubmitting || isDeleting}
+                className='flex-1 py-3 bg-[#E4DD3B] hover:bg-[#E4DD3B]/90 text-black font-semibold transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
+              >
+                {isSubmitting ? (
+                  <>
+                    <svg
+                      className='w-5 h-5 animate-spin'
+                      fill='none'
+                      viewBox='0 0 24 24'
+                    >
+                      <circle
+                        className='opacity-25'
+                        cx='12'
+                        cy='12'
+                        r='10'
+                        stroke='currentColor'
+                        strokeWidth='4'
+                      />
+                      <path
+                        className='opacity-75'
+                        fill='currentColor'
+                        d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                      />
+                    </svg>
+                    {t('updatingEvent')}
+                  </>
+                ) : (
+                  t('updateEvent')
+                )}
+              </button>
+
+              <button
+                type='button'
+                onClick={handleDuplicate}
+                disabled={isSubmitting || isDeleting}
+                className='px-6 py-3 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 hover:border-blue-500/50 text-blue-400 font-semibold transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
+              >
+                <svg
+                  className='w-5 h-5'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z'
+                  />
+                </svg>
+                {t('duplicateEvent')}
+              </button>
+
+              <button
+                type='button'
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={isSubmitting || isDeleting}
+                className='px-6 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 text-red-400 font-semibold transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
+              >
+                {t('deleteEvent')}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -587,7 +591,7 @@ export default function EventEditModal({
           onClick={() => setShowDeleteConfirm(false)}
         >
           <div
-            className='bg-black/95 border border-red-500/30 rounded-xl p-6 max-w-md w-full'
+            className='bg-black/95 border border-red-500/30 p-6 max-w-md w-full'
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className='text-xl text-white font-semibold mb-3'>
@@ -601,14 +605,14 @@ export default function EventEditModal({
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={isDeleting}
-                className='flex-1 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg transition-all duration-200'
+                className='flex-1 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-all duration-200'
               >
                 {t('cancel')}
               </button>
               <button
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className='flex-1 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-400 rounded-lg transition-all duration-200 flex items-center justify-center gap-2'
+                className='flex-1 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-400 transition-all duration-200 flex items-center justify-center gap-2'
               >
                 {isDeleting ? (
                   <>

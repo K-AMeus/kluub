@@ -29,7 +29,7 @@ function TopPickCard({ event }: { event: Event }) {
       href={`/events/${citySlug}/${event.id}`}
       className='group mx-1.5 md:mx-3 cursor-pointer inline-block'
     >
-      <div className='relative w-44 h-28 md:w-80 md:h-44 rounded-lg overflow-hidden'>
+      <div className='relative w-44 h-28 md:w-80 md:h-44 overflow-hidden'>
         <Image
           src={imageUrl}
           alt={event.title}
