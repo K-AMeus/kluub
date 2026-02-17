@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useRef, ReactNode } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { City } from '@/lib/types';
+import { City, DEFAULT_EVENT_FILTERS, VenueOption } from '@/lib/types';
 import { TIMEZONE, getTodayInTallinn } from '@/lib/date-utils';
 import { ChevronDownIcon, CloseIcon } from '@/components/shared/icons';
-import { getVenuesByCity, VenueOption } from '@/lib/db';
+import { getVenuesByCity } from '@/lib/db';
 
 export type { VenueOption };
 
@@ -22,13 +22,7 @@ interface EventFiltersProps {
   onFiltersChange: (filters: EventFilters) => void;
 }
 
-const initialFilters: EventFilters = {
-  topPicks: false,
-  freeOnly: false,
-  venueId: null,
-  startDate: null,
-  endDate: null,
-};
+const initialFilters: EventFilters = DEFAULT_EVENT_FILTERS;
 
 function formatDay(dateStr: string, locale: string): string {
   const dateLocale = locale === 'et' ? 'et-EE' : 'en-US';
@@ -96,6 +90,38 @@ function BottomSheet({
   children: ReactNode;
 }) {
   const t = useTranslations('eventsPage');
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const dragStartY = useRef<number | null>(null);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const hasAnimated = useRef(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      hasAnimated.current = false;
+    }
+  }, [isOpen]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    hasAnimated.current = true;
+    dragStartY.current = e.touches[0].clientY;
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (dragStartY.current === null) return;
+    const delta = e.touches[0].clientY - dragStartY.current;
+    setDragOffset(Math.max(0, delta));
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    if (dragOffset > 100) {
+      onClose();
+    }
+    setDragOffset(0);
+    dragStartY.current = null;
+  };
 
   if (!isOpen) return null;
 
@@ -103,10 +129,34 @@ function BottomSheet({
     <div className='fixed inset-0 z-50 md:hidden'>
       <div
         className='absolute inset-0 bg-black/70 backdrop-blur-sm'
+        style={{ opacity: Math.max(0, 1 - dragOffset / 300) }}
         onClick={onClose}
       />
-      <div className='absolute bottom-0 left-0 right-0 bg-[#111] rounded-t-2xl max-h-[92vh] overflow-hidden animate-slide-up'>
-        <div className='flex justify-center pt-3 pb-2'>
+      <div
+        ref={sheetRef}
+        className={`absolute bottom-0 left-0 right-0 bg-[#111] rounded-t-2xl max-h-[92vh] overflow-hidden ${
+          !hasAnimated.current ? 'animate-slide-up' : ''
+        }`}
+        style={{
+          transform: `translateY(${dragOffset}px)`,
+          transition: isDragging ? 'none' : 'transform 0.3s ease-out',
+        }}
+      >
+        <div
+          className='flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none'
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          role='button'
+          aria-label={t('done')}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onClose();
+            }
+          }}
+        >
           <div className='w-10 h-1 bg-white/20 rounded-full' />
         </div>
         <div className='flex items-center justify-between px-4 pb-3 border-b border-white/10'>
@@ -352,7 +402,7 @@ function FilterChip({
     <button
       onClick={onClick}
       className={`
-        px-2 py-1 text-[11px] font-sans font-medium uppercase tracking-normal whitespace-nowrap transition-all cursor-pointer
+        px-2.5 py-[5px] text-xs font-sans font-medium uppercase tracking-normal whitespace-nowrap transition-all cursor-pointer
         ${
           active
             ? 'bg-[#E4DD3B] text-black'

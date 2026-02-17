@@ -6,7 +6,7 @@ import TopPicksMarquee from '@/components/events/TopPicksMarquee';
 import EventList from '@/components/events/EventList';
 import EventsBackground from '@/components/events/background/EventsBackground';
 import { getEventsByCity, getTopPicks } from '@/lib/db';
-import { City } from '@/lib/types';
+import { City, DEFAULT_EVENT_FILTERS } from '@/lib/types';
 
 interface CityEventsPageProps {
   params: Promise<{ city: string }>;
@@ -31,8 +31,8 @@ export default async function CityEventsPage({ params }: CityEventsPageProps) {
     notFound();
   }
 
-  const [events, topPicks] = await Promise.all([
-    getEventsByCity(city),
+  const [initialPage, topPicks] = await Promise.all([
+    getEventsByCity(city, DEFAULT_EVENT_FILTERS, 0),
     getTopPicks(city),
   ]);
 
@@ -43,6 +43,9 @@ export default async function CityEventsPage({ params }: CityEventsPageProps) {
     facebookEvent: t('facebookEvent'),
     noEvents: t('noEvents'),
     loadMore: t('loadMore'),
+    loadError: t('loadError'),
+    retry: t('retry'),
+    loading: t('loading'),
   };
 
   return (
@@ -65,7 +68,12 @@ export default async function CityEventsPage({ params }: CityEventsPageProps) {
             topPicks.length > 0 ? 'pt-2 md:pt-4' : 'mt-12 md:mt-16 pt-2 md:pt-4'
           }`}
         >
-          <EventList events={events} translations={translations} city={city} />
+          <EventList
+            initialEvents={initialPage.events}
+            initialHasMore={initialPage.hasMore}
+            translations={translations}
+            city={city}
+          />
         </main>
 
         <div className='mt-12 md:mt-32'>
