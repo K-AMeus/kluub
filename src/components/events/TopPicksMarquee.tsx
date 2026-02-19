@@ -39,10 +39,10 @@ function TopPickCard({ event }: { event: Event }) {
           preload
         />
 
-        <div className='absolute top-2 left-2 md:top-3 md:left-3'>
-          <div className='bg-black/70 backdrop-blur-sm border border-[#E4DD3B]/60 px-1.5 py-0.5 md:px-2 md:py-0.5 flex items-center'>
-            <span className='font-sans text-[9px] md:text-[10px] text-[#E4DD3B] font-semibold uppercase tracking-wide leading-tight'>
-              TOP PICK
+        <div className='absolute top-1 left-1 md:top-2 md:left-2'>
+          <div className='bg-[#E4DD3B] shadow-md shadow-black/30 px-2 py-0.5 md:px-3 md:py-1 flex items-center gap-1'>
+            <span className='font-display text-[10px] md:text-xs text-black font-bold uppercase tracking-widest leading-tight'>
+TOP PICK
             </span>
           </div>
         </div>
