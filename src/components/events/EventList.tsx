@@ -169,35 +169,31 @@ export default function EventList({
                 onClick={loadMore}
                 disabled={isLoading}
                 aria-label={isLoading ? translations.loading : translations.loadMore}
-                className='group relative px-8 md:px-12 py-3 md:py-4 border border-[#E4DD3B] bg-black/60 hover:bg-[#E4DD3B]/10 text-[#E4DD3B] hover:text-white font-display text-sm md:text-base uppercase tracking-wider transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-wait flex items-center justify-center gap-2'
+                className='group relative px-6 md:px-9 py-2 md:py-3 border border-[#E4DD3B] bg-black/60 hover:bg-[#E4DD3B]/10 text-[#E4DD3B] hover:text-white font-display text-xs md:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-wait'
               >
-                {isLoading ? (
-                  <>
-                    <svg
-                      className='w-5 h-5 animate-spin text-[#E4DD3B]'
-                      aria-hidden='true'
-                      fill='none'
-                      viewBox='0 0 24 24'
-                    >
-                      <circle
-                        className='opacity-25'
-                        cx='12'
-                        cy='12'
-                        r='10'
-                        stroke='currentColor'
-                        strokeWidth='4'
-                      />
-                      <path
-                        className='opacity-75'
-                        fill='currentColor'
-                        d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                      />
-                    </svg>
-                    {translations.loadMore}
-                  </>
-                ) : (
-                  translations.loadMore
+                {isLoading && (
+                  <svg
+                    className='absolute left-1.5 md:left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 md:w-3.5 md:h-3.5 animate-spin text-[#E4DD3B]'
+                    aria-hidden='true'
+                    fill='none'
+                    viewBox='0 0 24 24'
+                  >
+                    <circle
+                      className='opacity-25'
+                      cx='12'
+                      cy='12'
+                      r='10'
+                      stroke='currentColor'
+                      strokeWidth='4'
+                    />
+                    <path
+                      className='opacity-75'
+                      fill='currentColor'
+                      d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                    />
+                  </svg>
                 )}
+                {translations.loadMore}
               </button>
               <span className='sr-only' role='status' aria-live='polite'>
                 {isLoading ? translations.loading : ''}

@@ -58,7 +58,7 @@ export default async function CityEventsPage({ params }: CityEventsPageProps) {
         <Header />
 
         {topPicks.length > 0 && (
-          <section className='mt-12 md:mt-16'>
+          <section className='mt-14 md:mt-16'>
             <TopPicksMarquee events={topPicks} />
           </section>
         )}

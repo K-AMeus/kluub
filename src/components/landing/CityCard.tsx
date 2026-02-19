@@ -52,15 +52,15 @@ export default function CityCard({ name, isActive, href }: CityCardProps) {
 
         {isActive && (
           <span
-            className={`absolute right-3 top-1/2 -translate-y-1/2 transition-all duration-300 ${
+            className={`absolute left-1 sm:left-2 md:left-3 top-1/2 -translate-y-1/2 transition-all duration-300 ${
               isLoading
                 ? 'opacity-100'
-                : 'opacity-0 group-hover:opacity-100 group-hover:translate-x-1'
+                : 'opacity-0 group-hover:opacity-100 group-hover:-translate-x-1'
             }`}
           >
             {isLoading ? (
               <svg
-                className='w-5 h-5 text-[#E4DD3B] animate-spin'
+                className='w-4 h-4 md:w-5 md:h-5 text-[#E4DD3B] animate-spin'
                 fill='none'
                 viewBox='0 0 24 24'
               >
@@ -80,7 +80,7 @@ export default function CityCard({ name, isActive, href }: CityCardProps) {
               </svg>
             ) : (
               <svg
-                className='w-5 h-5 text-[#E4DD3B]'
+                className='w-4 h-4 md:w-5 md:h-5 text-[#E4DD3B]'
                 fill='none'
                 stroke='currentColor'
                 viewBox='0 0 24 24'
@@ -89,7 +89,7 @@ export default function CityCard({ name, isActive, href }: CityCardProps) {
                   strokeLinecap='round'
                   strokeLinejoin='round'
                   strokeWidth={2}
-                  d='M9 5l7 7-7 7'
+                  d='M15 19l-7-7 7-7'
                 />
               </svg>
             )}
