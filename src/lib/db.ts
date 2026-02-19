@@ -2,9 +2,27 @@
 
 import { unstable_cache } from 'next/cache';
 import { createStaticClient } from '@/supabase/server';
-import { Event, City, PriceTier } from './types';
+import {
+  Event,
+  City,
+  PriceTier,
+  EventFilterParams,
+  EventsResult,
+  VenueOption,
+  EVENTS_PAGE_SIZE,
+} from './types';
+import { TIMEZONE } from './date-utils';
 
 const CACHE_REVALIDATE_SECONDS = 86400;
+
+function toUTC(dateStr: string, timeStr: string): string {
+  const asUTC = new Date(`${dateStr}T${timeStr}Z`);
+  const inTallinn = new Date(
+    asUTC.toLocaleString('en-US', { timeZone: TIMEZONE })
+  );
+  const offsetMs = inTallinn.getTime() - asUTC.getTime();
+  return new Date(asUTC.getTime() - offsetMs).toISOString();
+}
 
 interface EventDbRow {
   id: string;
@@ -38,10 +56,19 @@ function transformEvent(row: EventDbRow): Event {
   };
 }
 
-async function fetchEventsByCity(city: City): Promise<Event[]> {
+async function fetchEvents(
+  city: City,
+  filtersJson: string,
+  page: number,
+  pageSize: number
+): Promise<EventsResult> {
+  const filters: EventFilterParams = JSON.parse(filtersJson);
   const supabase = createStaticClient();
 
-  const { data, error } = await supabase
+  const from = page * pageSize;
+  const to = from + pageSize;
+
+  let query = supabase
     .from('events')
     .select(
       `
@@ -63,21 +90,61 @@ async function fetchEventsByCity(city: City): Promise<Event[]> {
     .gte('start_time', new Date().toISOString())
     .order('start_time', { ascending: true });
 
-  if (error) {
-    console.error('Error fetching events by city:', error);
-    return [];
+  if (filters.topPicks) {
+    query = query.eq('top_pick', true);
   }
 
-  return (data ?? []).map((row) =>
-    transformEvent(row as unknown as EventDbRow)
-  );
+  if (filters.freeOnly) {
+    query = query.eq('price_tier', 0);
+  }
+
+  if (filters.venueId) {
+    query = query.eq('venue_id', filters.venueId);
+  }
+
+  if (filters.startDate) {
+    query = query.gte('start_time', toUTC(filters.startDate, '00:00:00'));
+  }
+
+  if (filters.endDate) {
+    query = query.lte('start_time', toUTC(filters.endDate, '23:59:59'));
+  }
+
+  query = query.range(from, to);
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Error fetching events:', error);
+    return { events: [], hasMore: false };
+  }
+
+  const rows = data ?? [];
+  const hasMore = rows.length > pageSize;
+  const pageRows = hasMore ? rows.slice(0, pageSize) : rows;
+
+  return {
+    events: pageRows.map((row) => transformEvent(row as unknown as EventDbRow)),
+    hasMore,
+  };
 }
 
-export async function getEventsByCity(city: City) {
-  return unstable_cache(fetchEventsByCity, ['events-by-city', city], {
-    revalidate: CACHE_REVALIDATE_SECONDS,
-    tags: ['events'],
-  })(city);
+export async function getEventsByCity(
+  city: City,
+  filters: EventFilterParams,
+  page: number,
+  pageSize: number = EVENTS_PAGE_SIZE
+): Promise<EventsResult> {
+  const filtersJson = JSON.stringify(filters);
+
+  return unstable_cache(
+    fetchEvents,
+    ['events', city, filtersJson, String(page), String(pageSize)],
+    {
+      revalidate: CACHE_REVALIDATE_SECONDS,
+      tags: ['events'],
+    }
+  )(city, filtersJson, page, pageSize);
 }
 
 async function fetchTopPicks(city: City): Promise<Event[]> {
@@ -168,11 +235,6 @@ export async function revalidateEvents() {
   revalidateTag('events', 'max');
   revalidatePath('/et/events/tartu');
   revalidatePath('/en/events/tartu');
-}
-
-export interface VenueOption {
-  id: string;
-  name: string;
 }
 
 async function fetchVenuesByCity(city: City): Promise<VenueOption[]> {

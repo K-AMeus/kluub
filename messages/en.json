@@ -39,7 +39,9 @@
     "loading": "Loading...",
     "all": "All",
     "date": "Date",
-    "venue": "Venue"
+    "venue": "Venue",
+    "loadError": "Something went wrong. Please try again.",
+    "retry": "Retry"
   },
   "eventDetail": {
     "backToEvents": "Back to Events"
