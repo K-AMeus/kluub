@@ -13,7 +13,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const locale of locales) {
     entries.push({
       url: `${BASE_URL}/${locale}`,
-      changeFrequency: 'weekly',
     });
   }
 
@@ -21,7 +20,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     for (const city of cities) {
       entries.push({
         url: `${BASE_URL}/${locale}/events/${city}`,
-        changeFrequency: 'daily',
       });
     }
   }
@@ -31,7 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const { data: events } = await supabase
       .from('events')
-      .select('id, city, start_time')
+      .select('id, city')
       .gte('start_time', new Date().toISOString())
       .order('start_time', { ascending: true })
       .limit(500);
@@ -43,8 +41,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         for (const locale of locales) {
           entries.push({
             url: `${BASE_URL}/${locale}/events/${citySlug}/${event.id}`,
-            changeFrequency: 'weekly',
-            lastModified: new Date(event.start_time),
           });
         }
       }
