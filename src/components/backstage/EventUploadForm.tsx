@@ -9,10 +9,18 @@ import PriceInfoTooltip from '@/components/shared/PriceInfoTooltip';
 import ImageUpload from '@/components/shared/ImageUpload';
 import { revalidateEvents } from '@/lib/db';
 
+interface FacebookImportData {
+  title?: string;
+  description?: string;
+  imageUrl?: string;
+  startTime?: string;
+  endTime?: string;
+  facebookUrl: string;
+}
+
 export default function EventUploadForm() {
   const t = useTranslations('backstage');
 
-  // Form fields
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priceTier, setPriceTier] = useState<PriceTier>(0);
@@ -22,6 +30,10 @@ export default function EventUploadForm() {
   const [facebookUrl, setFacebookUrl] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
+
+  const [importUrl, setImportUrl] = useState('');
+  const [isImporting, setIsImporting] = useState(false);
+  const [importedFrom, setImportedFrom] = useState(false);
 
   // UI states
   const [userVenues, setUserVenues] = useState<Venue[]>([]);
@@ -180,6 +192,8 @@ export default function EventUploadForm() {
     setStartTime('');
     setEndTime('');
     setValidationErrors({});
+    setImportedFrom(false);
+    setImportUrl('');
 
     // Reset to first venue if available
     if (userVenues.length > 0) {
@@ -199,15 +213,86 @@ export default function EventUploadForm() {
     }
   };
 
-  // Form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleFacebookImport = async () => {
+    const url = importUrl.trim();
+    if (!url) return;
 
-    // Clear previous messages
+    const withProtocol = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+    try {
+      const parsed = new URL(withProtocol);
+      const hostname = parsed.hostname.replace('www.', '').replace('m.', '');
+      if (!hostname.includes('facebook.com') && hostname !== 'fb.me') {
+        setError(t('importInvalidUrl'));
+        return;
+      }
+    } catch {
+      setError(t('importInvalidUrl'));
+      return;
+    }
+
+    setIsImporting(true);
     setError(null);
     setSuccess(null);
 
-    // Validate
+    try {
+      const response = await fetch('/api/import/facebook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || t('importError'));
+        setIsImporting(false);
+        return;
+      }
+
+      const imported = data as FacebookImportData;
+
+      if (imported.title) setTitle(imported.title);
+      if (imported.description) setDescription(imported.description);
+      if (imported.imageUrl) setImageUrl(imported.imageUrl);
+      if (imported.facebookUrl) setFacebookUrl(imported.facebookUrl);
+
+      if (imported.startTime) {
+        try {
+          setStartTime(formatDateTimeForInput(imported.startTime));
+        } catch {
+        }
+      }
+      if (imported.endTime) {
+        try {
+          setEndTime(formatDateTimeForInput(imported.endTime));
+        } catch {
+        }
+      }
+
+      setImportedFrom(true);
+      setSuccess(t('importSuccess'));
+      setImportUrl('');
+
+      setTimeout(() => {
+        document.getElementById('event-form')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }, 300);
+    } catch (err) {
+      setError(t('importError'));
+      console.error('Facebook import error:', err);
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    setError(null);
+    setSuccess(null);
+
     if (!validateForm()) {
       return;
     }
@@ -311,7 +396,81 @@ export default function EventUploadForm() {
 
   // Form
   return (
-      <div className='relative bg-black/60 backdrop-blur-xl border border-[#E4DD3B]/30 p-6 md:p-8 max-w-2xl'>
+      <div className='max-w-2xl space-y-6'>
+          <div className='relative bg-black/60 backdrop-blur-xl border border-white/10 p-6 md:p-8'>
+            <div className='flex items-center gap-3 mb-4'>
+              <div className='w-8 h-8 bg-[#1877F2] rounded-sm flex items-center justify-center shrink-0'>
+                <svg className='w-4 h-4 text-white' viewBox='0 0 24 24' fill='currentColor'>
+                  <path d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' />
+                </svg>
+              </div>
+              <div>
+                <h3 className='text-white font-medium text-sm'>
+                  {t('importFromFacebook')}
+                </h3>
+                <p className='text-white/40 text-xs'>
+                  {t('importDescription')}
+                </p>
+              </div>
+            </div>
+
+            <div className='flex gap-3'>
+              <input
+                type='url'
+                value={importUrl}
+                onChange={(e) => setImportUrl(e.target.value)}
+                disabled={isImporting}
+                className='flex-1 px-4 py-3 bg-white/5 border border-white/10 text-white text-sm placeholder-white/30 focus:outline-none focus:border-[#1877F2]/50 focus:ring-1 focus:ring-[#1877F2]/50 transition-all duration-200 disabled:opacity-50'
+                placeholder={t('fbUrlPlaceholder')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleFacebookImport();
+                  }
+                }}
+              />
+              <button
+                type='button'
+                onClick={handleFacebookImport}
+                disabled={isImporting || !importUrl.trim()}
+                className='px-6 py-3 bg-[#1877F2] hover:bg-[#1877F2]/90 text-white text-sm font-medium transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shrink-0'
+              >
+                {isImporting ? (
+                  <>
+                    <svg
+                      className='w-4 h-4 animate-spin'
+                      fill='none'
+                      viewBox='0 0 24 24'
+                    >
+                      <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
+                      <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z' />
+                    </svg>
+                    {t('importing')}
+                  </>
+                ) : (
+                  t('importButton')
+                )}
+              </button>
+            </div>
+
+            {!importedFrom && (
+              <p className='text-white/30 text-xs mt-3'>
+                {t('orCreateManually')}
+              </p>
+            )}
+          </div>
+
+          <div id='event-form' className='relative bg-black/60 backdrop-blur-xl border border-[#E4DD3B]/30 p-6 md:p-8'>
+
+          {importedFrom && (
+            <div className='mb-6 p-3 bg-[#1877F2]/10 border border-[#1877F2]/30 text-[#6CB4EE] text-sm flex items-center gap-3'>
+              <svg className='w-5 h-5 shrink-0' viewBox='0 0 24 24' fill='currentColor'>
+                <path d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' />
+              </svg>
+              <span>{t('reviewAndPublish')}</span>
+            </div>
+          )}
+
           {/* Error message */}
           {error && (
             <div className='mb-6 p-4 bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-start gap-3'>
@@ -394,7 +553,7 @@ export default function EventUploadForm() {
                 required
                 disabled={isSubmitting}
                 rows={4}
-                className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50 min-h-[7.5rem]'
+                className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50 min-h-30'
                 placeholder={t('eventDescriptionPlaceholder')}
               />
               {validationErrors.description && (
@@ -446,7 +605,7 @@ export default function EventUploadForm() {
               <div className='md:col-span-1'>
                 <label
                   htmlFor='priceTier'
-                  className='block text-white/70 text-sm mb-2 flex items-center gap-1'
+                  className='block text-white/70 text-sm mb-2 items-center gap-1'
                 >
                   {t('priceTier')} <span className='text-red-400'>*</span>
                   <PriceInfoTooltip size={16} />
@@ -605,5 +764,6 @@ export default function EventUploadForm() {
             </button>
           </form>
         </div>
+      </div>
   );
 }

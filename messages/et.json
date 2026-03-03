@@ -132,6 +132,16 @@
     "startTimeRequired": "Algusaeg on kohustuslik",
     "endTimeRequired": "Lõppaeg on kohustuslik",
     "endTimeAfterStart": "Lõppaeg peab olema pärast algusaega",
-    "invalidUrl": "Palun sisesta kehtiv URL"
+    "invalidUrl": "Palun sisesta kehtiv URL",
+    "importFromFacebook": "Impordi Facebookist",
+    "importDescription": "Kleebi Facebooki ürituse URL, et vorm automaatselt täita",
+    "fbUrlPlaceholder": "https://facebook.com/events/123456789",
+    "importButton": "Impordi",
+    "importing": "Importimine...",
+    "importSuccess": "Ürituse andmed imporditud! Vaata üle ja avalda.",
+    "importError": "Üritust ei õnnestunud importida. Üritus võib olla privaatne.",
+    "importInvalidUrl": "Palun sisesta kehtiv Facebooki ürituse URL",
+    "orCreateManually": "või täida vorm käsitsi allpool",
+    "reviewAndPublish": "Imporditud Facebookist — vaata üle ja avalda"
   }
 }
