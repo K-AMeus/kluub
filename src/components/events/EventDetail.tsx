@@ -44,7 +44,7 @@ export default function EventDetail({ event, translations }: EventDetailProps) {
   const backHref = `/events/${citySlug}`;
 
   return (
-    <div className='bg-black text-white pb-8 md:pb-12'>
+    <div className='text-white pb-8 md:pb-12'>
       {/* Back Button */}
       <div className='px-4 md:px-8 lg:px-12 max-w-5xl mx-auto py-4 md:py-6'>
         <Link
@@ -66,183 +66,89 @@ export default function EventDetail({ event, translations }: EventDetailProps) {
           <div className='absolute inset-0 bg-[#E4DD3B] translate-x-2 translate-y-2' />
 
           <div className='relative bg-black border border-white/30'>
-            {/* Desktop Layout */}
-            <div className='hidden md:flex'>
-              {/* Image Section */}
-              <div className='relative w-1/3 min-h-[320px] lg:min-h-[360px]'>
-                <Image
-                  src={imageUrl}
-                  alt={event.title}
-                  fill
-                  className='object-cover border-r-2 border-[#E4DD3B]'
-                  preload
-                  sizes='(max-width: 1200px) 33vw, 400px'
-                />
-                {/* Date Badge */}
-                <div className='absolute top-4 left-4 bg-[#E4DD3B] px-3 py-2 flex flex-col items-center'>
-                  <span className='text-black font-display text-2xl leading-none font-bold'>
-                    {day}
-                  </span>
-                  <span className='text-black font-sans text-xs uppercase tracking-wider'>
-                    {month}
-                  </span>
-                </div>
-              </div>
-
-              {/* Content Section */}
-              <div className='flex-1 flex flex-col p-6 lg:p-8'>
-                {/* Title */}
-                <h1 className='text-white font-display text-2xl lg:text-3xl uppercase tracking-wide mb-6'>
-                  {event.title}
-                </h1>
-
-                {/* Info Grid */}
-                <div className='grid grid-cols-2 gap-4 mb-6 pb-6 border-b border-white/10'>
-                  {/* Location */}
-                  <div className='flex items-center gap-3'>
-                    <LocationIcon
-                      size={20}
-                      className='text-[#E4DD3B] shrink-0'
-                    />
-                    <span className='text-white/95 font-sans text-sm'>
-                      {event.venue}
-                    </span>
-                  </div>
-
-                  {/* Time */}
-                  <div className='flex items-center gap-3'>
-                    <CalendarIcon
-                      size={20}
-                      className='text-[#E4DD3B] shrink-0'
-                    />
-                    <span className='text-white/95 font-sans text-sm'>
-                      {formatTime(event.startTime)} –{' '}
-                      {formatTime(event.endTime)}
-                    </span>
-                  </div>
-
-                  {/* Price */}
-                  <div className='flex items-center gap-3'>
-                    <TicketIcon size={20} className='text-[#E4DD3B] shrink-0' />
-                    <span className='text-white/95 font-sans text-sm'>
-                      {priceDisplay}
-                    </span>
-                    <PriceInfoTooltip size={14} />
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div className='flex-1'>
-                  <p className='text-white/95 font-sans text-sm lg:text-base leading-relaxed whitespace-pre-line'>
-                    {event.description}
-                  </p>
-                </div>
-
-                {/* Facebook Link */}
-                {event.facebookUrl && (
-                  <div className='mt-6 pt-6 border-t border-white/10'>
-                    <a
-                      href={event.facebookUrl}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      className='group inline-flex items-center gap-2.5 text-[#E4DD3B] hover:text-[#E4DD3B]/80 transition-colors font-sans text-sm'
-                    >
-                      <FacebookIcon size={18} />
-                      <span>{translations.facebookEvent}</span>
-                      <ChevronRightIcon
-                        size={16}
-                        className='transition-transform group-hover:translate-x-1'
-                      />
-                    </a>
-                  </div>
-                )}
+            <div className='relative w-full aspect-video overflow-hidden'>
+              <Image
+                src={imageUrl}
+                alt=''
+                fill
+                className='object-cover scale-110 blur-2xl opacity-80'
+                sizes='1px'
+                aria-hidden='true'
+              />
+              <div className='absolute inset-0 bg-black/40' />
+              <Image
+                src={imageUrl}
+                alt={event.title}
+                fill
+                className='object-contain relative'
+                priority
+                sizes='(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 960px'
+              />
+              <div className='absolute top-3 left-3 md:top-4 md:left-4 bg-[#E4DD3B] px-2.5 py-1.5 md:px-3 md:py-2 flex flex-col items-center z-10'>
+                <span className='text-black font-display text-xl md:text-2xl leading-none font-bold'>
+                  {day}
+                </span>
+                <span className='text-black font-sans text-[10px] md:text-xs uppercase tracking-wider'>
+                  {month}
+                </span>
               </div>
             </div>
 
-            {/* Mobile Layout */}
-            <div className='md:hidden'>
-              {/* Image */}
-              <div className='relative w-full h-56'>
-                <Image
-                  src={imageUrl}
-                  alt={event.title}
-                  fill
-                  className='object-cover'
-                  preload
-                  sizes='100vw'
-                />
-                {/* Date Badge */}
-                <div className='absolute top-3 left-3 bg-[#E4DD3B] px-2.5 py-1.5 flex flex-col items-center'>
-                  <span className='text-black font-display text-xl leading-none font-bold'>
-                    {day}
+            <div className='p-4 md:p-6 lg:p-8'>
+              <h1 className='text-white font-display text-xl md:text-2xl lg:text-3xl uppercase tracking-wide mb-4 md:mb-6'>
+                {event.title}
+              </h1>
+
+              <div className='space-y-2.5 md:grid md:grid-cols-3 md:gap-4 md:space-y-0 mb-4 md:mb-6 pb-4 md:pb-6 border-b border-white/10'>
+                <div className='flex items-center gap-2.5 md:gap-3'>
+                  <LocationIcon
+                    size={18}
+                    className='text-[#E4DD3B] shrink-0'
+                  />
+                  <span className='text-white/95 font-sans text-sm'>
+                    {event.venue}
                   </span>
-                  <span className='text-black font-sans text-[10px] uppercase tracking-wider'>
-                    {month}
+                </div>
+                <div className='flex items-center gap-2.5 md:gap-3'>
+                  <CalendarIcon
+                    size={18}
+                    className='text-[#E4DD3B] shrink-0'
+                  />
+                  <span className='text-white/95 font-sans text-sm'>
+                    {formatTime(event.startTime)} –{' '}
+                    {formatTime(event.endTime)}
                   </span>
+                </div>
+                <div className='flex items-center gap-2.5 md:gap-3'>
+                  <TicketIcon size={18} className='text-[#E4DD3B] shrink-0' />
+                  <span className='text-white/95 font-sans text-sm'>
+                    {priceDisplay}
+                  </span>
+                  <PriceInfoTooltip size={13} />
                 </div>
               </div>
 
-              {/* Content */}
-              <div className='p-4'>
-                {/* Title */}
-                <h1 className='text-white font-display text-xl uppercase tracking-wide mb-4'>
-                  {event.title}
-                </h1>
+              <p className='text-white/95 font-sans text-sm md:text-base leading-relaxed whitespace-pre-line'>
+                {event.description}
+              </p>
 
-                {/* Info */}
-                <div className='space-y-2.5 mb-4 pb-4 border-b border-white/10'>
-                  <div className='flex items-center gap-2.5'>
-                    <LocationIcon
+              {event.facebookUrl && (
+                <div className='mt-4 md:mt-6 pt-4 md:pt-6 border-t border-white/10'>
+                  <a
+                    href={event.facebookUrl}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='group inline-flex items-center gap-2 md:gap-2.5 text-[#E4DD3B] hover:text-[#E4DD3B]/80 transition-colors font-sans text-sm'
+                  >
+                    <FacebookIcon size={18} />
+                    <span>{translations.facebookEvent}</span>
+                    <ChevronRightIcon
                       size={16}
-                      className='text-[#E4DD3B] shrink-0'
+                      className='transition-transform group-hover:translate-x-1'
                     />
-                    <span className='text-white/95 font-sans text-sm'>
-                      {event.venue}
-                    </span>
-                  </div>
-                  <div className='flex items-center gap-2.5'>
-                    <CalendarIcon
-                      size={16}
-                      className='text-[#E4DD3B] shrink-0'
-                    />
-                    <span className='text-white/95 font-sans text-sm'>
-                      {formatTime(event.startTime)} –{' '}
-                      {formatTime(event.endTime)}
-                    </span>
-                  </div>
-                  <div className='flex items-center gap-2.5'>
-                    <TicketIcon size={16} className='text-[#E4DD3B] shrink-0' />
-                    <span className='text-white/95 font-sans text-sm'>
-                      {priceDisplay}
-                    </span>
-                    <PriceInfoTooltip size={12} />
-                  </div>
+                  </a>
                 </div>
-
-                {/* Description */}
-                <p className='text-white/95 font-sans text-sm leading-relaxed whitespace-pre-line'>
-                  {event.description}
-                </p>
-
-                {/* Facebook Link */}
-                {event.facebookUrl && (
-                  <div className='mt-4 pt-4 border-t border-white/10'>
-                    <a
-                      href={event.facebookUrl}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      className='group inline-flex items-center gap-2 text-[#E4DD3B] hover:text-[#E4DD3B]/80 transition-colors font-sans text-sm'
-                    >
-                      <FacebookIcon size={16} />
-                      <span>{translations.facebookEvent}</span>
-                      <ChevronRightIcon
-                        size={14}
-                        className='transition-transform group-hover:translate-x-1'
-                      />
-                    </a>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
           </div>
         </article>

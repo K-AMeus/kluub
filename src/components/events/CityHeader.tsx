@@ -24,12 +24,12 @@ export default function CityHeader({ city }: CityHeaderProps) {
   }, []);
 
   return (
-    <div className='flex items-baseline gap-2 md:gap-4'>
+    <div className='flex items-baseline gap-3 md:gap-5'>
       <h1 className='text-white font-display text-3xl md:text-5xl lg:text-6xl tracking-tight'>
         {city}
       </h1>
       <span
-        className={`text-white/40 font-sans text-sm md:text-lg transition-opacity duration-500 ${
+        className={`text-white/40 font-sans text-sm md:text-lg tabular-nums tracking-wide transition-opacity duration-500 ${
           mounted ? 'opacity-100' : 'opacity-0'
         }`}
         aria-label={`Current time in ${city}`}

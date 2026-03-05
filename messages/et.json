@@ -1,4 +1,8 @@
 {
+  "metadata": {
+    "title": "Kluub - Ööelu ja üritused Tallinnas, Tartus ja Pärnus",
+    "description": "Avasta parim ööelu Eestis — ööklubid, peod, DJ setid ja üritused Tallinnas, Tartus ja Pärnus. Sirvi kuupäeva, asukoha ja hinna järgi ning leia, mis toimub täna õhtul."
+  },
   "landingPage": {
     "title": "Leia üritus, mis sobib igasse hetke",
     "subtitle": "Vali asukoht ja alusta avastamist."
@@ -18,6 +22,7 @@
     "readMore": "Loe lähemalt",
     "loadMore": "Lae veel",
     "noEvents": "Üritusi ei leitud",
+    "noEventsHint": "Proovi filtreid muuta",
     "free": "Tasuta",
     "facebookEvent": "Facebooki üritus",
     "topPicks": "Top picks",
