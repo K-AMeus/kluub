@@ -8,9 +8,11 @@ import EventCard, { EventCardTranslations } from './EventCard';
 import DateHeader from './DateHeader';
 import EventFiltersComponent, { EventFilters } from './EventFilters';
 import CityHeader from './CityHeader';
+import { CalendarIcon } from '@/components/shared/icons';
 
 interface EventListTranslations extends EventCardTranslations {
   noEvents: string;
+  noEventsHint: string;
   loadMore: string;
   loadError: string;
   retry: string;
@@ -114,8 +116,8 @@ export default function EventList({
 
   return (
     <div>
-      <div className='pb-3 md:pb-6 border-b border-white/10'>
-        <div className='flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-4'>
+      <div className='pb-2 md:pb-5 border-b border-white/10'>
+        <div className='flex flex-col md:flex-row md:items-end md:justify-between gap-3 md:gap-4'>
           <CityHeader city={cityDisplay} />
           <EventFiltersComponent
             city={city}
@@ -138,11 +140,19 @@ export default function EventList({
       )}
 
       {events.length === 0 && !isLoading && !error ? (
-        <div className='flex items-center justify-center py-12 md:py-16'>
-          <div className='text-center'>
-            <p className='text-white/60 font-sans text-base md:text-lg'>
-              {translations.noEvents}
-            </p>
+        <div className='flex items-center justify-center py-16 md:py-24'>
+          <div className='text-center flex flex-col items-center gap-4'>
+            <div className='w-14 h-14 md:w-16 md:h-16 flex items-center justify-center'>
+              <CalendarIcon size={28} className='text-white/25' />
+            </div>
+            <div className='space-y-1.5'>
+              <p className='text-white/50 font-sans text-base md:text-lg font-medium'>
+                {translations.noEvents}
+              </p>
+              <p className='text-white/25 font-sans text-sm'>
+                {translations.noEventsHint}
+              </p>
+            </div>
           </div>
         </div>
       ) : (

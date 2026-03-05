@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import { getLocale } from 'next-intl/server';
 import { Montserrat, Dela_Gothic_One } from 'next/font/google';
 import './globals.css';
@@ -15,14 +14,6 @@ const delaGothicOne = Dela_Gothic_One({
   subsets: ['latin', 'latin-ext'],
   display: 'swap',
 });
-
-export const metadata: Metadata = {
-  title: 'Kluub - Discover Events in Estonia',
-  description: 'Discover the perfect event for every occasion',
-  appleWebApp: {
-    title: 'Kluub - Discover Events in Estonia',
-  },
-};
 
 export default async function RootLayout({
   children,

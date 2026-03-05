@@ -1,4 +1,8 @@
 {
+  "metadata": {
+    "title": "Kluub - Nightlife & Events in Tallinn, Tartu & Pärnu",
+    "description": "Discover the best nightlife in Estonia — club nights, parties, DJ sets, and events in Tallinn, Tartu, and Pärnu. Browse by date, venue, and price to find out what's happening tonight."
+  },
   "landingPage": {
     "title": "Discover the perfect event for every occasion",
     "subtitle": "Choose your location and find the perfect match."
@@ -18,6 +22,7 @@
     "readMore": "Read More",
     "loadMore": "Load More",
     "noEvents": "No events found",
+    "noEventsHint": "Try adjusting your filters",
     "free": "Free",
     "facebookEvent": "Facebook Event",
     "topPicks": "Top Picks",
