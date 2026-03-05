@@ -23,6 +23,7 @@ function extractFromScripts(root: HTMLElement) {
   let description: string | null = null;
   let startTime: string | null = null;
   let endTime: string | null = null;
+  let imageUrl: string | null = null;
 
   for (const el of root.querySelectorAll('script')) {
     const text = el.rawText;
@@ -48,10 +49,33 @@ function extractFromScripts(root: HTMLElement) {
       }
     }
 
-    if (description && startTime) break;
+    // Extract cover image URL from script JSON data as fallback
+    if (!imageUrl) {
+      // Try: "full_image":{"uri":"..."}
+      const fullImg = text.match(/"full_image"\s*:\s*\{\s*"uri"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+      if (fullImg?.[1]) {
+        imageUrl = unescapeJsonString(fullImg[1]);
+      }
+    }
+    if (!imageUrl) {
+      // Try: "cover_photo":{"photo":{"image":{"uri":"..."}}}
+      const coverPhoto = text.match(/"cover_photo"\s*:\s*\{[^}]*"photo"\s*:\s*\{[^}]*"image"\s*:\s*\{[^}]*"uri"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+      if (coverPhoto?.[1]) {
+        imageUrl = unescapeJsonString(coverPhoto[1]);
+      }
+    }
+    if (!imageUrl) {
+      // Try: "event_cover_photo" or "coverPhoto" with uri
+      const eventCover = text.match(/"(?:event_cover_photo|coverPhoto)"[^{]*\{[^}]*"uri"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+      if (eventCover?.[1]) {
+        imageUrl = unescapeJsonString(eventCover[1]);
+      }
+    }
+
+    if (description && startTime && imageUrl) break;
   }
 
-  return { description, startTime, endTime };
+  return { description, startTime, endTime, imageUrl };
 }
 
 function unescapeJsonString(str: string): string {
@@ -99,8 +123,71 @@ function isLoginWall(ogTitle: string | null): boolean {
   return LOGIN_WALL_PATTERNS.some((p) => ogTitle.includes(p));
 }
 
+function decodeHtmlEntities(str: string): string {
+  return str
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&#x27;/g, "'")
+    .replace(/&#x2F;/g, '/');
+}
+
 function isTimeoutError(error: unknown): boolean {
   return error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError');
+}
+
+const FB_UA = 'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)';
+
+async function uploadImageToCloudinary(imageUrl: string): Promise<string | null> {
+  try {
+    const imgResponse = await fetch(imageUrl, {
+      headers: {
+        'User-Agent': FB_UA,
+        'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8',
+      },
+      redirect: 'follow',
+      signal: AbortSignal.timeout(10_000),
+    });
+
+    if (!imgResponse.ok) {
+      console.error(`Image fetch failed: status ${imgResponse.status} for ${imageUrl}`);
+      return null;
+    }
+
+    const contentType = imgResponse.headers.get('content-type') || '';
+    if (!contentType.startsWith('image/')) {
+      console.error(`Image fetch returned non-image content-type: ${contentType}`);
+      return null;
+    }
+
+    const buffer = Buffer.from(await imgResponse.arrayBuffer());
+
+    const uploadResult = await new Promise<UploadApiResponse>((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'kluub-events',
+          resource_type: 'image',
+          transformation: [
+            { width: 1200, crop: 'limit' },
+            { quality: 'auto:good' },
+            { fetch_format: 'auto' },
+          ],
+        },
+        (error, result) => {
+          if (error || !result) reject(error);
+          else resolve(result);
+        },
+      );
+      Readable.from(buffer).pipe(uploadStream);
+    });
+
+    return uploadResult.secure_url;
+  } catch (imgError) {
+    console.error('Failed to upload image to Cloudinary:', imgError);
+    return null;
+  }
 }
 
 export async function POST(request: Request) {
@@ -130,7 +217,7 @@ export async function POST(request: Request) {
 
     const response = await fetch(normalizedUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+        'User-Agent': FB_UA,
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language': 'en-US,en;q=0.9',
       },
@@ -149,7 +236,8 @@ export async function POST(request: Request) {
     const root = parseHTML(html);
 
     const ogTitle = extractOgTag(root, 'og:title');
-    const ogImage = extractOgTag(root, 'og:image');
+    const rawOgImage = extractOgTag(root, 'og:image');
+    const ogImage = rawOgImage ? decodeHtmlEntities(rawOgImage) : null;
 
     if (isLoginWall(ogTitle)) {
       return NextResponse.json(
@@ -158,51 +246,20 @@ export async function POST(request: Request) {
       );
     }
 
-    const { description, startTime, endTime } = extractFromScripts(root);
+    const { description, startTime, endTime, imageUrl: scriptImageUrl } = extractFromScripts(root);
 
-    // Re-upload cover image to Cloudinary since Facebook's CDN blocks third-party fetches
+    const candidateImageUrl = ogImage || scriptImageUrl;
+
     let persistentImageUrl: string | null = null;
-    if (ogImage) {
-      try {
-        const imgResponse = await fetch(ogImage, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-            'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8',
-          },
-          redirect: 'follow',
-          signal: AbortSignal.timeout(10_000),
-        });
+    if (candidateImageUrl) {
+      persistentImageUrl = await uploadImageToCloudinary(candidateImageUrl);
+    }
 
-        if (imgResponse.ok) {
-          const contentType = imgResponse.headers.get('content-type') || '';
-          if (contentType.startsWith('image/')) {
-            const buffer = Buffer.from(await imgResponse.arrayBuffer());
-
-            const uploadResult = await new Promise<UploadApiResponse>((resolve, reject) => {
-              const uploadStream = cloudinary.uploader.upload_stream(
-                {
-                  folder: 'kluub-events',
-                  resource_type: 'image',
-                  transformation: [
-                    { width: 1200, crop: 'limit' },
-                    { quality: 'auto:good' },
-                    { fetch_format: 'auto' },
-                  ],
-                },
-                (error, result) => {
-                  if (error || !result) reject(error);
-                  else resolve(result);
-                },
-              );
-              Readable.from(buffer).pipe(uploadStream);
-            });
-
-            persistentImageUrl = uploadResult.secure_url;
-          }
-        }
-      } catch (imgError) {
-        console.error('Failed to upload FB image to Cloudinary:', imgError);
-      }
+    if (!persistentImageUrl && candidateImageUrl) {
+      console.warn('Image extraction found URL but upload failed:', candidateImageUrl);
+    }
+    if (!candidateImageUrl) {
+      console.warn('No image URL found in og:image or script data for:', normalizedUrl);
     }
 
     const result: FacebookEventData = {
