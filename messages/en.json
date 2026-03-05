@@ -133,6 +133,16 @@
     "startTimeRequired": "Start time is required",
     "endTimeRequired": "End time is required",
     "endTimeAfterStart": "End time must be after start time",
-    "invalidUrl": "Please enter a valid URL"
+    "invalidUrl": "Please enter a valid URL",
+    "importFromFacebook": "Import from Facebook",
+    "importDescription": "Paste a Facebook event URL to auto-fill the form",
+    "fbUrlPlaceholder": "https://facebook.com/events/123456789",
+    "importButton": "Import",
+    "importing": "Importing...",
+    "importSuccess": "Event data imported! Review the details below and publish.",
+    "importError": "Could not import event. The event may be private.",
+    "importInvalidUrl": "Please enter a valid Facebook event URL",
+    "orCreateManually": "or fill in the form manually below",
+    "reviewAndPublish": "Imported from Facebook — review and publish"
   }
 }
