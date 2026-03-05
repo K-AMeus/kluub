@@ -29,7 +29,6 @@ export default function EventEditModal({
   const locale = useLocale();
   const router = useRouter();
 
-  // Form fields (initialized with event data)
   const [title, setTitle] = useState(event.title);
   const [description, setDescription] = useState(event.description);
   const [priceTier, setPriceTier] = useState<PriceTier>(event.priceTier);
@@ -40,7 +39,6 @@ export default function EventEditModal({
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
 
-  // UI states
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -52,13 +50,11 @@ export default function EventEditModal({
 
   const supabase = createBrowserSupabaseClient();
 
-  // Convert ISO timestamps to datetime-local format
   useEffect(() => {
     setStartTime(formatDateTimeForInput(event.startTime));
     setEndTime(formatDateTimeForInput(event.endTime));
   }, [event]);
 
-  // Validation helper
   const isValidUrl = (url: string): boolean => {
     try {
       new URL(url);
@@ -68,7 +64,6 @@ export default function EventEditModal({
     }
   };
 
-  // Form validation
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
 
@@ -95,7 +90,6 @@ export default function EventEditModal({
     return Object.keys(errors).length === 0;
   };
 
-  // Handle venue change
   const handleVenueChange = (newVenueId: string) => {
     setVenueId(newVenueId);
 
@@ -105,7 +99,6 @@ export default function EventEditModal({
     }
   };
 
-  // Handle update
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -155,9 +148,7 @@ export default function EventEditModal({
     }
   };
 
-  // Handle duplicate
   const handleDuplicate = () => {
-    // Save event data to localStorage (without the ID)
     const duplicateData = {
       title: event.title,
       description: event.description,
@@ -171,12 +162,9 @@ export default function EventEditModal({
     };
 
     localStorage.setItem('duplicateEvent', JSON.stringify(duplicateData));
-
-    // Navigate to upload page
     router.push(`/${locale}/backstage/events/upload`);
   };
 
-  // Handle delete
   const handleDelete = async () => {
     setError(null);
     setIsDeleting(true);
@@ -208,94 +196,64 @@ export default function EventEditModal({
     }
   };
 
+  const inputClasses = 'w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] text-white placeholder-white/25 focus:outline-none focus:border-[#E4DD3B]/40 focus:ring-1 focus:ring-[#E4DD3B]/20 transition-all duration-200 disabled:opacity-40 text-sm';
+  const labelClasses = 'block text-white/60 text-xs font-medium mb-2 uppercase tracking-wider';
+
   return (
     <>
       {/* Modal Overlay */}
       <div
-        className='fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-start justify-center p-4 pt-20 pb-8'
+        className='fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-start justify-center p-4 pt-16 md:pt-20 pb-4'
         onClick={onClose}
       >
         {/* Modal Content */}
         <div
-          className='relative bg-black/90 border border-[#E4DD3B]/30 w-full max-w-2xl max-h-[calc(100vh-7rem)] flex flex-col'
+          className='relative bg-[#111] border border-white/8 w-full max-w-2xl max-h-[calc(100vh-5rem)] flex flex-col overflow-hidden'
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Close button */}
-          <button
-            onClick={onClose}
-            className='absolute top-4 right-4 text-white/40 hover:text-white transition-colors'
-          >
-            <svg
-              className='w-6 h-6'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
+          {/* Header */}
+          <div className='flex items-center justify-between px-5 md:px-6 py-4 border-b border-white/6'>
+            <h2 className='font-display text-lg text-white tracking-wider'>
+              {t('editEvent')}
+            </h2>
+            <button
+              onClick={onClose}
+              className='p-1.5 text-white/30 hover:text-white/60 hover:bg-white/6 transition-all duration-200 cursor-pointer'
             >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth={2}
-                d='M6 18L18 6M6 6l12 12'
-              />
-            </svg>
-          </button>
+              <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+                <path strokeLinecap='round' strokeLinejoin='round' d='M6 18L18 6M6 6l12 12' />
+              </svg>
+            </button>
 
-          <div className='p-6 md:p-8 overflow-y-auto flex-1'>
-            {/* Header */}
-            <div className='mb-6'>
-              <h2 className='font-display text-2xl text-white tracking-wider'>
-                {t('editEvent')}
-              </h2>
-            </div>
+          </div>
 
+          {/* Scrollable Body */}
+          <div className='p-5 md:p-6 overflow-y-auto flex-1'>
             {/* Error message */}
             {error && (
-              <div className='mb-6 p-4 bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-start gap-3'>
-                <svg
-                  className='w-5 h-5 shrink-0 mt-0.5'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-                  />
+              <div className='mb-5 p-3 bg-red-500/6 border border-red-500/20 text-red-400 text-sm flex items-center gap-3'>
+                <svg className='w-4 h-4 shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+                  <path strokeLinecap='round' strokeLinejoin='round' d='M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z' />
                 </svg>
-                <span>{error}</span>
+                <span className='text-xs'>{error}</span>
               </div>
             )}
 
             {/* Success message */}
             {success && (
-              <div className='mb-6 p-4 bg-green-500/10 border border-green-500/30 text-green-400 text-sm flex items-start gap-3'>
-                <svg
-                  className='w-5 h-5 shrink-0 mt-0.5'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
-                  />
+              <div className='mb-5 p-3 bg-emerald-500/6 border border-emerald-500/20 text-emerald-400 text-sm flex items-center gap-3'>
+                <svg className='w-4 h-4 shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+                  <path strokeLinecap='round' strokeLinejoin='round' d='M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
                 </svg>
-                <span>{success}</span>
+                <span className='text-xs'>{success}</span>
               </div>
             )}
 
             {/* Form */}
-            <form id='edit-event-form' onSubmit={handleUpdate} className='space-y-6'>
+            <form id='edit-event-form' onSubmit={handleUpdate} className='space-y-5'>
               {/* Title */}
               <div>
-                <label
-                  htmlFor='title'
-                  className='block text-white/70 text-sm mb-2'
-                >
+                <label htmlFor='title' className={labelClasses}>
                   {t('eventTitle')} <span className='text-red-400'>*</span>
                 </label>
                 <input
@@ -305,24 +263,18 @@ export default function EventEditModal({
                   onChange={(e) => setTitle(e.target.value)}
                   required
                   disabled={isSubmitting || isDeleting}
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                  className={inputClasses}
                   placeholder={t('eventTitlePlaceholder')}
                 />
                 {validationErrors.title && (
-                  <p className='mt-1 text-sm text-red-400'>
-                    {validationErrors.title}
-                  </p>
+                  <p className='mt-1.5 text-xs text-red-400'>{validationErrors.title}</p>
                 )}
               </div>
 
               {/* Description */}
               <div>
-                <label
-                  htmlFor='description'
-                  className='block text-white/70 text-sm mb-2'
-                >
-                  {t('eventDescription')}{' '}
-                  <span className='text-red-400'>*</span>
+                <label htmlFor='description' className={labelClasses}>
+                  {t('eventDescription')} <span className='text-red-400'>*</span>
                 </label>
                 <textarea
                   id='description'
@@ -331,24 +283,18 @@ export default function EventEditModal({
                   required
                   disabled={isSubmitting || isDeleting}
                   rows={4}
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50 min-h-[7.5rem]'
+                  className={inputClasses + ' min-h-30 resize-y'}
                   placeholder={t('eventDescriptionPlaceholder')}
                 />
                 {validationErrors.description && (
-                  <p className='mt-1 text-sm text-red-400'>
-                    {validationErrors.description}
-                  </p>
+                  <p className='mt-1.5 text-xs text-red-400'>{validationErrors.description}</p>
                 )}
               </div>
 
-              {/* Venue Selector */}
+              {/* Venue + Price Tier */}
               <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                {/* Venue Selector - 2/3 width */}
                 <div className='md:col-span-2'>
-                  <label
-                    htmlFor='venue'
-                    className='block text-white/70 text-sm mb-2'
-                  >
+                  <label htmlFor='venue' className={labelClasses}>
                     {t('venue')} <span className='text-red-400'>*</span>
                   </label>
                   <select
@@ -357,72 +303,47 @@ export default function EventEditModal({
                     onChange={(e) => handleVenueChange(e.target.value)}
                     required
                     disabled={isSubmitting || isDeleting}
-                    className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                    className={inputClasses}
                   >
-                    <option value='' className='bg-black'>
+                    <option value='' className='bg-[#111]'>
                       {t('venueSelect')}
                     </option>
                     {venues.map((venue) => (
-                      <option
-                        key={venue.id}
-                        value={venue.id}
-                        className='bg-black'
-                      >
+                      <option key={venue.id} value={venue.id} className='bg-[#111]'>
                         {venue.name}
                       </option>
                     ))}
                   </select>
                   {validationErrors.venueId && (
-                    <p className='mt-1 text-sm text-red-400'>
-                      {validationErrors.venueId}
-                    </p>
+                    <p className='mt-1.5 text-xs text-red-400'>{validationErrors.venueId}</p>
                   )}
                 </div>
 
-                {/* Price Tier - 1/3 width */}
                 <div className='md:col-span-1'>
-                  <label
-                    htmlFor='priceTier'
-                    className='block text-white/70 text-sm mb-2 flex items-center gap-1'
-                  >
+                  <label htmlFor='priceTier' className={labelClasses + ' flex items-center gap-1'}>
                     {t('priceTier')} <span className='text-red-400'>*</span>
-                    <PriceInfoTooltip size={16} />
+                    <PriceInfoTooltip size={14} />
                   </label>
                   <select
                     id='priceTier'
                     value={priceTier}
-                    onChange={(e) =>
-                      setPriceTier(Number(e.target.value) as PriceTier)
-                    }
+                    onChange={(e) => setPriceTier(Number(e.target.value) as PriceTier)}
                     required
                     disabled={isSubmitting || isDeleting}
-                    className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                    className={inputClasses}
                   >
-                    <option value={0} className='bg-black'>
-                      {t('priceTierFree')}
-                    </option>
-                    <option value={1} className='bg-black'>
-                      {t('priceTierLow')}
-                    </option>
-                    <option value={2} className='bg-black'>
-                      {t('priceTierMedium')}
-                    </option>
-                    <option value={3} className='bg-black'>
-                      {t('priceTierHigh')}
-                    </option>
+                    <option value={0} className='bg-[#111]'>{t('priceTierFree')}</option>
+                    <option value={1} className='bg-[#111]'>{t('priceTierLow')}</option>
+                    <option value={2} className='bg-[#111]'>{t('priceTierMedium')}</option>
+                    <option value={3} className='bg-[#111]'>{t('priceTierHigh')}</option>
                   </select>
                 </div>
               </div>
 
-
-              {/* Start Time and End Time (Same Row) */}
+              {/* Start/End Time */}
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                {/* Start Time */}
                 <div>
-                  <label
-                    htmlFor='startTime'
-                    className='block text-white/70 text-sm mb-2'
-                  >
+                  <label htmlFor='startTime' className={labelClasses}>
                     {t('startTime')} <span className='text-red-400'>*</span>
                   </label>
                   <input
@@ -432,21 +353,15 @@ export default function EventEditModal({
                     onChange={(e) => setStartTime(e.target.value)}
                     required
                     disabled={isSubmitting || isDeleting}
-                    className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50'
+                    className={inputClasses}
                   />
                   {validationErrors.startTime && (
-                    <p className='mt-1 text-sm text-red-400'>
-                      {validationErrors.startTime}
-                    </p>
+                    <p className='mt-1.5 text-xs text-red-400'>{validationErrors.startTime}</p>
                   )}
                 </div>
 
-                {/* End Time */}
                 <div>
-                  <label
-                    htmlFor='endTime'
-                    className='block text-white/70 text-sm mb-2'
-                  >
+                  <label htmlFor='endTime' className={labelClasses}>
                     {t('endTime')} <span className='text-red-400'>*</span>
                   </label>
                   <input
@@ -456,19 +371,17 @@ export default function EventEditModal({
                     onChange={(e) => setEndTime(e.target.value)}
                     required
                     disabled={isSubmitting || isDeleting}
-                    className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-[border-color,box-shadow,opacity] duration-200 disabled:opacity-50'
+                    className={inputClasses}
                   />
                   {validationErrors.endTime && (
-                    <p className='mt-1 text-sm text-red-400'>
-                      {validationErrors.endTime}
-                    </p>
+                    <p className='mt-1.5 text-xs text-red-400'>{validationErrors.endTime}</p>
                   )}
                 </div>
               </div>
 
               {/* Image Upload */}
               <div>
-                <label className='block text-white/70 text-sm mb-2'>
+                <label className={labelClasses}>
                   {t('eventImage')}
                 </label>
                 <ImageUpload
@@ -487,10 +400,7 @@ export default function EventEditModal({
 
               {/* Facebook URL */}
               <div>
-                <label
-                  htmlFor='facebookUrl'
-                  className='block text-white/70 text-sm mb-2'
-                >
+                <label htmlFor='facebookUrl' className={labelClasses}>
                   {t('facebookUrl')}
                 </label>
                 <input
@@ -499,49 +409,28 @@ export default function EventEditModal({
                   value={facebookUrl}
                   onChange={(e) => setFacebookUrl(e.target.value)}
                   disabled={isSubmitting || isDeleting}
-                  className='w-full px-4 py-3 bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-[#E4DD3B]/50 focus:ring-1 focus:ring-[#E4DD3B]/50 transition-all duration-200 disabled:opacity-50'
+                  className={inputClasses}
                   placeholder={t('facebookUrlPlaceholder')}
                 />
                 {validationErrors.facebookUrl && (
-                  <p className='mt-1 text-sm text-red-400'>
-                    {validationErrors.facebookUrl}
-                  </p>
+                  <p className='mt-1.5 text-xs text-red-400'>{validationErrors.facebookUrl}</p>
                 )}
               </div>
-
             </form>
           </div>
 
           {/* Sticky Footer */}
-          <div className='sticky bottom-0 bg-black/90 border-t border-white/10 px-6 md:px-8 py-4'>
-            <div className='flex flex-col sm:flex-row gap-3'>
+          <div className='border-t border-white/6 px-5 md:px-6 py-4 bg-[#111]'>
+            <div className='flex flex-col sm:flex-row gap-2'>
               <button
                 type='submit'
                 form='edit-event-form'
                 disabled={isSubmitting || isDeleting}
-                className='flex-1 py-3 bg-[#E4DD3B] hover:bg-[#E4DD3B]/90 text-black font-semibold transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
+                className='flex-1 py-2.5 bg-[#E4DD3B] hover:bg-[#E4DD3B]/90 text-black text-sm font-semibold transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2'
               >
                 {isSubmitting ? (
                   <>
-                    <svg
-                      className='w-5 h-5 animate-spin'
-                      fill='none'
-                      viewBox='0 0 24 24'
-                    >
-                      <circle
-                        className='opacity-25'
-                        cx='12'
-                        cy='12'
-                        r='10'
-                        stroke='currentColor'
-                        strokeWidth='4'
-                      />
-                      <path
-                        className='opacity-75'
-                        fill='currentColor'
-                        d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                      />
-                    </svg>
+                    <div className='w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin' />
                     {t('updatingEvent')}
                   </>
                 ) : (
@@ -553,21 +442,8 @@ export default function EventEditModal({
                 type='button'
                 onClick={handleDuplicate}
                 disabled={isSubmitting || isDeleting}
-                className='px-6 py-3 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 hover:border-blue-500/50 text-blue-400 font-semibold transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
+                className='flex-1 py-2.5 bg-white/4 hover:bg-white/8 border border-white/8 hover:border-white/15 text-white/70 text-sm font-medium transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2'
               >
-                <svg
-                  className='w-5 h-5'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z'
-                  />
-                </svg>
                 {t('duplicateEvent')}
               </button>
 
@@ -575,7 +451,7 @@ export default function EventEditModal({
                 type='button'
                 onClick={() => setShowDeleteConfirm(true)}
                 disabled={isSubmitting || isDeleting}
-                className='px-6 py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 text-red-400 font-semibold transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
+                className='flex-1 py-2.5 bg-red-500/6 hover:bg-red-500/12 border border-red-500/20 hover:border-red-500/30 text-red-400 text-sm font-medium transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed'
               >
                 {t('deleteEvent')}
               </button>
@@ -587,54 +463,45 @@ export default function EventEditModal({
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div
-          className='fixed inset-0 bg-black/90 backdrop-blur-sm z-60 flex items-center justify-center p-4'
+          className='fixed inset-0 bg-black/80 backdrop-blur-sm z-60 flex items-center justify-center p-4'
           onClick={() => setShowDeleteConfirm(false)}
         >
           <div
-            className='bg-black/95 border border-red-500/30 p-6 max-w-md w-full'
+            className='bg-[#111] border border-white/8 p-6 max-w-sm w-full'
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className='text-xl text-white font-semibold mb-3'>
-              {t('confirmDelete')}
-            </h3>
-            <p className='text-white/50 text-sm mb-6'>
-              {t('confirmDeleteMessage')}
-            </p>
+            <div className='flex items-center gap-3 mb-4'>
+              <div className='w-10 h-10 bg-red-500/1 flex items-center justify-center shrink-0'>
+                <svg className='w-5 h-5 text-red-400' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+                  <path strokeLinecap='round' strokeLinejoin='round' d='M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z' />
+                </svg>
+              </div>
+              <div>
+                <h3 className='text-white text-base font-semibold'>
+                  {t('confirmDelete')}
+                </h3>
+                <p className='text-white/40 text-xs mt-0.5'>
+                  {t('confirmDeleteMessage')}
+                </p>
+              </div>
+            </div>
 
-            <div className='flex gap-3'>
+            <div className='flex gap-2 mt-6'>
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={isDeleting}
-                className='flex-1 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-all duration-200'
+                className='flex-1 py-2.5 bg-white/4 hover:bg-white/8 border border-white/8 text-white/70 text-sm font-medium transition-all duration-200 cursor-pointer'
               >
                 {t('cancel')}
               </button>
               <button
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className='flex-1 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-400 transition-all duration-200 flex items-center justify-center gap-2'
+                className='flex-1 py-2.5 bg-red-500/12 hover:bg-red-500/20 border border-red-500/30 text-red-400 text-sm font-medium transition-all duration-200 cursor-pointer flex items-center justify-center gap-2'
               >
                 {isDeleting ? (
                   <>
-                    <svg
-                      className='w-4 h-4 animate-spin'
-                      fill='none'
-                      viewBox='0 0 24 24'
-                    >
-                      <circle
-                        className='opacity-25'
-                        cx='12'
-                        cy='12'
-                        r='10'
-                        stroke='currentColor'
-                        strokeWidth='4'
-                      />
-                      <path
-                        className='opacity-75'
-                        fill='currentColor'
-                        d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                      />
-                    </svg>
+                    <div className='w-4 h-4 border-2 border-red-400/20 border-t-red-400 rounded-full animate-spin' />
                     {t('deletingEvent')}
                   </>
                 ) : (
