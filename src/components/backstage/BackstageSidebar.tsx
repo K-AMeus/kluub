@@ -91,7 +91,7 @@ export default function BackstageSidebar({ isOpen, onClose }: BackstageSidebarPr
         {/* Navigation */}
         <nav className='flex-1 px-3 py-4 space-y-1'>
           <p className='px-3 mb-3 text-[10px] font-semibold tracking-widest uppercase text-white/30'>
-            Menu
+            {t('menu')}
           </p>
           {navItems.map((item) => {
             const active = isActive(item.href);

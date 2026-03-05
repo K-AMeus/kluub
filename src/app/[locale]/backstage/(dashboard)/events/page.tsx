@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { createBrowserSupabaseClient } from '@/supabase/client';
 import EventEditModal from '@/components/backstage/EventEditModal';
 import type { Event, Venue } from '@/lib/types';
@@ -9,6 +9,7 @@ import { formatDateTimeWithYear } from '@/lib/event-utils';
 
 export default function MyEventsPage() {
   const t = useTranslations('backstage');
+  const locale = useLocale();
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
@@ -156,8 +157,18 @@ export default function MyEventsPage() {
   const eventsToShow = activeTab === 'upcoming' ? upcomingEvents : pastEvents;
 
   const priceTierLabel = (tier: number) => {
-    const labels = ['Free', '€', '€€', '€€€'];
-    return labels[tier] || '';
+    switch (tier) {
+      case 0:
+        return t('priceTierFree');
+      case 1:
+        return t('priceTierLow');
+      case 2:
+        return t('priceTierMedium');
+      case 3:
+        return t('priceTierHigh');
+      default:
+        return '';
+    }
   };
 
   return (
@@ -267,7 +278,7 @@ export default function MyEventsPage() {
                         {/* Date badge */}
                         <div className='hidden sm:flex flex-col items-center justify-center w-12 h-12 bg-white/4 group-hover:bg-[#E4DD3B]/8 shrink-0 transition-colors duration-200'>
                           <span className='text-[10px] font-semibold text-white/40 uppercase leading-none'>
-                            {new Date(event.startTime).toLocaleDateString('en', { month: 'short' })}
+                            {new Date(event.startTime).toLocaleDateString(locale, { month: 'short' })}
                           </span>
                           <span className='text-lg font-bold text-white leading-tight'>
                             {new Date(event.startTime).getDate()}

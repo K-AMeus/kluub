@@ -48,7 +48,7 @@ export default function BackstageHeader({ onMenuToggle, isMobileMenuOpen }: Back
         {/* Right: Back to site */}
         <div className='ml-auto flex items-center gap-2'>
           <Link
-            href='/'
+            href={`/${locale}`}
             className='flex items-center gap-1.5 text-sm font-medium text-[#E4DD3B]/70 hover:text-[#E4DD3B] transition-colors duration-200'
           >
             kluub.ee
