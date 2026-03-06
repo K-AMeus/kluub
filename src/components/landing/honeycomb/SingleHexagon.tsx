@@ -16,8 +16,8 @@ export default function SingleHexagon({
   const points: string[] = [];
   for (let i = 0; i < 6; i++) {
     const angle = (Math.PI / 3) * i;
-    const px = size * Math.cos(angle);
-    const py = size * Math.sin(angle);
+    const px = Math.round(size * Math.cos(angle) * 100) / 100;
+    const py = Math.round(size * Math.sin(angle) * 100) / 100;
     points.push(`${px},${py}`);
   }
 

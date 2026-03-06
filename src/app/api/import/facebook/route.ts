@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { UploadApiResponse } from 'cloudinary';
-import cloudinary from '@/lib/cloudinary';
-import { Readable } from 'stream';
+import { uploadToCloudinary } from '@/lib/cloudinary';
 import { parse as parseHTML, HTMLElement } from 'node-html-parser';
 import { createClient } from '@/supabase/server';
+
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
 interface FacebookEventData {
   title: string | null;
@@ -178,26 +178,11 @@ export async function POST(request: Request) {
           if (contentType.startsWith('image/')) {
             const buffer = Buffer.from(await imgResponse.arrayBuffer());
 
-            const uploadResult = await new Promise<UploadApiResponse>((resolve, reject) => {
-              const uploadStream = cloudinary.uploader.upload_stream(
-                {
-                  folder: 'kluub-events',
-                  resource_type: 'image',
-                  transformation: [
-                    { width: 1200, crop: 'limit' },
-                    { quality: 'auto:good' },
-                    { fetch_format: 'auto' },
-                  ],
-                },
-                (error, result) => {
-                  if (error || !result) reject(error);
-                  else resolve(result);
-                },
-              );
-              Readable.from(buffer).pipe(uploadStream);
-            });
-
-            persistentImageUrl = uploadResult.secure_url;
+            if (buffer.byteLength > MAX_IMAGE_SIZE) {
+              console.warn('Facebook cover image exceeds 5MB, skipping upload');
+            } else {
+              persistentImageUrl = await uploadToCloudinary(buffer, contentType);
+            }
           }
         }
       } catch (imgError) {
