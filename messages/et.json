@@ -119,7 +119,7 @@
     "imageRemove": "Eemalda pilt",
     "imageDragActive": "Aseta pilt siia",
     "facebookUrl": "Facebooki Ürituse URL (valikuline)",
-    "facebookUrlPlaceholder": "https://facebook.com/events/...",
+    "facebookUrlPlaceholder": "https://facebook.com/events/123456789",
     "startTime": "Algusaeg",
     "endTime": "Lõppaeg",
     "createEvent": "Loo Üritus",

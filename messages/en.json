@@ -120,7 +120,7 @@
     "imageRemove": "Remove image",
     "imageDragActive": "Drop image here",
     "facebookUrl": "Facebook Event URL (optional)",
-    "facebookUrlPlaceholder": "https://facebook.com/events/...",
+    "facebookUrlPlaceholder": "https://facebook.com/events/123456789",
     "startTime": "Start Time",
     "endTime": "End Time",
     "createEvent": "Create Event",

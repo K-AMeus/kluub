@@ -17,14 +17,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
     }
 
-    // Extract public_id from Cloudinary URL
-    // Format: https://res.cloudinary.com/{cloud}/image/upload/v{version}/{folder}/{public_id}.{ext}
-    const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[^.]+$/);
-    if (!match) {
+    const uploadPath = url.split('/upload/')[1];
+    if (!uploadPath) {
       return NextResponse.json({ error: 'Could not parse URL' }, { status: 400 });
     }
 
-    const publicId = match[1];
+    const segments = uploadPath.split('/');
+    const versionIndex = segments.findIndex((s: string) => /^v\d+$/.test(s));
+    const publicIdSegments = versionIndex >= 0
+      ? segments.slice(versionIndex + 1)
+      : segments;
+    const publicId = publicIdSegments.join('/').replace(/\.[^.]+$/, '');
+
+    if (!publicId) {
+      return NextResponse.json({ error: 'Could not extract public ID' }, { status: 400 });
+    }
+
     await cloudinary.uploader.destroy(publicId);
 
     return NextResponse.json({ success: true });

@@ -58,9 +58,6 @@ export default function ImageUpload({
     setIsUploading(true);
 
     try {
-      // Delete old image if replacing
-      if (value) await deleteFromCloudinary(value);
-
       const formData = new FormData();
       formData.append('file', file);
 
@@ -81,8 +78,7 @@ export default function ImageUpload({
   };
 
   const handleRemove = () => {
-    // Don't delete from Cloudinary here - only clear the form value
-    // Deletion happens only when replacing with a new image
+    if (value) deleteFromCloudinary(value);
     onChange('');
   };
 
