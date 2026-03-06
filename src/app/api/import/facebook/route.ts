@@ -135,7 +135,7 @@ export async function POST(request: Request) {
         'Accept-Language': 'en-US,en;q=0.9',
       },
       redirect: 'follow',
-      signal: AbortSignal.timeout(10_000),
+      signal: AbortSignal.timeout(15_000),
     });
 
     if (!response.ok) {
@@ -160,7 +160,6 @@ export async function POST(request: Request) {
 
     const { description, startTime, endTime } = extractFromScripts(root);
 
-    // Re-upload cover image to Cloudinary since Facebook's CDN blocks third-party fetches
     let persistentImageUrl: string | null = null;
     if (ogImage) {
       try {
@@ -170,7 +169,7 @@ export async function POST(request: Request) {
             'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8',
           },
           redirect: 'follow',
-          signal: AbortSignal.timeout(10_000),
+          signal: AbortSignal.timeout(15_000),
         });
 
         if (imgResponse.ok) {
