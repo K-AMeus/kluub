@@ -134,7 +134,7 @@ function BottomSheet({
       />
       <div
         ref={sheetRef}
-        className={`absolute bottom-0 left-0 right-0 bg-[#111] rounded-t-2xl max-h-[92vh] overflow-hidden ${
+        className={`absolute bottom-0 left-0 right-0 bg-[#111] max-h-[92vh] overflow-hidden ${
           !hasAnimated.current ? 'animate-slide-up' : ''
         }`}
         style={{
@@ -322,6 +322,7 @@ function DateRangeCalendar({
 
           const dateStr = formatDayToString(day);
           const isPast = dateStr < today;
+          const isToday = dateStr === today;
           const inRange = isInRange(day);
           const isStartDay = isStart(day);
           const isEndDay = isEnd(day);
@@ -337,6 +338,7 @@ function DateRangeCalendar({
                 ${isPast ? 'text-white/20 cursor-not-allowed' : ''}
                 ${inRange && !isSelected ? 'bg-[#E4DD3B]/20 text-white' : ''}
                 ${isSelected ? 'bg-[#E4DD3B] text-black font-medium' : ''}
+                ${isToday && !isSelected ? 'ring-1 ring-[#E4DD3B] ring-offset-1 ring-offset-[#1a1a1a]' : ''}
                 ${
                   !isPast && !inRange && !isSelected
                     ? 'text-white/70 hover:text-white hover:bg-white/10'
@@ -365,7 +367,7 @@ function DateRangeCalendar({
         <div className='flex gap-2'>
           <button
             onClick={clearRange}
-            className='flex-1 px-3 py-2.5 text-sm font-sans text-white/70 border border-white/20 rounded-lg hover:border-white/40 transition-colors cursor-pointer'
+            className='flex-1 px-3 py-2.5 text-sm font-sans text-white/70 border border-white/20 hover:border-white/40 transition-colors cursor-pointer'
           >
             {t('clearFilters')}
           </button>
@@ -373,7 +375,7 @@ function DateRangeCalendar({
             onClick={applyRange}
             disabled={!tempStart}
             className={`
-              flex-1 px-3 py-2.5 text-sm font-sans rounded-lg transition-colors cursor-pointer
+              flex-1 px-3 py-2.5 text-sm font-sans transition-colors cursor-pointer
               ${
                 tempStart
                   ? 'bg-[#E4DD3B] text-black hover:bg-[#E4DD3B]/90'
@@ -676,7 +678,7 @@ export default function EventFiltersComponent({
           </DesktopFilterButton>
 
           {datePickerOpen && (
-            <div className='absolute top-full right-0 mt-2 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-2xl z-100'>
+            <div className='absolute top-full right-0 mt-2 bg-[#1a1a1a] border border-white/10 shadow-2xl z-100'>
               <DateRangeCalendar
                 startDate={filters.startDate}
                 endDate={filters.endDate}
@@ -706,7 +708,7 @@ export default function EventFiltersComponent({
           </DesktopFilterButton>
 
           {venueDropdownOpen && (
-            <div className='absolute top-full right-0 mt-2 w-56 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-2xl z-100 max-h-72 overflow-y-auto'>
+            <div className='absolute top-full right-0 mt-2 w-56 bg-[#1a1a1a] border border-white/10 shadow-2xl z-100 max-h-72 overflow-y-auto'>
               <button
                 onClick={() => {
                   updateFilters({ venueId: null });
@@ -780,7 +782,7 @@ export default function EventFiltersComponent({
             onClick={() => {
               handleMobileFiltersChange({ ...filters, venueId: null });
             }}
-            className={`w-full px-4 py-3 text-left font-sans rounded-lg transition-colors cursor-pointer ${
+            className={`w-full px-4 py-3 text-left font-sans transition-colors cursor-pointer ${
               filters.venueId === null
                 ? 'bg-[#E4DD3B] text-black'
                 : 'text-white/80 hover:bg-white/5'
@@ -799,7 +801,7 @@ export default function EventFiltersComponent({
                 onClick={() => {
                   handleMobileFiltersChange({ ...filters, venueId: venue.id });
                 }}
-                className={`w-full px-4 py-3 text-left font-sans rounded-lg transition-colors cursor-pointer ${
+                className={`w-full px-4 py-3 text-left font-sans transition-colors cursor-pointer ${
                   filters.venueId === venue.id
                     ? 'bg-[#E4DD3B] text-black'
                     : 'text-white/80 hover:bg-white/5'
