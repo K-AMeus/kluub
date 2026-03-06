@@ -51,7 +51,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className='w-104'>
+    <div className='w-[calc(100vw-2rem)] md:w-[28rem]'>
       {/* Header */}
       <div className='text-center mb-8'>
         <h1 className='font-display text-2xl md:text-3xl text-white tracking-wider mb-2'>

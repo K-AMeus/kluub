@@ -40,6 +40,7 @@ export default async function CityEventsPage({ params }: CityEventsPageProps) {
     readMore: t('readMore'),
     free: t('free'),
     facebookEvent: t('facebookEvent'),
+    topPicks: t('topPicks'),
     noEvents: t('noEvents'),
     noEventsHint: t('noEventsHint'),
     loadMore: t('loadMore'),

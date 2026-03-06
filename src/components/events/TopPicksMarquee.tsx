@@ -6,6 +6,7 @@ import { Link } from '@/i18n/navigation';
 import { Event } from '@/lib/types';
 import { TIMEZONE } from '@/lib/date-utils';
 import { DEFAULT_EVENT_IMAGE } from '@/lib/constants';
+import { useTranslations } from 'next-intl';
 
 interface TopPicksMarqueeProps {
   events: Event[];
@@ -23,6 +24,8 @@ function formatDate(dateString: string): string {
 function TopPickCard({ event }: { event: Event }) {
   const citySlug = event.city.toLowerCase();
   const imageUrl = event.imageUrl || DEFAULT_EVENT_IMAGE;
+  const t = useTranslations('eventsPage');
+  
 
   return (
     <Link
@@ -40,9 +43,12 @@ function TopPickCard({ event }: { event: Event }) {
         />
 
         <div className='absolute top-1 left-1 md:top-2 md:left-2'>
-          <div className='bg-[#E4DD3B] shadow-md shadow-black/30 px-2 py-0.5 md:px-3 md:py-1 flex items-center gap-1'>
-            <span className='font-display text-[10px] md:text-xs text-black font-bold uppercase tracking-widest leading-tight'>
-TOP PICK
+          <div className='bg-[#E4DD3B] shadow-[0_2px_8px_rgba(228,221,59,0.3)] px-2.5 py-1 flex items-center gap-1'>
+            <svg width='12' height='12' viewBox='0 0 24 24' fill='currentColor' className='shrink-0 text-black'>
+              <path d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z' />
+            </svg>
+            <span className='font-sans text-[10px] md:text-[11px] text-black font-bold uppercase tracking-wider'>
+              {t('topPicks')}
             </span>
           </div>
         </div>
