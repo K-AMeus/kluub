@@ -8,6 +8,7 @@ import HoneycombPattern from './honeycomb/HoneycombPattern';
 import CityCard from './CityCard';
 import Header from '@/components/shared/Header';
 import Footer from '@/components/shared/Footer';
+import { Link } from '@/i18n/navigation';
 
 const ParticleField = dynamic(() => import('./ParticleField'), {
   ssr: false,
@@ -80,6 +81,21 @@ export default function LandingPage() {
           />
           <CityCard name='Tallinn' isActive={false} delay={400} />
           <CityCard name='Pärnu' isActive={false} delay={600} />
+        </div>
+
+        {/* join link */}
+        <div
+          className={`mt-8 md:mt-14 flex items-center gap-2 text-sm md:text-base transform transition-all duration-1000 delay-500 ease-out ${
+            mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+          }`}
+        >
+          <span className='text-white/40'>{t('venueOwner')}</span>
+          <Link
+            href='/join'
+            className='text-[#E4DD3B] hover:text-[#E4DD3B]/80 transition-colors duration-300 underline underline-offset-2 decoration-[#E4DD3B]/40 hover:decoration-[#E4DD3B]/80'
+          >
+            {t('registerVenue')}
+          </Link>
         </div>
       </div>
 

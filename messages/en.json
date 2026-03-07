@@ -5,7 +5,9 @@
   },
   "landingPage": {
     "title": "Discover the perfect event for every occasion",
-    "subtitle": "Choose your location and find the perfect match."
+    "subtitle": "Choose your location and find the perfect match.",
+    "venueOwner": "Bring your events to Kluub.",
+    "registerVenue": "Register now!"
   },
   "cityCard": {
     "selectCity": "Select {city}",
@@ -51,6 +53,30 @@
   "eventDetail": {
     "backToEvents": "Back to Events"
   },
+  "joinPage": {
+    "heroTitle": "Put your events on the map",
+    "heroSubtitle": "Kluub.ee is Estonia's growing nightlife and events platform. Promote your venue and events to thousands of visitors in Tallinn, Tartu, and Pärnu.",
+    "whyJoinTitle": "Why join Kluub?",
+    "whyJoinSubtitle": "You create the event. We create its audience",
+    "benefit1Title": "Reach new audiences",
+    "benefit1Desc": "Kluub.ee puts your venue in front of thousands of nightlife and event enthusiasts actively looking for where to go tonight. Discover new regulars who wouldn't have found you otherwise.",
+    "benefit2Title": "Facebook integration",
+    "benefit2Desc": "Import your Facebook events with a single click. No need to copy data manually, we handle it for you.",
+    "benefit3Title": "Effortless event management",
+    "benefit3Desc": "The Backstage dashboard makes adding and managing events quick and easy. Possible to set up recurring events once and they publish automatically every week.",
+    "benefit4Title": "Analytics & insights",
+    "benefit4Desc": "Track how much interest your events generate. Data-driven decisions help you plan and market your events better.",
+    "benefit5Title": "Custom solutions",
+    "benefit5Desc": "Need something special? We help build custom integrations, like automatically importing events from your website to Kluub.",
+    "benefit6Title": "Continuous development",
+    "benefit6Desc": "We're constantly improving the platform. New features and integrations are already on the way, including a mobile app.",
+    "ctaTitle": "Ready to get started?",
+    "ctaSubtitle": "Joining is simple and quick. Get in touch and we'll help you every step of the way.",
+    "ctaButton": "Get in touch",
+    "ctaEmail": "info@kluub.ee",
+    "joinNow": "Join now",
+    "backToHome": "Back to homepage"
+  },
   "backstage": {
     "title": "Backstage",
     "subtitle": "Event management portal",
@@ -62,6 +88,8 @@
     "or": "or",
     "googleSignIn": "Continue with Google",
     "backToSite": "Back to homepage",
+    "noAccount": "Don't have an account yet?",
+    "joinUs": "Join Kluub",
     "loginError": "Invalid email or password. Please try again.",
     "welcomeTitle": "Welcome!",
     "welcomeSubtitle": "You have successfully signed in.",
