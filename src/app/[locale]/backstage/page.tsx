@@ -3,6 +3,8 @@
 import { useSearchParams } from 'next/navigation';
 import BackstageBackground from '@/components/backstage/BackstageBackground';
 import LoginForm from '@/components/backstage/LoginForm';
+import Header from '@/components/shared/Header';
+import Footer from '@/components/shared/Footer';
 
 export default function BackstagePage() {
   const searchParams = useSearchParams();
@@ -12,7 +14,9 @@ export default function BackstagePage() {
     <div className='flex flex-col min-h-screen w-screen bg-[#0a0a0a] overflow-hidden'>
       <BackstageBackground />
 
-      <main className='relative z-10 flex-1 flex items-center justify-center px-4 py-12'>
+      <Header />
+
+      <main className='relative z-10 flex-1 flex items-center justify-center px-4 pt-20 pb-12'>
         <div className='animate-fade-in-up'>
           <LoginForm />
           {hasError && (
@@ -22,6 +26,8 @@ export default function BackstagePage() {
           )}
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }
