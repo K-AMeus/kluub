@@ -1,4 +1,7 @@
 {
+  "header": {
+    "login": "Logi sisse"
+  },
   "metadata": {
     "title": "Kluub - Ööelu ja üritused Tallinnas, Tartus ja Pärnus",
     "description": "Avasta parim ööelu Eestis — ööklubid, peod, DJ setid ja üritused Tallinnas, Tartus ja Pärnus. Sirvi kuupäeva, asukoha ja hinna järgi ning leia, mis toimub täna õhtul."
@@ -88,7 +91,7 @@
     "or": "või",
     "googleSignIn": "Jätka Google'iga",
     "backToSite": "Tagasi avalehele",
-    "noAccount": "Pole veel kontot?",
+    "noAccount": "Ei ole veel kontot?",
     "joinUs": "Liitu Kluubiga",
     "loginError": "Vale e-post või parool. Palun proovi uuesti.",
     "welcomeTitle": "Tere tulemast!",

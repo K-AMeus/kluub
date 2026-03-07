@@ -14,6 +14,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entries.push({
       url: `${BASE_URL}/${locale}`,
     });
+
+    entries.push({
+      url: `${BASE_URL}/${locale}/join`,
+    });
   }
 
   for (const locale of locales) {
