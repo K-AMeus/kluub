@@ -5,7 +5,9 @@
   },
   "landingPage": {
     "title": "Leia üritus, mis sobib igasse hetke",
-    "subtitle": "Vali asukoht ja alusta avastamist."
+    "subtitle": "Vali asukoht ja alusta avastamist.",
+    "venueOwner": "Too oma üritused Kluubi.",
+    "registerVenue": "Liitu meiega!"
   },
   "cityCard": {
     "selectCity": "Vali {city}",
@@ -51,6 +53,30 @@
   "eventDetail": {
     "backToEvents": "Tagasi ürituste juurde"
   },
+  "joinPage": {
+    "heroTitle": "Tee oma üritused nähtavaks",
+    "heroSubtitle": "Kluub.ee on Eesti kasvav ööelu ja ürituste platvorm. Reklaami oma asutust ja üritusi tuhandetele külastajatele Tallinnas, Tartus ja Pärnus.",
+    "whyJoinTitle": "Miks liituda Kluubiga?",
+    "whyJoinSubtitle": "Sina lood ürituse. Meie loome sellele publiku",
+    "benefit1Title": "Jõua uute klientideni",
+    "benefit1Desc": "Kluub.ee toob sinu asutuse tuhandete ööelu- ja ürituste huviliste ette, kes otsivad aktiivselt, kuhu õhtul minna. Leia uusi püsikliente, kes poleks sind muidu avastanud.",
+    "benefit2Title": "Facebooki integratsioon",
+    "benefit2Desc": "Impordi oma Facebooki üritused ühe klikiga. Pole vaja andmeid käsitsi ümber tõsta, meie teeme selle sinu eest ära.",
+    "benefit3Title": "Lihtne ürituste haldamine",
+    "benefit3Desc": "Backstage juhtpaneel teeb ürituste lisamise ja haldamise kiireks ja mugavaks. Seadista ka korduvad üritused ühe korra ja need avaldatakse automaatselt iga nädal.",
+    "benefit4Title": "Analüütika ja statistika",
+    "benefit4Desc": "Jälgi, kui palju huvilisi sinu üritused köidavad. Andmepõhised otsused aitavad sul üritusi paremini planeerida ja turundada.",
+    "benefit5Title": "Kohandatud lahendused",
+    "benefit5Desc": "Vajad midagi erilist? Aitame luua kohandatud integratsioonid, näiteks ürituste automaatne import sinu kodulehelt Kluubi.",
+    "benefit6Title": "Pidev areng",
+    "benefit6Desc": "Arendame platvormi pidevalt. Uued funktsioonid ja integratsioonid on juba teel, sealhulgas mobiilirakendus.",
+    "ctaTitle": "Valmis liituma?",
+    "ctaSubtitle": "Liitumine on lihtne ja kiire. Võta meiega ühendust ning aitame sind igal sammul.",
+    "ctaButton": "Võta ühendust",
+    "ctaEmail": "info@kluub.ee",
+    "joinNow": "Liitu kohe",
+    "backToHome": "Tagasi avalehele"
+  },
   "backstage": {
     "title": "Backstage",
     "subtitle": "Ürituste haldusportaal",
@@ -62,6 +88,8 @@
     "or": "või",
     "googleSignIn": "Jätka Google'iga",
     "backToSite": "Tagasi avalehele",
+    "noAccount": "Pole veel kontot?",
+    "joinUs": "Liitu Kluubiga",
     "loginError": "Vale e-post või parool. Palun proovi uuesti.",
     "welcomeTitle": "Tere tulemast!",
     "welcomeSubtitle": "Oled edukalt sisse loginud.",
