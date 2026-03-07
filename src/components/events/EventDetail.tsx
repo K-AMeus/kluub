@@ -12,6 +12,8 @@ import {
 import { DEFAULT_EVENT_IMAGE } from '@/lib/constants';
 import { formatTime } from '@/lib/date-utils';
 import PriceInfoTooltip from '@/components/shared/PriceInfoTooltip';
+import EventDetailTracker from '@/components/events/EventDetailTracker';
+import FacebookEventLink from '@/components/events/FacebookEventLink';
 
 interface EventDetailTranslations {
   free: string;
@@ -45,6 +47,15 @@ export default function EventDetail({ event, translations }: EventDetailProps) {
 
   return (
     <div className='bg-black text-white pb-8 md:pb-12'>
+      {/* Analytics Tracker */}
+      <EventDetailTracker
+        eventId={event.id}
+        eventTitle={event.title}
+        city={event.city}
+        priceTier={event.priceTier}
+        venueId={event.venueId}
+      />
+
       {/* Back Button */}
       <div className='px-4 md:px-8 lg:px-12 max-w-5xl mx-auto py-4 md:py-6'>
         <Link
@@ -141,10 +152,11 @@ export default function EventDetail({ event, translations }: EventDetailProps) {
                 {/* Facebook Link */}
                 {event.facebookUrl && (
                   <div className='mt-6 pt-6 border-t border-white/10'>
-                    <a
+                    <FacebookEventLink
                       href={event.facebookUrl}
-                      target='_blank'
-                      rel='noopener noreferrer'
+                      eventId={event.id}
+                      eventTitle={event.title}
+                      venueId={event.venueId}
                       className='group inline-flex items-center gap-2.5 text-[#E4DD3B] hover:text-[#E4DD3B]/80 transition-colors font-sans text-sm'
                     >
                       <FacebookIcon size={18} />
@@ -153,7 +165,7 @@ export default function EventDetail({ event, translations }: EventDetailProps) {
                         size={16}
                         className='transition-transform group-hover:translate-x-1'
                       />
-                    </a>
+                    </FacebookEventLink>
                   </div>
                 )}
               </div>
@@ -227,10 +239,11 @@ export default function EventDetail({ event, translations }: EventDetailProps) {
                 {/* Facebook Link */}
                 {event.facebookUrl && (
                   <div className='mt-4 pt-4 border-t border-white/10'>
-                    <a
+                    <FacebookEventLink
                       href={event.facebookUrl}
-                      target='_blank'
-                      rel='noopener noreferrer'
+                      eventId={event.id}
+                      eventTitle={event.title}
+                      venueId={event.venueId}
                       className='group inline-flex items-center gap-2 text-[#E4DD3B] hover:text-[#E4DD3B]/80 transition-colors font-sans text-sm'
                     >
                       <FacebookIcon size={16} />
@@ -239,7 +252,7 @@ export default function EventDetail({ event, translations }: EventDetailProps) {
                         size={14}
                         className='transition-transform group-hover:translate-x-1'
                       />
-                    </a>
+                    </FacebookEventLink>
                   </div>
                 )}
               </div>
