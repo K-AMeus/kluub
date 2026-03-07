@@ -29,18 +29,8 @@ export default function BackstageSidebar({ isOpen, onClose }: BackstageSidebarPr
       name: t('home'),
       href: `/${locale}/backstage/welcome`,
       icon: (
-        <svg
-          className='w-5 h-5'
-          fill='none'
-          stroke='currentColor'
-          viewBox='0 0 24 24'
-        >
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            strokeWidth={2}
-            d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'
-          />
+        <svg className='w-[18px] h-[18px]' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+          <path strokeLinecap='round' strokeLinejoin='round' d='M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25' />
         </svg>
       ),
     },
@@ -48,18 +38,8 @@ export default function BackstageSidebar({ isOpen, onClose }: BackstageSidebarPr
       name: t('myEvents'),
       href: `/${locale}/backstage/events`,
       icon: (
-        <svg
-          className='w-5 h-5'
-          fill='none'
-          stroke='currentColor'
-          viewBox='0 0 24 24'
-        >
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            strokeWidth={2}
-            d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'
-          />
+        <svg className='w-[18px] h-[18px]' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+          <path strokeLinecap='round' strokeLinejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' />
         </svg>
       ),
     },
@@ -67,18 +47,8 @@ export default function BackstageSidebar({ isOpen, onClose }: BackstageSidebarPr
       name: t('addNewEvent'),
       href: `/${locale}/backstage/events/upload`,
       icon: (
-        <svg
-          className='w-5 h-5'
-          fill='none'
-          stroke='currentColor'
-          viewBox='0 0 24 24'
-        >
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            strokeWidth={2}
-            d='M12 4v16m8-8H4'
-          />
+        <svg className='w-[18px] h-[18px]' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+          <path strokeLinecap='round' strokeLinejoin='round' d='M12 4.5v15m7.5-7.5h-15' />
         </svg>
       ),
     },
@@ -103,16 +73,14 @@ export default function BackstageSidebar({ isOpen, onClose }: BackstageSidebarPr
     },
   ];
 
-  const isActive = (href: string) => {
-    return pathname === href;
-  };
+  const isActive = (href: string) => pathname === href;
 
   return (
     <>
       {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className='lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40'
+          className='lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300'
           onClick={onClose}
         />
       )}
@@ -122,50 +90,68 @@ export default function BackstageSidebar({ isOpen, onClose }: BackstageSidebarPr
         className={`
           fixed top-14 md:top-16 bottom-0 left-0 z-40
           lg:fixed lg:top-0 lg:bottom-0
-          w-64 border-r border-white/10 bg-black/95 backdrop-blur-sm flex flex-col
+          w-64 bg-black/90 backdrop-blur-md border-r border-white/6 flex flex-col
           transform transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
       >
+        {/* Logo area (desktop only) */}
+        <div className='hidden lg:flex items-center h-16 px-5 border-b border-white/6'>
+          <Link href={`/${locale}/backstage/welcome`} className='flex items-center gap-2.5 group'>
+            <span className='font-display text-lg text-white tracking-wider group-hover:text-[#E4DD3B] transition-colors duration-200'>
+              KLUUB
+            </span>
+            <span className='inline-flex items-center px-2 py-0.5 text-[10px] font-semibold tracking-widest uppercase text-[#E4DD3B]/80 bg-[#E4DD3B]/8 border border-[#E4DD3B]/20'>
+              Backstage
+            </span>
+          </Link>
+        </div>
+
         {/* Navigation */}
-        <nav className='flex-1 p-4 pt-6 lg:pt-[calc(4rem+1.5rem)] space-y-2'>
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-3 transition-all duration-200 ${
-                isActive(item.href)
-                  ? 'bg-[#E4DD3B]/10 text-[#E4DD3B] border border-[#E4DD3B]/30'
-                  : 'text-white/70 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              {item.icon}
-              <span className='font-medium'>{item.name}</span>
-            </Link>
-          ))}
+        <nav className='flex-1 px-3 py-4 space-y-1'>
+          <p className='px-3 mb-3 text-[10px] font-semibold tracking-widest uppercase text-white/30'>
+            {t('menu')}
+          </p>
+          {navItems.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onClose}
+                className={`
+                  flex items-center gap-3 px-3 py-2.5 text-sm font-medium
+                  transition-all duration-200 group
+                  ${active
+                    ? 'bg-[#E4DD3B]/1 text-[#E4DD3B]'
+                    : 'text-white/50 hover:text-white/90 hover:bg-white/4'
+                  }
+                `}
+              >
+                <span className={`${active ? 'text-[#E4DD3B]' : 'text-white/40 group-hover:text-white/70'} transition-colors duration-200`}>
+                  {item.icon}
+                </span>
+                <span>{item.name}</span>
+                {active && (
+                  <span className='ml-auto w-1.5 h-1.5 rounded-full bg-[#E4DD3B]' />
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Sign Out at the bottom */}
-        <div className='p-4 border-t border-white/10'>
+        <div className='px-3 py-4 border-t border-white/6'>
           <button
             onClick={handleSignOut}
-            className='w-full flex items-center gap-3 px-4 py-3 transition-all duration-200 text-red-400 hover:text-red-300 hover:bg-red-500/10'
+            className='w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium
+              text-white/40 hover:text-red-400 hover:bg-red-500/6
+              transition-all duration-200 cursor-pointer group'
           >
-            <svg
-              className='w-5 h-5'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth={2}
-                d='M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1'
-              />
+            <svg className='w-[18px] h-[18px] text-white/30 group-hover:text-red-400 transition-colors duration-200' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+              <path strokeLinecap='round' strokeLinejoin='round' d='M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9' />
             </svg>
-            <span className='font-medium'>{t('signOut')}</span>
+            <span>{t('signOut')}</span>
           </button>
         </div>
       </aside>

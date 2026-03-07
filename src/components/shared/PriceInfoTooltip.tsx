@@ -48,7 +48,7 @@ export default function PriceInfoTooltip({ size = 14 }: PriceInfoTooltipProps) {
             }}
           />
           {/* Tooltip */}
-          <div className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-40 bg-black/95 border border-[#E4DD3B]/30 rounded-lg p-3 min-w-[160px] shadow-xl'>
+          <div className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-40 bg-black/95 border border-[#E4DD3B]/30 p-3 min-w-[160px] shadow-xl'>
             <div className='text-xs text-white/90 space-y-1'>
               <div><strong>Free:</strong> 0 EUR</div>
               <div><strong>€:</strong> 0-10 EUR</div>
@@ -56,7 +56,7 @@ export default function PriceInfoTooltip({ size = 14 }: PriceInfoTooltipProps) {
               <div><strong>€€€:</strong> 20+ EUR</div>
             </div>
             {/* Arrow */}
-            <div className='absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-[#E4DD3B]/30' />
+            <div className='absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-8 border-t-[#E4DD3B]/30' />
           </div>
         </>
       )}

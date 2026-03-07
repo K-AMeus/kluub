@@ -51,7 +51,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className='w-104'>
+    <div className='w-[calc(100vw-2rem)] md:w-md'>
       {/* Header */}
       <div className='text-center mb-8'>
         <h1 className='font-display text-2xl md:text-3xl text-white tracking-wider mb-2'>
@@ -184,13 +184,14 @@ export default function LoginForm() {
         </div>
       </div>
 
-      {/* Back to site link */}
-      <div className='text-center mt-6'>
+      {/* Join link */}
+      <div className='text-center mt-6 flex items-center justify-center gap-1.5 text-sm'>
+        <span className='text-white/40'>{t('noAccount')}</span>
         <Link
-          href='/'
-          className='text-white/40 hover:text-white/60 text-sm transition-colors duration-200'
+          href={`/${locale}/join`}
+          className='text-[#E4DD3B] hover:text-[#E4DD3B]/80 transition-colors duration-200 underline underline-offset-2 decoration-[#E4DD3B]/40 hover:decoration-[#E4DD3B]/80'
         >
-          ← {t('backToSite')}
+          {t('joinUs')}
         </Link>
       </div>
     </div>

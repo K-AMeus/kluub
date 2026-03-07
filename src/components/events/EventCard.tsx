@@ -16,6 +16,7 @@ export interface EventCardTranslations {
   readMore: string;
   free: string;
   facebookEvent: string;
+  topPicks: string;
 }
 
 interface EventCardProps {
@@ -36,6 +37,15 @@ export default function EventCard({ event, translations }: EventCardProps) {
     <article className='relative group'>
       {/* Desktop only */}
       <div className='hidden md:block absolute inset-0 bg-[#E4DD3B] translate-x-2 translate-y-2 transition-transform duration-200 group-hover:translate-x-0 group-hover:translate-y-0' />
+
+      {event.topPick && (
+        <div className='absolute -top-2 right-3 md:right-4 z-30 bg-[#E4DD3B] text-black px-2.5 py-1 text-[10px] md:text-[11px] font-sans font-bold uppercase tracking-wider flex items-center gap-1 shadow-[0_2px_8px_rgba(228,221,59,0.3)]'>
+          <svg width='12' height='12' viewBox='0 0 24 24' fill='currentColor' className='shrink-0'>
+            <path d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z' />
+          </svg>
+          {translations.topPicks}
+        </div>
+      )}
 
       <div className='relative bg-[#060606] border border-white/20 md:border-white/30 md:group-hover:border-[#E4DD3B] transition-colors duration-200 flex md:h-52 lg:h-56'>
         {/* Stretched Link */}

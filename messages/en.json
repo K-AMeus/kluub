@@ -1,7 +1,16 @@
 {
+  "header": {
+    "login": "Log in"
+  },
+  "metadata": {
+    "title": "Kluub - Nightlife & Events in Tallinn, Tartu & Pärnu",
+    "description": "Discover the best nightlife in Estonia — club nights, parties, DJ sets, and events in Tallinn, Tartu, and Pärnu. Browse by date, venue, and price to find out what's happening tonight."
+  },
   "landingPage": {
     "title": "Discover the perfect event for every occasion",
-    "subtitle": "Choose your location and find the perfect match."
+    "subtitle": "Choose your location and find the perfect match.",
+    "venueOwner": "Bring your events to Kluub.",
+    "registerVenue": "Register now!"
   },
   "cityCard": {
     "selectCity": "Select {city}",
@@ -18,9 +27,10 @@
     "readMore": "Read More",
     "loadMore": "Load More",
     "noEvents": "No events found",
+    "noEventsHint": "Try adjusting your filters",
     "free": "Free",
     "facebookEvent": "Facebook Event",
-    "topPicks": "Top Picks",
+    "topPicks": "Top Pick",
     "events": "Events",
     "today": "Today",
     "tomorrow": "Tomorrow",
@@ -39,10 +49,36 @@
     "loading": "Loading...",
     "all": "All",
     "date": "Date",
-    "venue": "Venue"
+    "venue": "Venue",
+    "loadError": "Something went wrong. Please try again.",
+    "retry": "Retry"
   },
   "eventDetail": {
     "backToEvents": "Back to Events"
+  },
+  "joinPage": {
+    "heroTitle": "Put your events on the map",
+    "heroSubtitle": "Kluub.ee is Estonia's growing nightlife and events platform. Promote your venue and events to thousands of visitors in Tallinn, Tartu, and Pärnu.",
+    "whyJoinTitle": "Why join Kluub?",
+    "whyJoinSubtitle": "You create the event. We create its audience",
+    "benefit1Title": "Reach new audiences",
+    "benefit1Desc": "Kluub.ee puts your venue in front of thousands of nightlife and event enthusiasts actively looking for where to go tonight. Discover new regulars who wouldn't have found you otherwise.",
+    "benefit2Title": "Facebook integration",
+    "benefit2Desc": "Import your Facebook events with a single click. No need to copy data manually, we handle it for you.",
+    "benefit3Title": "Effortless event management",
+    "benefit3Desc": "The Backstage dashboard makes adding and managing events quick and easy. Possible to set up recurring events once and they publish automatically every week.",
+    "benefit4Title": "Analytics & insights",
+    "benefit4Desc": "Track how much interest your events generate. Data-driven decisions help you plan and market your events better.",
+    "benefit5Title": "Custom solutions",
+    "benefit5Desc": "Need something special? We help build custom integrations, like automatically importing events from your website to Kluub.",
+    "benefit6Title": "Continuous development",
+    "benefit6Desc": "We're constantly improving the platform. New features and integrations are already on the way, including a mobile app.",
+    "ctaTitle": "Ready to get started?",
+    "ctaSubtitle": "Joining is simple and quick. Get in touch and we'll help you every step of the way.",
+    "ctaButton": "Get in touch",
+    "ctaEmail": "info@kluub.ee",
+    "joinNow": "Join now",
+    "backToHome": "Back to homepage"
   },
   "backstage": {
     "title": "Backstage",
@@ -55,6 +91,8 @@
     "or": "or",
     "googleSignIn": "Continue with Google",
     "backToSite": "Back to homepage",
+    "noAccount": "Don't have an account yet?",
+    "joinUs": "Join Kluub",
     "loginError": "Invalid email or password. Please try again.",
     "welcomeTitle": "Welcome!",
     "welcomeSubtitle": "You have successfully signed in.",
@@ -64,9 +102,12 @@
     "uploadEvent": "Upload Event",
     "uploadEventSubtitle": "Create a new event for your venue",
     "uploadNewEvent": "Upload New Event",
+    "menu": "Menu",
     "home": "Home",
     "myEvents": "My Events",
     "addNewEvent": "Add New Event",
+    "upcomingEvents": "Upcoming",
+    "pastEvents": "Past",
     "analytics": "Analytics",
     "analyticsTitle": "Analytics",
     "analyticsSubtitle": "Track your venue performance",
@@ -78,10 +119,10 @@
     "noUpcomingEvents": "No upcoming events",
     "noPastEvents": "No past events",
     "editEvent": "Edit Event",
-    "updateEvent": "Update Event",
-    "updatingEvent": "Updating Event...",
-    "deleteEvent": "Delete Event",
-    "deletingEvent": "Deleting Event...",
+    "updateEvent": "Update",
+    "updatingEvent": "Updating...",
+    "deleteEvent": "Delete",
+    "deletingEvent": "Deleting...",
     "confirmDelete": "Are you sure you want to delete this event?",
     "confirmDeleteMessage": "This action cannot be undone.",
     "cancel": "Cancel",
@@ -90,9 +131,9 @@
     "updateError": "Failed to update event. Please try again.",
     "deleteError": "Failed to delete event. Please try again.",
     "loadingEvents": "Loading events...",
-    "duplicateEvent": "Duplicate Event",
+    "duplicateEvent": "Duplicate",
     "eventDuplicated": "Event duplicated! Redirecting to create page...",
-    "totalEvents": "Total Events",
+    "totalEvents": "Total",
     "upcomingCount": "Upcoming",
     "pastCount": "Past",
     "recentEvents": "Recent Events",
@@ -118,7 +159,7 @@
     "imageRemove": "Remove image",
     "imageDragActive": "Drop image here",
     "facebookUrl": "Facebook Event URL (optional)",
-    "facebookUrlPlaceholder": "https://facebook.com/events/...",
+    "facebookUrlPlaceholder": "https://facebook.com/events/123456789",
     "startTime": "Start Time",
     "endTime": "End Time",
     "createEvent": "Create Event",
@@ -137,6 +178,16 @@
     "startTimeRequired": "Start time is required",
     "endTimeRequired": "End time is required",
     "endTimeAfterStart": "End time must be after start time",
-    "invalidUrl": "Please enter a valid URL"
+    "invalidUrl": "Please enter a valid URL",
+    "importFromFacebook": "Import from Facebook",
+    "importDescription": "Paste a Facebook event URL to auto-fill the form",
+    "fbUrlPlaceholder": "https://facebook.com/events/123456789",
+    "importButton": "Import",
+    "importing": "Importing...",
+    "importSuccess": "Event data imported! Review the details below and publish.",
+    "importError": "Could not import event. The event may be private.",
+    "importInvalidUrl": "Please enter a valid Facebook event URL",
+    "orCreateManually": "or fill in the form manually below",
+    "reviewAndPublish": "Imported from Facebook — review and publish"
   }
 }

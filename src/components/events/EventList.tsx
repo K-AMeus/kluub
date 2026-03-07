@@ -1,24 +1,33 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { Event, City } from '@/lib/types';
+import { Event, City, EVENTS_PAGE_SIZE, DEFAULT_EVENT_FILTERS } from '@/lib/types';
 import { groupEventsByDate } from '@/lib/event-utils';
+import { getEventsByCity } from '@/lib/db';
 import EventCard, { EventCardTranslations } from './EventCard';
 import DateHeader from './DateHeader';
 import EventFiltersComponent, { EventFilters } from './EventFilters';
 import CityHeader from './CityHeader';
+<<<<<<< HEAD
 import posthog from 'posthog-js';
+=======
+import { CalendarIcon } from '@/components/shared/icons';
+>>>>>>> main
 
 interface EventListTranslations extends EventCardTranslations {
   noEvents: string;
+  noEventsHint: string;
   loadMore: string;
+  loadError: string;
+  retry: string;
+  loading: string;
 }
 
 interface EventListProps {
-  events: Event[];
+  initialEvents: Event[];
+  initialHasMore: boolean;
   translations: EventListTranslations;
   city: City;
-  initialDisplayCount?: number;
 }
 
 function toCityDisplay(city: City): string {
@@ -30,23 +39,24 @@ function toCityDisplay(city: City): string {
   return names[city];
 }
 
+const defaultFilters: EventFilters = DEFAULT_EVENT_FILTERS;
+
 export default function EventList({
-  events,
+  initialEvents,
+  initialHasMore,
   translations,
   city,
-  initialDisplayCount = 10,
 }: EventListProps) {
   const cityDisplay = toCityDisplay(city);
-  const [displayCount, setDisplayCount] = useState(initialDisplayCount);
-  const [filters, setFilters] = useState<EventFilters>({
-    topPicks: false,
-    freeOnly: false,
-    venueId: null,
-    startDate: null,
-    endDate: null,
-  });
+  const [events, setEvents] = useState<Event[]>(initialEvents);
+  const [hasMore, setHasMore] = useState(initialHasMore);
+  const [page, setPage] = useState(0);
+  const [filters, setFilters] = useState<EventFilters>(defaultFilters);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleFiltersChange = useCallback(
+<<<<<<< HEAD
     (newFilters: EventFilters) => {
       // Capture filter applied analytics
       const activeFilters = [];
@@ -66,48 +76,72 @@ export default function EventList({
         });
       }
 
+=======
+    async (newFilters: EventFilters) => {
+>>>>>>> main
       setFilters(newFilters);
-      setDisplayCount(initialDisplayCount);
+      setPage(0);
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const result = await getEventsByCity(city, newFilters, 0, EVENTS_PAGE_SIZE);
+        setEvents(result.events);
+        setHasMore(result.hasMore);
+      } catch {
+        setError(translations.loadError);
+      } finally {
+        setIsLoading(false);
+      }
     },
+<<<<<<< HEAD
     [initialDisplayCount, city]
+=======
+    [city, translations.loadError]
+>>>>>>> main
   );
 
-  const filteredEvents = useMemo(() => {
-    return events.filter((event) => {
-      if (filters.topPicks && !event.topPick) {
-        return false;
+  const loadMore = useCallback(async () => {
+    if (isLoading) return;
+
+    const nextPage = page + 1;
+    setPage(nextPage);
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const result = await getEventsByCity(city, filters, nextPage, EVENTS_PAGE_SIZE);
+      setEvents((prev) => [...prev, ...result.events]);
+      setHasMore(result.hasMore);
+    } catch {
+      setPage(page);
+      setError(translations.loadError);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [city, filters, page, isLoading, translations.loadError]);
+
+  const retry = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const result = await getEventsByCity(city, filters, page, EVENTS_PAGE_SIZE);
+      if (page === 0) {
+        setEvents(result.events);
+      } else {
+        setEvents((prev) => [...prev, ...result.events]);
       }
-
-      if (filters.freeOnly && event.priceTier !== 0) {
-        return false;
-      }
-
-      if (filters.venueId && event.venueId !== filters.venueId) {
-        return false;
-      }
-
-      if (filters.startDate || filters.endDate) {
-        const eventDate = event.startTime.split('T')[0];
-        if (filters.startDate && eventDate < filters.startDate) {
-          return false;
-        }
-        if (filters.endDate && eventDate > filters.endDate) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-  }, [events, filters]);
-
-  // Only show events up to displayCount
-  const displayedEvents = useMemo(() => {
-    return filteredEvents.slice(0, displayCount);
-  }, [filteredEvents, displayCount]);
-
-  const hasMore = displayCount < filteredEvents.length;
+      setHasMore(result.hasMore);
+    } catch {
+      setError(translations.loadError);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [city, filters, page, translations.loadError]);
 
   const groupedEvents = useMemo(() => {
+<<<<<<< HEAD
     return groupEventsByDate(displayedEvents);
   }, [displayedEvents]);
 
@@ -120,11 +154,15 @@ export default function EventList({
     });
     setDisplayCount((prev) => prev + 10);
   };
+=======
+    return groupEventsByDate(events);
+  }, [events]);
+>>>>>>> main
 
   return (
     <div>
-      <div className='pb-3 md:pb-6 border-b border-white/10'>
-        <div className='flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-4'>
+      <div className='pb-2 md:pb-5 border-b border-white/10'>
+        <div className='flex flex-col md:flex-row md:items-end md:justify-between gap-3 md:gap-4'>
           <CityHeader city={cityDisplay} />
           <EventFiltersComponent
             city={city}
@@ -133,12 +171,33 @@ export default function EventList({
         </div>
       </div>
 
-      {filteredEvents.length === 0 ? (
-        <div className='flex items-center justify-center py-12 md:py-16'>
-          <div className='text-center'>
-            <p className='text-white/60 font-sans text-base md:text-lg'>
-              {translations.noEvents}
-            </p>
+      {error && (
+        <div className='flex items-center justify-between gap-3 mt-4 px-4 py-3 border border-white/10 bg-white/5'>
+          <p className='text-white/60 font-sans text-sm'>{error}</p>
+          <button
+            onClick={retry}
+            disabled={isLoading}
+            className='shrink-0 px-4 py-1.5 text-xs font-sans font-semibold uppercase tracking-wide text-[#E4DD3B] border border-[#E4DD3B]/40 hover:border-[#E4DD3B] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
+          >
+            {translations.retry}
+          </button>
+        </div>
+      )}
+
+      {events.length === 0 && !isLoading && !error ? (
+        <div className='flex items-center justify-center py-16 md:py-24'>
+          <div className='text-center flex flex-col items-center gap-4'>
+            <div className='w-14 h-14 md:w-16 md:h-16 flex items-center justify-center'>
+              <CalendarIcon size={28} className='text-white/25' />
+            </div>
+            <div className='space-y-1.5'>
+              <p className='text-white/50 font-sans text-base md:text-lg font-medium'>
+                {translations.noEvents}
+              </p>
+              <p className='text-white/25 font-sans text-sm'>
+                {translations.noEventsHint}
+              </p>
+            </div>
           </div>
         </div>
       ) : (
@@ -163,10 +222,37 @@ export default function EventList({
             <div className='flex justify-center pt-6 md:pt-8 pb-4'>
               <button
                 onClick={loadMore}
-                className='px-6 md:px-8 py-2.5 md:py-3 border border-white/30 text-white/80 font-sans text-sm tracking-wide rounded-full hover:border-white/50 hover:text-white transition-colors duration-200 cursor-pointer'
+                disabled={isLoading}
+                aria-label={isLoading ? translations.loading : translations.loadMore}
+                className='group relative px-6 md:px-9 py-2 md:py-3 border border-[#E4DD3B] bg-black/60 hover:bg-[#E4DD3B]/10 text-[#E4DD3B] hover:text-white font-display text-xs md:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-wait'
               >
+                {isLoading && (
+                  <svg
+                    className='absolute left-1.5 md:left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 md:w-3.5 md:h-3.5 animate-spin text-[#E4DD3B]'
+                    aria-hidden='true'
+                    fill='none'
+                    viewBox='0 0 24 24'
+                  >
+                    <circle
+                      className='opacity-25'
+                      cx='12'
+                      cy='12'
+                      r='10'
+                      stroke='currentColor'
+                      strokeWidth='4'
+                    />
+                    <path
+                      className='opacity-75'
+                      fill='currentColor'
+                      d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                    />
+                  </svg>
+                )}
                 {translations.loadMore}
               </button>
+              <span className='sr-only' role='status' aria-live='polite'>
+                {isLoading ? translations.loading : ''}
+              </span>
             </div>
           )}
         </div>

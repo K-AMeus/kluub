@@ -34,3 +34,31 @@ export const PRICE_TIER_LABELS = ['Free', '€', '€€', '€€€'] as const
 export function formatPriceTier(tier: PriceTier): string {
   return PRICE_TIER_LABELS[tier];
 }
+
+export const EVENTS_PAGE_SIZE = 10;
+
+export interface EventFilterParams {
+  topPicks: boolean;
+  freeOnly: boolean;
+  venueId: string | null;
+  startDate: string | null;
+  endDate: string | null;
+}
+
+export const DEFAULT_EVENT_FILTERS: EventFilterParams = {
+  topPicks: false,
+  freeOnly: false,
+  venueId: null,
+  startDate: null,
+  endDate: null,
+};
+
+export interface EventsResult {
+  events: Event[];
+  hasMore: boolean;
+}
+
+export interface VenueOption {
+  id: string;
+  name: string;
+}

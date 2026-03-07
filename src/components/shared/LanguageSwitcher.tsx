@@ -5,8 +5,8 @@ import { Link, usePathname } from '@/i18n/navigation';
 import { routing } from '@/i18n/routing';
 
 const LOCALE_LABELS: Record<'et' | 'en', string> = {
-  et: 'EST',
-  en: 'ENG',
+  et: 'ET',
+  en: 'EN',
 };
 
 export default function LanguageSwitcher() {
@@ -14,25 +14,26 @@ export default function LanguageSwitcher() {
   const pathname = usePathname();
 
   return (
-    <div className='flex items-center gap-1 text-sm font-medium tracking-wide'>
-      {routing.locales.map((loc, index) => (
-        <span key={loc} className='flex items-center'>
-          {index > 0 && <span className='text-white/20 mx-1'>|</span>}
-          {locale === loc ? (
-            <span className='px-1 py-0.5 text-[#E4DD3B] cursor-default'>
-              {LOCALE_LABELS[loc]}
-            </span>
-          ) : (
-            <Link
-              href={pathname}
-              locale={loc}
-              className='px-1 py-0.5 text-white/50 hover:text-white transition-colors duration-300'
-            >
-              {LOCALE_LABELS[loc]}
-            </Link>
-          )}
-        </span>
-      ))}
+    <div className='flex items-center shrink-0 gap-1'>
+      {routing.locales.map((loc) =>
+        locale === loc ? (
+          <span
+            key={loc}
+            className='px-2 py-1 text-[11px] font-sans font-semibold uppercase tracking-wider text-[#E4DD3B] cursor-default'
+          >
+            {LOCALE_LABELS[loc]}
+          </span>
+        ) : (
+          <Link
+            key={loc}
+            href={pathname}
+            locale={loc}
+            className='px-2 py-1 text-[11px] font-sans font-semibold uppercase tracking-wider text-white/40 hover:text-white transition-colors duration-200'
+          >
+            {LOCALE_LABELS[loc]}
+          </Link>
+        )
+      )}
     </div>
   );
 }
