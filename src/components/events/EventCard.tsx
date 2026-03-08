@@ -142,6 +142,7 @@ export default function EventCard({ event, translations }: EventCardProps) {
               href={event.facebookUrl}
               eventId={event.id}
               eventTitle={event.title}
+              venueId={event.venueId}
               className='relative z-20 flex items-center gap-2.5 text-sm text-white/95 hover:text-[#E4DD3B] transition-colors mt-2 pt-3 border-t border-white/10'
             >
               <FacebookIcon size={16} className='text-[#E4DD3B] shrink-0' />
