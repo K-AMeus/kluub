@@ -9,6 +9,7 @@ import DateHeader from './DateHeader';
 import EventFiltersComponent, { EventFilters } from './EventFilters';
 import CityHeader from './CityHeader';
 import { CalendarIcon } from '@/components/shared/icons';
+import posthog from 'posthog-js';
 
 interface EventListTranslations extends EventCardTranslations {
   noEvents: string;
@@ -53,6 +54,24 @@ export default function EventList({
 
   const handleFiltersChange = useCallback(
     async (newFilters: EventFilters) => {
+      // Capture filter applied analytics
+      const activeFilters = [];
+      if (newFilters.topPicks) activeFilters.push('top_picks');
+      if (newFilters.freeOnly) activeFilters.push('free_only');
+      if (newFilters.venueId) activeFilters.push('venue');
+      if (newFilters.startDate || newFilters.endDate) activeFilters.push('date_range');
+
+      if (activeFilters.length > 0) {
+        posthog.capture('events_filter_applied', {
+          city: city,
+          active_filters: activeFilters,
+          top_picks: newFilters.topPicks,
+          free_only: newFilters.freeOnly,
+          has_venue_filter: !!newFilters.venueId,
+          has_date_filter: !!(newFilters.startDate || newFilters.endDate),
+        });
+      }
+
       setFilters(newFilters);
       setPage(0);
       setIsLoading(true);

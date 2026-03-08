@@ -1,6 +1,9 @@
+'use client';
+
 import { useEffect, useState, MouseEvent } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
+import posthog from 'posthog-js';
 
 interface CityCardProps {
   name: string;
@@ -24,6 +27,10 @@ export default function CityCard({ name, isActive, href }: CityCardProps) {
       e.preventDefault();
       return;
     }
+    // Capture city selected analytics
+    posthog.capture('city_selected', {
+      city: name,
+    });
     setIsLoading(true);
   };
 
