@@ -10,6 +10,7 @@ import {
 } from '@/components/shared/icons';
 import { DEFAULT_EVENT_IMAGE } from '@/lib/constants';
 import { formatTime } from '@/lib/date-utils';
+import FacebookEventLink from '@/components/events/FacebookEventLink';
 
 export interface EventCardTranslations {
   readMore: string;
@@ -101,14 +102,15 @@ export default function EventCard({ event, translations }: EventCardProps) {
               <span className='text-white/95'>{priceDisplay}</span>
             </div>
             {event.facebookUrl && (
-              <a
+              <FacebookEventLink
                 href={event.facebookUrl}
-                target='_blank'
-                rel='noopener noreferrer'
+                eventId={event.id}
+                eventTitle={event.title}
+                venueId={event.venueId}
                 className='relative z-20 text-[#E4DD3B] hover:text-[#E4DD3B]/80 transition-colors'
               >
                 <FacebookIcon size={16} />
-              </a>
+              </FacebookEventLink>
             )}
           </div>
 
@@ -136,15 +138,16 @@ export default function EventCard({ event, translations }: EventCardProps) {
             <span className='text-white/95'>{priceDisplay}</span>
           </div>
           {event.facebookUrl && (
-            <a
+            <FacebookEventLink
               href={event.facebookUrl}
-              target='_blank'
-              rel='noopener noreferrer'
+              eventId={event.id}
+              eventTitle={event.title}
+              venueId={event.venueId}
               className='relative z-20 flex items-center gap-2.5 text-sm text-white/95 hover:text-[#E4DD3B] transition-colors mt-2 pt-3 border-t border-white/10'
             >
               <FacebookIcon size={16} className='text-[#E4DD3B] shrink-0' />
               <span>{translations.facebookEvent}</span>
-            </a>
+            </FacebookEventLink>
           )}
         </div>
       </div>
