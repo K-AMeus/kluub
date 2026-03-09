@@ -7,6 +7,11 @@ import EventEditModal from '@/components/backstage/EventEditModal';
 import type { Event, Venue } from '@/lib/types';
 import { formatDateTimeWithYear } from '@/lib/event-utils';
 
+interface EventAnalyticsData {
+  detailViews: number;
+  facebookClicks: number;
+}
+
 export default function MyEventsPage() {
   const t = useTranslations('backstage');
   const locale = useLocale();
@@ -17,6 +22,7 @@ export default function MyEventsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [eventAnalytics, setEventAnalytics] = useState<Record<string, EventAnalyticsData>>({});
 
   const supabase = createBrowserSupabaseClient();
 
@@ -126,6 +132,17 @@ export default function MyEventsPage() {
 
       setUpcomingEvents(upcoming);
       setPastEvents(past.reverse());
+
+      // Fetch per-event analytics
+      try {
+        const res = await fetch('/api/analytics');
+        if (res.ok) {
+          const { eventAnalytics: eAnalytics } = await res.json();
+          setEventAnalytics(eAnalytics || {});
+        }
+      } catch {
+        // Analytics fetch failure is non-blocking
+      }
     } catch (err) {
       setError(t('unexpectedError'));
       console.error('Unexpected error:', err);
@@ -267,52 +284,141 @@ export default function MyEventsPage() {
                   </p>
                 </div>
               ) : (
-                <div className='space-y-2'>
-                  {eventsToShow.map((event) => (
-                    <div
-                      key={event.id}
-                      onClick={() => handleEventClick(event)}
-                      className='group bg-white/2 hover:bg-white/4 border border-white/6 hover:border-white/10 p-4 md:p-5 transition-all duration-200 cursor-pointer'
-                    >
-                      <div className='flex items-center gap-4'>
-                        {/* Date badge */}
-                        <div className='hidden sm:flex flex-col items-center justify-center w-12 h-12 bg-white/4 group-hover:bg-[#E4DD3B]/8 shrink-0 transition-colors duration-200'>
-                          <span className='text-[10px] font-semibold text-white/40 uppercase leading-none'>
-                            {new Date(event.startTime).toLocaleDateString(locale, { month: 'short' })}
-                          </span>
-                          <span className='text-lg font-bold text-white leading-tight'>
-                            {new Date(event.startTime).getDate()}
-                          </span>
-                        </div>
+                <div className='space-y-3'>
+                  {eventsToShow.map((event, index) => {
+                    const stats = eventAnalytics[event.id];
+                    const views = stats?.detailViews || 0;
+                    const clicks = stats?.facebookClicks || 0;
+                    const conversionRate = views > 0 ? Math.round((clicks / views) * 100) : 0;
 
-                        {/* Event info */}
-                        <div className='flex-1 min-w-0'>
-                          <div className='flex items-center gap-2 mb-1'>
-                            <h3 className='text-white font-semibold text-sm truncate group-hover:text-[#E4DD3B] transition-colors duration-200'>
-                              {event.title}
-                            </h3>
-                            {event.topPick && (
-                              <span className='inline-flex items-center px-1.5 py-0.5 text-[10px] font-semibold text-[#E4DD3B] bg-[#E4DD3B]/10'>
-                                TOP
+                    const eventDate = new Date(event.startTime);
+                    const monthKey = `${eventDate.getFullYear()}-${eventDate.getMonth()}`;
+                    const prevEvent = index > 0 ? eventsToShow[index - 1] : null;
+                    const prevDate = prevEvent ? new Date(prevEvent.startTime) : null;
+                    const prevMonthKey = prevDate ? `${prevDate.getFullYear()}-${prevDate.getMonth()}` : null;
+                    const showMonthMarker = monthKey !== prevMonthKey;
+
+                    return (
+                      <div key={event.id}>
+                      {showMonthMarker && (
+                        <div className={`flex items-center gap-3 ${index > 0 ? 'mt-6' : ''} mb-3`}>
+                          <div className='h-px flex-1 bg-[#E4DD3B]/15' />
+                          <span className='text-[#E4DD3B]/70 text-xs font-bold uppercase tracking-widest'>
+                            {eventDate.toLocaleDateString(locale, { month: 'long', year: 'numeric' })}
+                          </span>
+                          <div className='h-px flex-1 bg-[#E4DD3B]/15' />
+                        </div>
+                      )}
+                      <div
+                        onClick={() => handleEventClick(event)}
+                        className='group bg-white/3 hover:bg-white/5 border border-white/8 hover:border-white/15 transition-all duration-200 cursor-pointer'
+                      >
+                        {/* Main row: event info + desktop analytics */}
+                        <div className='flex items-center'>
+                          {/* Event info section */}
+                          <div className='flex-1 min-w-0 p-4 md:p-5 flex items-center gap-4'>
+                            {/* Date badge */}
+                            <div className='hidden sm:flex flex-col items-center justify-center w-12 h-12 bg-white/5 group-hover:bg-[#E4DD3B]/8 shrink-0 transition-colors duration-200'>
+                              <span className='text-[10px] font-semibold text-white/50 uppercase leading-none'>
+                                {new Date(event.startTime).toLocaleDateString(locale, { month: 'short' })}
                               </span>
-                            )}
+                              <span className='text-lg font-bold text-white leading-tight'>
+                                {new Date(event.startTime).getDate()}
+                              </span>
+                            </div>
+
+                            {/* Event details */}
+                            <div className='flex-1 min-w-0'>
+                              <div className='flex items-center gap-2 mb-1'>
+                                <h3 className='text-white font-bold text-sm truncate group-hover:text-[#E4DD3B] transition-colors duration-200'>
+                                  {event.title}
+                                </h3>
+                                {event.topPick && (
+                                  <span className='inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold text-[#E4DD3B] bg-[#E4DD3B]/10'>
+                                    TOP
+                                  </span>
+                                )}
+                              </div>
+                              <div className='flex items-center gap-3 text-xs text-white/50'>
+                                <span className='font-medium'>{event.venue}</span>
+                                <span>·</span>
+                                <span className='font-mono'>{formatDateTimeWithYear(event.startTime)}</span>
+                                <span>·</span>
+                                <span className='font-medium'>{priceTierLabel(event.priceTier)}</span>
+                              </div>
+                            </div>
+
+                            {/* Arrow */}
+                            <svg className='w-4 h-4 text-white/25 group-hover:text-white/50 shrink-0 transition-colors duration-200 md:mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
+                              <path strokeLinecap='round' strokeLinejoin='round' d='M8.25 4.5l7.5 7.5-7.5 7.5' />
+                            </svg>
                           </div>
-                          <div className='flex items-center gap-3 text-xs text-white/35'>
-                            <span>{event.venue}</span>
-                            <span>·</span>
-                            <span className='font-mono'>{formatDateTimeWithYear(event.startTime)}</span>
-                            <span>·</span>
-                            <span>{priceTierLabel(event.priceTier)}</span>
+
+                          {/* Desktop analytics boxes */}
+                          <div className='hidden md:flex items-stretch self-stretch border-l border-white/10 shrink-0'>
+                            {/* Views */}
+                            <div className='w-28 flex flex-col items-center justify-center px-3 py-4 bg-[#E4DD3B]/[0.03] border-r border-white/10'>
+                              <div className='flex items-center gap-1.5 mb-1'>
+                                <svg className='w-3.5 h-3.5 text-[#E4DD3B]' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
+                                  <path strokeLinecap='round' strokeLinejoin='round' d='M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z' />
+                                  <path strokeLinecap='round' strokeLinejoin='round' d='M15 12a3 3 0 11-6 0 3 3 0 016 0z' />
+                                </svg>
+                                <span className='text-white/40 text-[10px] font-semibold uppercase tracking-wider'>{t('eventViews')}</span>
+                              </div>
+                              <span className='text-[#E4DD3B] font-extrabold text-xl font-mono leading-none'>{views}</span>
+                            </div>
+                            {/* Facebook clicks */}
+                            <div className='w-28 flex flex-col items-center justify-center px-3 py-4 bg-[#E4DD3B]/[0.03] border-r border-white/10'>
+                              <div className='flex items-center gap-1.5 mb-1'>
+                                <svg className='w-3.5 h-3.5 text-[#E4DD3B]' fill='currentColor' viewBox='0 0 24 24'>
+                                  <path d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' />
+                                </svg>
+                                <span className='text-white/40 text-[10px] font-semibold uppercase tracking-wider'>{t('eventFbClicks')}</span>
+                              </div>
+                              <span className='text-[#E4DD3B] font-extrabold text-xl font-mono leading-none'>{clicks}</span>
+                            </div>
+                            {/* Conversion rate */}
+                            <div className='w-28 flex flex-col items-center justify-center px-3 py-4 bg-[#E4DD3B]/[0.03]'>
+                              <div className='flex items-center gap-1.5 mb-1'>
+                                <svg className='w-3.5 h-3.5 text-[#E4DD3B]' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
+                                  <path strokeLinecap='round' strokeLinejoin='round' d='M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z' />
+                                </svg>
+                                <span className='text-white/40 text-[10px] font-semibold uppercase tracking-wider'>{t('eventConversion')}</span>
+                              </div>
+                              <span className='text-[#E4DD3B] font-extrabold text-xl font-mono leading-none'>{conversionRate}%</span>
+                            </div>
                           </div>
                         </div>
 
-                        {/* Arrow */}
-                        <svg className='w-4 h-4 text-white/20 group-hover:text-white/40 shrink-0 transition-colors duration-200' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
-                          <path strokeLinecap='round' strokeLinejoin='round' d='M8.25 4.5l7.5 7.5-7.5 7.5' />
-                        </svg>
+                        {/* Mobile analytics row */}
+                        <div className='flex md:hidden items-center gap-5 px-4 pb-3 pt-2 border-t border-white/8'>
+                          <div className='flex items-center gap-1.5'>
+                            <svg className='w-3.5 h-3.5 text-[#E4DD3B]/70' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
+                              <path strokeLinecap='round' strokeLinejoin='round' d='M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z' />
+                              <path strokeLinecap='round' strokeLinejoin='round' d='M15 12a3 3 0 11-6 0 3 3 0 016 0z' />
+                            </svg>
+                            <span className='text-[#E4DD3B] text-xs font-bold font-mono'>{views}</span>
+                            <span className='text-white/40 text-[10px] font-medium'>{t('eventViews')}</span>
+                          </div>
+                          <div className='flex items-center gap-1.5'>
+                            <svg className='w-3.5 h-3.5 text-[#E4DD3B]/70' fill='currentColor' viewBox='0 0 24 24'>
+                              <path d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' />
+                            </svg>
+                            <span className='text-[#E4DD3B] text-xs font-bold font-mono'>{clicks}</span>
+                            <span className='text-white/40 text-[10px] font-medium'>{t('eventFbClicks')}</span>
+                          </div>
+                          <div className='flex items-center gap-1.5'>
+                            <svg className='w-3.5 h-3.5 text-[#E4DD3B]/70' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
+                              <path strokeLinecap='round' strokeLinejoin='round' d='M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z' />
+                            </svg>
+                            <span className='text-[#E4DD3B] text-xs font-bold font-mono'>{conversionRate}%</span>
+                            <span className='text-white/40 text-[10px] font-medium'>{t('eventConversion')}</span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </>

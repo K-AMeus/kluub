@@ -7,6 +7,7 @@ import type { City, PriceTier, Venue } from '@/lib/types';
 import { formatDateTimeForInput } from '@/lib/event-utils';
 import PriceInfoTooltip from '@/components/shared/PriceInfoTooltip';
 import ImageUpload from '@/components/shared/ImageUpload';
+import DateTimePicker from '@/components/backstage/DateTimePicker';
 import { revalidateEvents } from '@/lib/db';
 
 interface FacebookImportData {
@@ -542,14 +543,12 @@ export default function EventUploadForm() {
               <label htmlFor='startTime' className={labelClasses}>
                 {t('startTime')} <span className='text-red-400'>*</span>
               </label>
-              <input
+              <DateTimePicker
                 id='startTime'
-                type='datetime-local'
                 value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
+                onChange={setStartTime}
                 required
                 disabled={isSubmitting}
-                className={inputClasses}
               />
               {validationErrors.startTime && (
                 <p className='mt-1.5 text-xs text-red-400'>{validationErrors.startTime}</p>
@@ -560,14 +559,13 @@ export default function EventUploadForm() {
               <label htmlFor='endTime' className={labelClasses}>
                 {t('endTime')} <span className='text-red-400'>*</span>
               </label>
-              <input
+              <DateTimePicker
                 id='endTime'
-                type='datetime-local'
                 value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
+                onChange={setEndTime}
                 required
                 disabled={isSubmitting}
-                className={inputClasses}
+                defaultHour='02'
               />
               {validationErrors.endTime && (
                 <p className='mt-1.5 text-xs text-red-400'>{validationErrors.endTime}</p>

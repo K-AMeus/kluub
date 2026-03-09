@@ -54,7 +54,7 @@ export async function GET() {
 
     const venueIdList = venueIds.map((id: string) => `'${id}'`).join(', ');
 
-    const [viewsResult, clicksResult] = await Promise.all([
+    const [viewsResult, clicksResult, eventViewsResult, eventClicksResult] = await Promise.all([
       queryPostHog(`
         SELECT properties.venue_id AS venue_id, count() AS count
         FROM events
@@ -68,6 +68,20 @@ export async function GET() {
         WHERE event = 'facebook_event_clicked'
           AND properties.venue_id IN (${venueIdList})
         GROUP BY properties.venue_id
+      `),
+      queryPostHog(`
+        SELECT properties.event_id AS event_id, count() AS count
+        FROM events
+        WHERE event = 'event_detail_viewed'
+          AND properties.venue_id IN (${venueIdList})
+        GROUP BY properties.event_id
+      `),
+      queryPostHog(`
+        SELECT properties.event_id AS event_id, count() AS count
+        FROM events
+        WHERE event = 'facebook_event_clicked'
+          AND properties.venue_id IN (${venueIdList})
+        GROUP BY properties.event_id
       `),
     ]);
 
@@ -92,7 +106,26 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json({ analytics });
+    // Build per-event analytics map: event_id -> { detailViews, facebookClicks }
+    const eventAnalytics: Record<string, { detailViews: number; facebookClicks: number }> = {};
+
+    for (const row of eventViewsResult.results || []) {
+      const [eventId, count] = row;
+      if (!eventAnalytics[eventId]) {
+        eventAnalytics[eventId] = { detailViews: 0, facebookClicks: 0 };
+      }
+      eventAnalytics[eventId].detailViews = count;
+    }
+
+    for (const row of eventClicksResult.results || []) {
+      const [eventId, count] = row;
+      if (!eventAnalytics[eventId]) {
+        eventAnalytics[eventId] = { detailViews: 0, facebookClicks: 0 };
+      }
+      eventAnalytics[eventId].facebookClicks = count;
+    }
+
+    return NextResponse.json({ analytics, eventAnalytics });
   } catch (error) {
     console.error('Analytics API error:', error);
     return NextResponse.json({ error: 'Failed to fetch analytics' }, { status: 500 });
