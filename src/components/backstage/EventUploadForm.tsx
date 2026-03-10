@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { createBrowserSupabaseClient } from '@/supabase/client';
+import { useBackstage } from '@/components/backstage/BackstageProvider';
 import type { City, PriceTier, Venue } from '@/lib/types';
 import { formatDateTimeForInput } from '@/lib/event-utils';
 import PriceInfoTooltip from '@/components/shared/PriceInfoTooltip';
@@ -20,6 +21,7 @@ interface FacebookImportData {
 
 export default function EventUploadForm() {
   const t = useTranslations('backstage');
+  const { venues: userVenues, isLoading: contextLoading } = useBackstage();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -36,8 +38,6 @@ export default function EventUploadForm() {
   const [importedFrom, setImportedFrom] = useState(false);
 
   // UI states
-  const [userVenues, setUserVenues] = useState<Venue[]>([]);
-  const [isLoadingVenues, setIsLoadingVenues] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -45,7 +45,12 @@ export default function EventUploadForm() {
     Record<string, string>
   >({});
 
-  const supabase = createBrowserSupabaseClient();
+  useEffect(() => {
+    if (!contextLoading && userVenues.length > 0 && !venueId) {
+      setVenueId(userVenues[0].id);
+      setCity(userVenues[0].city);
+    }
+  }, [contextLoading, userVenues, venueId]);
 
   // Check for duplicated event data in localStorage
   useEffect(() => {
@@ -74,65 +79,6 @@ export default function EventUploadForm() {
       }
     }
   }, [t]);
-
-  // Fetch user's venues on mount
-  useEffect(() => {
-    const fetchUserVenues = async () => {
-      try {
-        setIsLoadingVenues(true);
-
-        const {
-          data: { user },
-          error: authError,
-        } = await supabase.auth.getUser();
-
-        if (authError || !user) {
-          setError(t('authError'));
-          setIsLoadingVenues(false);
-          return;
-        }
-
-        const { data, error: venueError } = await supabase
-          .from('venue_users')
-          .select(
-            `
-            venue_id,
-            venues (
-              id,
-              name,
-              city,
-              address,
-              lat,
-              lng
-            )
-          `
-          )
-          .eq('user_id', user.id);
-
-        if (venueError) {
-          setError(t('venueLoadError'));
-          setIsLoadingVenues(false);
-          return;
-        }
-
-        const venues = (data?.map((vu: any) => vu.venues).filter(Boolean) ||
-          []) as Venue[];
-
-        setUserVenues(venues);
-
-        if (venues.length > 0) {
-          setVenueId(venues[0].id);
-          setCity(venues[0].city);
-        }
-      } catch (err) {
-        setError(t('unexpectedError'));
-      } finally {
-        setIsLoadingVenues(false);
-      }
-    };
-
-    fetchUserVenues();
-  }, [supabase, t]);
 
   const isValidUrl = (url: string): boolean => {
     try {
@@ -283,6 +229,7 @@ export default function EventUploadForm() {
     setIsSubmitting(true);
 
     try {
+      const supabase = createBrowserSupabaseClient();
       const { error: submitError } = await supabase.from('events').insert({
         title: title.trim(),
         description: description.trim(),
@@ -316,7 +263,7 @@ export default function EventUploadForm() {
   };
 
   // Loading state
-  if (isLoadingVenues) {
+  if (contextLoading) {
     return (
       <div className='flex items-center justify-center py-16'>
         <div className='text-center'>

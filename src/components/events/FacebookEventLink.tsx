@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
-import posthog from 'posthog-js';
+import { usePostHog } from 'posthog-js/react';
 
 interface FacebookEventLinkProps {
   href: string;
@@ -20,6 +20,8 @@ export default function FacebookEventLink({
   children,
   className,
 }: FacebookEventLinkProps) {
+  const posthog = usePostHog();
+
   const handleClick = () => {
     posthog.capture('facebook_event_clicked', {
       event_id: eventId,

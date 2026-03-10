@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createBrowserSupabaseClient } from '@/supabase/client';
 
 export default function LoginForm() {
   const t = useTranslations('backstage');
   const locale = useLocale();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -29,7 +31,7 @@ export default function LoginForm() {
       setError(t('loginError'));
       setIsLoading(false);
     } else {
-      window.location.href = `/${locale}/backstage/welcome`;
+      router.push(`/${locale}/backstage/welcome`);
     }
   };
 
