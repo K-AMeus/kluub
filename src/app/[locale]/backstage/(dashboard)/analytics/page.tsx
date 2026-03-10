@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { createBrowserSupabaseClient } from '@/supabase/client';
-import { useTranslations } from 'next-intl';
 import type { Venue } from '@/lib/types';
 
 interface VenueAnalytics {
