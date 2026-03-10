@@ -3,7 +3,7 @@
 import { useEffect, useState, MouseEvent } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
-import posthog from 'posthog-js';
+import { usePostHog } from 'posthog-js/react';
 
 interface CityCardProps {
   name: string;
@@ -13,6 +13,7 @@ interface CityCardProps {
 }
 
 export default function CityCard({ name, isActive, href }: CityCardProps) {
+  const posthog = usePostHog();
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const t = useTranslations('cityCard');

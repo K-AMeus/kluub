@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import posthog from 'posthog-js';
+import { usePostHog } from 'posthog-js/react';
 
 interface EventDetailTrackerProps {
   eventId: string;
@@ -18,6 +18,8 @@ export default function EventDetailTracker({
   priceTier,
   venueId,
 }: EventDetailTrackerProps) {
+  const posthog = usePostHog();
+
   useEffect(() => {
     posthog.capture('event_detail_viewed', {
       event_id: eventId,

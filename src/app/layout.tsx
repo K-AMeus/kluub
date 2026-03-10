@@ -1,5 +1,6 @@
 import { getLocale } from 'next-intl/server';
 import { Montserrat, Dela_Gothic_One } from 'next/font/google';
+import PostHogProvider from '@/components/shared/PostHogProvider';
 import './globals.css';
 
 const montserrat = Montserrat({
@@ -27,7 +28,7 @@ export default async function RootLayout({
       <body
         className={`${montserrat.variable} ${delaGothicOne.variable} antialiased font-sans`}
       >
-        {children}
+        <PostHogProvider>{children}</PostHogProvider>
       </body>
     </html>
   );

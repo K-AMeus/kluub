@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { createBrowserSupabaseClient } from '@/supabase/client';
+import { useTranslations } from 'next-intl';
 import type { Venue } from '@/lib/types';
 
 interface VenueAnalytics {
@@ -44,57 +45,25 @@ export default function AnalyticsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const supabase = createBrowserSupabaseClient();
-
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
         setIsLoading(true);
 
-        const {
-          data: { user },
-          error: authError,
-        } = await supabase.auth.getUser();
-
-        if (authError || !user) {
+        const res = await fetch('/api/analytics');
+        if (res.status === 401) {
           setError(t('authError'));
           return;
         }
-
-        // Fetch user's venues
-        const { data: venueUserData, error: venueError } = await supabase
-          .from('venue_users')
-          .select(`
-            venue_id,
-            venues (id, name, city, address, lat, lng)
-          `)
-          .eq('user_id', user.id);
-
-        if (venueError) {
-          setError(t('venueLoadError'));
-          return;
-        }
-
-        const venues = (venueUserData
-          ?.map((vu: any) => vu.venues)
-          .filter(Boolean) || []) as Venue[];
-
-        if (venues.length === 0) {
-          setAnalytics([]);
-          return;
-        }
-
-        // Fetch PostHog analytics from our API
-        const res = await fetch('/api/analytics');
         if (!res.ok) {
           setError(t('unexpectedError'));
           return;
         }
 
-        const { analytics: counts, viewsByWeekday: wd, viewsByHour: hr } = await res.json();
+        const { venues, analytics: counts, viewsByWeekday: wd, viewsByHour: hr } = await res.json();
 
         setAnalytics(
-          venues.map((venue) => ({
+          (venues as Venue[]).map((venue) => ({
             venue,
             detailViews: counts[venue.id]?.detailViews || 0,
             facebookClicks: counts[venue.id]?.facebookClicks || 0,

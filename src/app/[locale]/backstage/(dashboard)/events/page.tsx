@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { createBrowserSupabaseClient } from '@/supabase/client';
+import { useBackstage } from '@/components/backstage/BackstageProvider';
 import EventEditModal from '@/components/backstage/EventEditModal';
 import type { Event, Venue } from '@/lib/types';
 import { formatDateTimeWithYear } from '@/lib/event-utils';
@@ -15,65 +16,26 @@ interface EventAnalyticsData {
 export default function MyEventsPage() {
   const t = useTranslations('backstage');
   const locale = useLocale();
+  const { venues: userVenues, venueIds, isLoading: contextLoading } = useBackstage();
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
-  const [userVenues, setUserVenues] = useState<Venue[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [eventAnalytics, setEventAnalytics] = useState<Record<string, EventAnalyticsData>>({});
 
-  const supabase = createBrowserSupabaseClient();
+  const fetchEvents = useCallback(async () => {
+    if (venueIds.length === 0) {
+      setIsLoading(false);
+      return;
+    }
 
-  const fetchEvents = async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
-
-      if (authError || !user) {
-        setError(t('authError'));
-        setIsLoading(false);
-        return;
-      }
-
-      const { data: venueUserData, error: venueUserError } = await supabase
-        .from('venue_users')
-        .select(
-          `
-          venue_id,
-          venues (
-            id,
-            name,
-            city
-          )
-        `
-        )
-        .eq('user_id', user.id);
-
-      if (venueUserError) {
-        setError(t('venueLoadError'));
-        setIsLoading(false);
-        return;
-      }
-
-      const venues = (venueUserData
-        ?.map((vu: any) => vu.venues)
-        .filter(Boolean) || []) as Venue[];
-
-      setUserVenues(venues);
-
-      if (venues.length === 0) {
-        setIsLoading(false);
-        return;
-      }
-
-      const venueIds = venues.map((v) => v.id);
+      const supabase = createBrowserSupabaseClient();
 
       const { data: eventsData, error: eventsError } = await supabase
         .from('events')
@@ -149,11 +111,12 @@ export default function MyEventsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [venueIds, t]);
 
   useEffect(() => {
+    if (contextLoading) return;
     fetchEvents();
-  }, []);
+  }, [contextLoading, fetchEvents]);
 
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);
@@ -201,7 +164,7 @@ export default function MyEventsPage() {
           </div>
 
           {/* Loading State */}
-          {isLoading && (
+          {(contextLoading || isLoading) && (
             <div className='space-y-3'>
               {[1, 2, 3].map((i) => (
                 <div key={i} className='bg-white/2 border border-white/6 p-5'>
@@ -228,7 +191,7 @@ export default function MyEventsPage() {
           )}
 
           {/* No Venues State */}
-          {!isLoading && !error && userVenues.length === 0 && (
+          {!contextLoading && !isLoading && !error && userVenues.length === 0 && (
             <div className='text-center py-16'>
               <div className='mb-5 inline-flex items-center justify-center w-14 h-14 bg-white/4 border border-white/6'>
                 <svg className='w-7 h-7 text-white/30' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
@@ -243,7 +206,7 @@ export default function MyEventsPage() {
           )}
 
           {/* Events Content */}
-          {!isLoading && !error && userVenues.length > 0 && (
+          {!contextLoading && !isLoading && !error && userVenues.length > 0 && (
             <>
               {/* Tabs */}
               <div className='flex gap-1 mb-6 bg-white/3 border border-white/6 p-1 w-fit'>

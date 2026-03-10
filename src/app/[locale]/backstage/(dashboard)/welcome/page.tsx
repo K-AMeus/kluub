@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { createBrowserSupabaseClient } from '@/supabase/client';
+import { useBackstage } from '@/components/backstage/BackstageProvider';
 import Link from 'next/link';
 import { formatDateTime } from '@/lib/event-utils';
 
@@ -16,8 +17,8 @@ interface RecentEvent {
 export default function WelcomePage() {
   const t = useTranslations('backstage');
   const locale = useLocale();
+  const { user, venueIds, isLoading: contextLoading } = useBackstage();
   const [mounted, setMounted] = useState(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
     total: 0,
@@ -25,7 +26,6 @@ export default function WelcomePage() {
     past: 0,
   });
   const [recentEvents, setRecentEvents] = useState<RecentEvent[]>([]);
-  const supabase = createBrowserSupabaseClient();
 
   useEffect(() => {
     const frameId = requestAnimationFrame(() => {
@@ -36,32 +36,18 @@ export default function WelcomePage() {
   }, []);
 
   useEffect(() => {
+    if (contextLoading) return;
+
+    if (!user || venueIds.length === 0) {
+      setIsLoading(false);
+      return;
+    }
+
     const fetchDashboardData = async () => {
       try {
         setIsLoading(true);
 
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        if (!user) {
-          setIsLoading(false);
-          return;
-        }
-
-        setUserEmail(user.email ?? null);
-
-        const { data: venueUserData } = await supabase
-          .from('venue_users')
-          .select('venue_id')
-          .eq('user_id', user.id);
-
-        if (!venueUserData || venueUserData.length === 0) {
-          setIsLoading(false);
-          return;
-        }
-
-        const venueIds = venueUserData.map((vu) => vu.venue_id);
+        const supabase = createBrowserSupabaseClient();
         const now = new Date().toISOString();
 
         // Run all three queries in parallel:
@@ -114,7 +100,9 @@ export default function WelcomePage() {
     };
 
     fetchDashboardData();
-  }, [supabase]);
+  }, [contextLoading, user, venueIds]);
+
+  const showLoading = contextLoading || isLoading;
 
   return (
     <div className='px-4 md:px-8 py-6 md:py-10'>
@@ -125,8 +113,8 @@ export default function WelcomePage() {
           <h1 className='font-display text-2xl md:text-3xl text-white tracking-wider mb-1'>
             {t('welcomeTitle')}
           </h1>
-          {userEmail && (
-            <p className='text-white/40 text-sm'>{userEmail}</p>
+          {user?.email && (
+            <p className='text-white/40 text-sm'>{user.email}</p>
           )}
         </div>
 
@@ -137,7 +125,7 @@ export default function WelcomePage() {
             <p className='text-white/40 text-xs font-medium mb-2 uppercase tracking-wider'>{t('totalEvents')}</p>
             <div className='flex items-end justify-between'>
               <p className='text-2xl md:text-3xl font-bold text-white tabular-nums'>
-                {isLoading ? (
+                {showLoading ? (
                   <span className='inline-block w-8 h-7 bg-white/6 animate-pulse' />
                 ) : stats.total}
               </p>
@@ -154,7 +142,7 @@ export default function WelcomePage() {
             <p className='text-white/40 text-xs font-medium mb-2 uppercase tracking-wider'>{t('upcomingCount')}</p>
             <div className='flex items-end justify-between'>
               <p className='text-2xl md:text-3xl font-bold text-white tabular-nums'>
-                {isLoading ? (
+                {showLoading ? (
                   <span className='inline-block w-8 h-7 bg-white/6 animate-pulse' />
                 ) : stats.upcoming}
               </p>
@@ -171,7 +159,7 @@ export default function WelcomePage() {
             <p className='text-white/40 text-xs font-medium mb-2 uppercase tracking-wider'>{t('pastCount')}</p>
             <div className='flex items-end justify-between'>
               <p className='text-2xl md:text-3xl font-bold text-white tabular-nums'>
-                {isLoading ? (
+                {showLoading ? (
                   <span className='inline-block w-8 h-7 bg-white/6 animate-pulse' />
                 ) : stats.past}
               </p>
@@ -229,7 +217,7 @@ export default function WelcomePage() {
         </div>
 
         {/* Recent Events */}
-        {!isLoading && recentEvents.length > 0 && (
+        {!showLoading && recentEvents.length > 0 && (
           <div>
             <div className='flex items-center justify-between mb-3'>
               <h2 className='text-white/60 text-xs font-semibold uppercase tracking-wider'>{t('recentEvents')}</h2>
@@ -267,7 +255,7 @@ export default function WelcomePage() {
         )}
 
         {/* Loading skeleton for recent events */}
-        {isLoading && (
+        {showLoading && (
           <div>
             <div className='h-3 w-24 bg-white/4 mb-3' />
             <div className='bg-white/2 border border-white/6 overflow-hidden divide-y divide-white/4'>
