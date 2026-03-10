@@ -9,7 +9,7 @@ import DateHeader from './DateHeader';
 import EventFiltersComponent, { EventFilters } from './EventFilters';
 import CityHeader from './CityHeader';
 import { CalendarIcon } from '@/components/shared/icons';
-import posthog from 'posthog-js';
+import { usePostHog } from 'posthog-js/react';
 
 interface EventListTranslations extends EventCardTranslations {
   noEvents: string;
@@ -44,6 +44,7 @@ export default function EventList({
   translations,
   city,
 }: EventListProps) {
+  const posthog = usePostHog();
   const cityDisplay = toCityDisplay(city);
   const [events, setEvents] = useState<Event[]>(initialEvents);
   const [hasMore, setHasMore] = useState(initialHasMore);
