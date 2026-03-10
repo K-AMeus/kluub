@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
+import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
 
 interface BackstageHeaderProps {
   onMenuToggle?: () => void;
@@ -45,8 +46,9 @@ export default function BackstageHeader({ onMenuToggle, isMobileMenuOpen }: Back
           </Link>
         </div>
 
-        {/* Right: Back to site */}
-        <div className='ml-auto flex items-center gap-2'>
+        <div className='ml-auto flex items-center gap-3'>
+          <LanguageSwitcher />
+          <div className='w-px h-4 bg-white/10' />
           <Link
             href={`/${locale}`}
             className='flex items-center gap-1.5 text-sm font-medium text-[#E4DD3B]/70 hover:text-[#E4DD3B] transition-colors duration-200'
