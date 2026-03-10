@@ -186,6 +186,11 @@
     "importError": "Could not import event. The event may be private.",
     "importInvalidUrl": "Please enter a valid Facebook event URL",
     "orCreateManually": "or fill in the form manually below",
-    "reviewAndPublish": "Imported from Facebook — review and publish"
+    "reviewAndPublish": "Imported from Facebook — review and publish",
+    "eventViews": "Views",
+    "eventFbClicks": "FB Clicks",
+    "eventConversion": "Conversion",
+    "viewsByWeekday": "Views by Weekday",
+    "viewsByHour": "Views by Hour"
   }
 }

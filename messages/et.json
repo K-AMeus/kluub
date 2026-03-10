@@ -185,6 +185,11 @@
     "importError": "Üritust ei õnnestunud importida. Üritus võib olla privaatne.",
     "importInvalidUrl": "Palun sisesta kehtiv Facebooki ürituse URL",
     "orCreateManually": "või täida vorm käsitsi allpool",
-    "reviewAndPublish": "Imporditud Facebookist — vaata üle ja avalda"
+    "reviewAndPublish": "Imporditud Facebookist — vaata üle ja avalda",
+    "eventViews": "Vaatamised",
+    "eventFbClicks": "FB klikid",
+    "eventConversion": "Konversioon",
+    "viewsByWeekday": "Vaatamised nädalapäevade kaupa",
+    "viewsByHour": "Vaatamised tunni kaupa"
   }
 }

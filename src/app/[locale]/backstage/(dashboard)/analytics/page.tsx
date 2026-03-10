@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import type { Venue } from '@/lib/types';
 
 interface VenueAnalytics {
@@ -10,9 +10,36 @@ interface VenueAnalytics {
   facebookClicks: number;
 }
 
+function BarGraph({ data, labels, title }: { data: number[]; labels: string[]; title: string }) {
+  const max = Math.max(...data, 1);
+
+  return (
+    <div className='bg-white/5 border border-white/10 p-5 overflow-hidden'>
+      <h3 className='text-white font-semibold text-sm mb-5'>{title}</h3>
+      <div className='flex items-end gap-px min-w-0 h-36'>
+        {data.map((value, i) => (
+          <div key={i} className='flex-1 min-w-0 flex flex-col items-center gap-1 h-full justify-end'>
+            {value > 0 && (
+              <span className='text-[#E4DD3B] text-[9px] font-bold font-mono truncate'>{value}</span>
+            )}
+            <div
+              className='w-full bg-[#E4DD3B]/80 hover:bg-[#E4DD3B] transition-colors rounded-t min-h-[2px]'
+              style={{ height: `${Math.max(Math.min((value / max) * 100, 75), value > 0 ? 3 : 0)}%` }}
+            />
+            <span className='text-white/40 text-[9px] font-medium truncate w-full text-center'>{labels[i]}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function AnalyticsPage() {
   const t = useTranslations('backstage');
+  const locale = useLocale();
   const [analytics, setAnalytics] = useState<VenueAnalytics[]>([]);
+  const [viewsByWeekday, setViewsByWeekday] = useState<number[]>(Array(7).fill(0));
+  const [viewsByHour, setViewsByHour] = useState<number[]>(Array(24).fill(0));
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,7 +58,7 @@ export default function AnalyticsPage() {
           return;
         }
 
-        const { venues, analytics: counts } = await res.json();
+        const { venues, analytics: counts, viewsByWeekday: wd, viewsByHour: hr } = await res.json();
 
         setAnalytics(
           (venues as Venue[]).map((venue) => ({
@@ -40,6 +67,8 @@ export default function AnalyticsPage() {
             facebookClicks: counts[venue.id]?.facebookClicks || 0,
           }))
         );
+        if (wd) setViewsByWeekday(wd);
+        if (hr) setViewsByHour(hr);
       } catch {
         setError(t('unexpectedError'));
       } finally {
@@ -166,6 +195,28 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Bar Graphs */}
+          {!isLoading && !error && analytics.length > 0 && (
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-6'>
+              <BarGraph
+                data={viewsByWeekday}
+                labels={(() => {
+                  const dateLocale = locale === 'et' ? 'et-EE' : 'en-US';
+                  return Array.from({ length: 7 }, (_, i) => {
+                    const d = new Date(2025, 0, 6 + i); // Mon=6 Jan 2025
+                    return d.toLocaleDateString(dateLocale, { weekday: 'short' });
+                  });
+                })()}
+                title={t('viewsByWeekday')}
+              />
+              <BarGraph
+                data={viewsByHour}
+                labels={Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'))}
+                title={t('viewsByHour')}
+              />
             </div>
           )}
 
