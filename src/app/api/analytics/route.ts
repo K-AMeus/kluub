@@ -54,7 +54,7 @@ export async function GET() {
 
     const venueIdList = venueIds.map((id: string) => `'${id}'`).join(', ');
 
-    const [viewsResult, clicksResult, eventViewsResult, eventClicksResult] = await Promise.all([
+    const [viewsResult, clicksResult, eventViewsResult, eventClicksResult, viewsByWeekdayResult, viewsByHourResult] = await Promise.all([
       queryPostHog(`
         SELECT properties.venue_id AS venue_id, count() AS count
         FROM events
@@ -82,6 +82,38 @@ export async function GET() {
         WHERE event = 'facebook_event_clicked'
           AND properties.venue_id IN (${venueIdList})
         GROUP BY properties.event_id
+      `),
+      queryPostHog(`
+        SELECT
+          days.day AS weekday,
+          coalesce(counts.count, 0) AS count
+        FROM (
+          SELECT arrayJoin([1,2,3,4,5,6,7]) AS day
+        ) AS days
+        LEFT JOIN (
+          SELECT toDayOfWeek(toTimeZone(timestamp, 'Europe/Tallinn')) AS day, count() AS count
+          FROM events
+          WHERE event = 'event_detail_viewed'
+            AND properties.venue_id IN (${venueIdList})
+          GROUP BY day
+        ) AS counts ON days.day = counts.day
+        ORDER BY days.day
+      `),
+      queryPostHog(`
+        SELECT
+          hours.hour AS hour,
+          coalesce(counts.count, 0) AS count
+        FROM (
+          SELECT arrayJoin(range(0, 24)) AS hour
+        ) AS hours
+        LEFT JOIN (
+          SELECT toHour(toTimeZone(timestamp, 'Europe/Tallinn')) AS hour, count() AS count
+          FROM events
+          WHERE event = 'event_detail_viewed'
+            AND properties.venue_id IN (${venueIdList})
+          GROUP BY hour
+        ) AS counts ON hours.hour = counts.hour
+        ORDER BY hours.hour
       `),
     ]);
 
@@ -125,7 +157,10 @@ export async function GET() {
       eventAnalytics[eventId].facebookClicks = count;
     }
 
-    return NextResponse.json({ analytics, eventAnalytics });
+    const viewsByWeekday = (viewsByWeekdayResult.results || []).map((row: [number, number]) => row[1]);
+    const viewsByHour = (viewsByHourResult.results || []).map((row: [number, number]) => row[1]);
+
+    return NextResponse.json({ analytics, eventAnalytics, viewsByWeekday, viewsByHour });
   } catch (error) {
     console.error('Analytics API error:', error);
     return NextResponse.json({ error: 'Failed to fetch analytics' }, { status: 500 });

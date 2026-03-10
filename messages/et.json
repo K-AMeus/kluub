@@ -188,6 +188,8 @@
     "reviewAndPublish": "Imporditud Facebookist — vaata üle ja avalda",
     "eventViews": "Vaatamised",
     "eventFbClicks": "FB klikid",
-    "eventConversion": "Konversioon"
+    "eventConversion": "Konversioon",
+    "viewsByWeekday": "Vaatamised nädalapäevade kaupa",
+    "viewsByHour": "Vaatamised tunni kaupa"
   }
 }

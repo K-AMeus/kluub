@@ -189,6 +189,8 @@
     "reviewAndPublish": "Imported from Facebook — review and publish",
     "eventViews": "Views",
     "eventFbClicks": "FB Clicks",
-    "eventConversion": "Conversion"
+    "eventConversion": "Conversion",
+    "viewsByWeekday": "Views by Weekday",
+    "viewsByHour": "Views by Hour"
   }
 }
