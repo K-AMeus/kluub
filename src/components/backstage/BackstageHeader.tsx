@@ -20,7 +20,7 @@ export default function BackstageHeader({ onMenuToggle, isMobileMenuOpen }: Back
           {/* Mobile Menu Button */}
           <button
             onClick={onMenuToggle}
-            className='lg:hidden p-1.5 -ml-1.5 text-white/60 hover:text-white hover:bg-white/6 transition-all duration-200'
+            className='lg:hidden p-1.5 -ml-1.5 text-white/60 hover:text-white hover:bg-white/6 transition-all duration-75 hover:duration-0'
             aria-label='Toggle menu'
           >
             <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
@@ -37,7 +37,7 @@ export default function BackstageHeader({ onMenuToggle, isMobileMenuOpen }: Back
             href={`/${locale}/backstage/welcome`}
             className='flex items-center gap-2.5 group'
           >
-            <span className='font-display text-lg md:text-xl text-white tracking-wider group-hover:text-[#E4DD3B] transition-colors duration-200'>
+            <span className='font-display text-lg md:text-xl text-white tracking-wider group-hover:text-[#E4DD3B] transition-colors duration-75 hover:duration-0'>
               KLUUB
             </span>
             <span className='hidden sm:inline-flex items-center px-2 py-0.5 text-[10px] font-semibold tracking-widest uppercase text-[#E4DD3B]/80 bg-[#E4DD3B]/8 border border-[#E4DD3B]/20'>
@@ -51,7 +51,7 @@ export default function BackstageHeader({ onMenuToggle, isMobileMenuOpen }: Back
           <div className='w-px h-4 bg-white/10' />
           <Link
             href={`/${locale}`}
-            className='flex items-center gap-1.5 text-sm font-medium text-[#E4DD3B]/70 hover:text-[#E4DD3B] transition-colors duration-200'
+            className='flex items-center gap-1.5 text-sm font-medium text-[#E4DD3B]/70 hover:text-[#E4DD3B] transition-colors duration-75 hover:duration-0'
           >
             kluub.ee
             <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>

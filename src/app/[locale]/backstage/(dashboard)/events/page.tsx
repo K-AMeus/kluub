@@ -24,6 +24,12 @@ export default function MyEventsPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [eventAnalytics, setEventAnalytics] = useState<Record<string, EventAnalyticsData>>({});
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const frameId = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(frameId);
+  }, []);
 
   const fetchEvents = useCallback(async () => {
     if (venueIds.length === 0) {
@@ -154,10 +160,10 @@ export default function MyEventsPage() {
   return (
     <>
       <div className='px-4 md:px-8 py-6 md:py-10'>
-        <div className='max-w-5xl mx-auto'>
+        <div className={`max-w-5xl mx-auto transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
 
           {/* Header */}
-          <div className='mb-6'>
+          <div className='mb-8'>
             <h1 className='font-display text-2xl md:text-3xl text-white tracking-wider'>
               {t('myEvents')}
             </h1>
@@ -212,7 +218,7 @@ export default function MyEventsPage() {
               <div className='flex gap-1 mb-6 bg-white/3 border border-white/6 p-1 w-fit'>
                 <button
                   onClick={() => setActiveTab('upcoming')}
-                  className={`px-4 py-2 text-sm font-medium transition-all duration-200 cursor-pointer ${
+                  className={`px-4 py-2 text-sm font-medium transition-all duration-75 hover:duration-0 cursor-pointer ${
                     activeTab === 'upcoming'
                       ? 'bg-[#E4DD3B]/12 text-[#E4DD3B]'
                       : 'text-white/40 hover:text-white/60'
@@ -222,7 +228,7 @@ export default function MyEventsPage() {
                 </button>
                 <button
                   onClick={() => setActiveTab('past')}
-                  className={`px-4 py-2 text-sm font-medium transition-all duration-200 cursor-pointer ${
+                  className={`px-4 py-2 text-sm font-medium transition-all duration-75 hover:duration-0 cursor-pointer ${
                     activeTab === 'past'
                       ? 'bg-[#E4DD3B]/12 text-[#E4DD3B]'
                       : 'text-white/40 hover:text-white/60'
@@ -274,14 +280,14 @@ export default function MyEventsPage() {
                       )}
                       <div
                         onClick={() => handleEventClick(event)}
-                        className='group bg-white/3 hover:bg-white/5 border border-white/8 hover:border-white/15 transition-all duration-200 cursor-pointer'
+                        className='group bg-white/3 hover:bg-white/5 border border-white/8 hover:border-white/15 transition-all duration-75 hover:duration-0 cursor-pointer'
                       >
                         {/* Main row: event info + desktop analytics */}
                         <div className='flex items-center'>
                           {/* Event info section */}
                           <div className='flex-1 min-w-0 p-4 md:p-5 flex items-center gap-4'>
                             {/* Date badge */}
-                            <div className='hidden sm:flex flex-col items-center justify-center w-12 h-12 bg-white/5 group-hover:bg-[#E4DD3B]/8 shrink-0 transition-colors duration-200'>
+                            <div className='hidden sm:flex flex-col items-center justify-center w-12 h-12 bg-white/5 group-hover:bg-[#E4DD3B]/8 shrink-0 transition-colors duration-75 hover:duration-0'>
                               <span className='text-[10px] font-semibold text-white/50 uppercase leading-none'>
                                 {new Date(event.startTime).toLocaleDateString(locale, { month: 'short' })}
                               </span>
@@ -293,7 +299,7 @@ export default function MyEventsPage() {
                             {/* Event details */}
                             <div className='flex-1 min-w-0'>
                               <div className='flex items-center gap-2 mb-1'>
-                                <h3 className='text-white font-bold text-sm truncate group-hover:text-[#E4DD3B] transition-colors duration-200'>
+                                <h3 className='text-white font-bold text-sm truncate group-hover:text-[#E4DD3B] transition-colors duration-75 hover:duration-0'>
                                   {event.title}
                                 </h3>
                                 {event.topPick && (
@@ -312,7 +318,7 @@ export default function MyEventsPage() {
                             </div>
 
                             {/* Arrow */}
-                            <svg className='w-4 h-4 text-white/25 group-hover:text-white/50 shrink-0 transition-colors duration-200 md:mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
+                            <svg className='w-4 h-4 text-white/25 group-hover:text-white/50 shrink-0 transition-colors duration-75 hover:duration-0 md:mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
                               <path strokeLinecap='round' strokeLinejoin='round' d='M8.25 4.5l7.5 7.5-7.5 7.5' />
                             </svg>
                           </div>
