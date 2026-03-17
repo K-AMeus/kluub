@@ -6,6 +6,7 @@ import { createBrowserSupabaseClient } from '@/supabase/client';
 import { useBackstage } from '@/components/backstage/BackstageProvider';
 import Link from 'next/link';
 import { formatDateTime } from '@/lib/event-utils';
+import { useMounted } from '@/lib/hooks';
 
 interface RecentEvent {
   id: string;
@@ -18,7 +19,7 @@ export default function WelcomePage() {
   const t = useTranslations('backstage');
   const locale = useLocale();
   const { user, venueIds, isLoading: contextLoading } = useBackstage();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
     total: 0,
@@ -27,13 +28,6 @@ export default function WelcomePage() {
   });
   const [recentEvents, setRecentEvents] = useState<RecentEvent[]>([]);
 
-  useEffect(() => {
-    const frameId = requestAnimationFrame(() => {
-      setMounted(true);
-    });
-
-    return () => cancelAnimationFrame(frameId);
-  }, []);
 
   useEffect(() => {
     if (contextLoading) return;

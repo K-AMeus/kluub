@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useMounted } from '@/lib/hooks';
 import { useTranslations, useLocale } from 'next-intl';
 import { createBrowserSupabaseClient } from '@/supabase/client';
 import { useBackstage } from '@/components/backstage/BackstageProvider';
@@ -24,12 +25,7 @@ export default function MyEventsPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [eventAnalytics, setEventAnalytics] = useState<Record<string, EventAnalyticsData>>({});
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const frameId = requestAnimationFrame(() => setMounted(true));
-    return () => cancelAnimationFrame(frameId);
-  }, []);
+  const mounted = useMounted();
 
   const fetchEvents = useCallback(async () => {
     if (venueIds.length === 0) {

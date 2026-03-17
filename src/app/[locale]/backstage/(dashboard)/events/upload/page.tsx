@@ -1,17 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import EventUploadForm from '@/components/backstage/EventUploadForm';
+import { useMounted } from '@/lib/hooks';
 
 export default function EventUploadPage() {
   const t = useTranslations('backstage');
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const frameId = requestAnimationFrame(() => setMounted(true));
-    return () => cancelAnimationFrame(frameId);
-  }, []);
+  const mounted = useMounted();
 
   return (
     <div className='px-4 md:px-8 py-6 md:py-10'>

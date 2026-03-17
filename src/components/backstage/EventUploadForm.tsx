@@ -346,7 +346,7 @@ export default function EventUploadForm() {
               type='button'
               onClick={handleFacebookImport}
               disabled={isImporting || !importUrl.trim()}
-              className='px-5 py-3 bg-[#1877F2] hover:bg-[#1877F2]/90 text-white text-sm font-medium transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 shrink-0'
+              className='px-5 py-3 bg-[#1877F2] hover:bg-[#1877F2]/90 text-white text-sm font-medium transition-all duration-75 hover:duration-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 shrink-0'
             >
               {isImporting ? (
                 <>
@@ -558,7 +558,7 @@ export default function EventUploadForm() {
             <button
               type='submit'
               disabled={isSubmitting}
-              className='w-full py-3 bg-[#E4DD3B] hover:bg-[#E4DD3B]/90 text-black font-semibold text-sm transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2'
+              className='w-full py-3 bg-[#E4DD3B] hover:bg-[#E4DD3B]/90 text-black font-semibold text-sm transition-all duration-75 hover:duration-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2'
             >
               {isSubmitting ? (
                 <>
@@ -586,18 +586,13 @@ export default function EventUploadForm() {
               alt={title || 'Event preview'}
               className='w-full h-full object-cover'
             />
-            {!imageUrl && (
-              <div className='absolute inset-0 flex items-center justify-center bg-white/3'>
-                <span className='text-white/20 text-xs'>{t('eventImage')}</span>
-              </div>
-            )}
           </div>
 
           {/* Content */}
           <div className='p-4 flex flex-col gap-3'>
             <div>
-              <h3 className='text-white font-display text-base uppercase tracking-wide line-clamp-2 leading-snug'>
-                {title || <span className='text-white/20'>{t('eventTitlePlaceholder')}</span>}
+              <h3 className='font-display text-base uppercase tracking-wide line-clamp-2 leading-snug'>
+                {title ? <span className='text-white'>{title}</span> : <span className='text-white/25'>{t('eventTitle')}</span>}
               </h3>
               {description && (
                 <p className='text-white/70 text-xs mt-2 line-clamp-3 leading-relaxed'>

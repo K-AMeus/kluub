@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useMounted } from '@/lib/hooks';
 import { useTranslations, useLocale } from 'next-intl';
 import type { Venue } from '@/lib/types';
 
@@ -42,12 +43,7 @@ export default function AnalyticsPage() {
   const [viewsByHour, setViewsByHour] = useState<number[]>(Array(24).fill(0));
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const frameId = requestAnimationFrame(() => setMounted(true));
-    return () => cancelAnimationFrame(frameId);
-  }, []);
+  const mounted = useMounted();
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -87,7 +83,7 @@ export default function AnalyticsPage() {
 
   return (
     <div className='px-4 md:px-8 py-6 md:py-10'>
-        <div className={`max-w-5xl mx-auto transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+      <div className={`max-w-5xl mx-auto transition-all duration-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
           {/* Header */}
           <div className='mb-8'>
             <h1 className='font-display text-2xl md:text-3xl text-white tracking-wider mb-2'>
@@ -223,10 +219,10 @@ export default function AnalyticsPage() {
           {/* No venues */}
           {!isLoading && !error && analytics.length === 0 && (
             <div className='text-center py-12'>
-              <p className='text-white/50'>{t('noVenuesTitle')}</p>
+              <p className='text-white/40'>{t('noVenuesTitle')}</p>
             </div>
           )}
-        </div>
+      </div>
     </div>
   );
 }
