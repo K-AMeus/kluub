@@ -219,10 +219,10 @@ export default function DateTimePicker({
             })}
           </div>
 
-          {/* Time picker */}
-          <div className='mt-4 pt-3 border-t border-white/10'>
-            <div className='flex items-center justify-center gap-2'>
-              <span className='text-white/40 text-xs font-semibold uppercase tracking-wider mr-2'>Time</span>
+          {/* Time picker + Save button */}
+          <div className='mt-4 pt-3 border-t border-white/10 flex items-center justify-between gap-2'>
+            <div className='flex items-center gap-2'>
+              <span className='text-white/40 text-xs font-semibold uppercase tracking-wider'>{locale === 'et' ? 'Kell' : 'Time'}</span>
               <input
                 type='text'
                 value={tempHour}
@@ -261,6 +261,13 @@ export default function DateTimePicker({
                 className='bg-white/[0.05] border border-white/10 text-white text-sm px-2 py-1.5 focus:outline-none focus:border-[#E4DD3B]/40 text-center w-12'
               />
             </div>
+            <button
+              type='button'
+              onClick={() => setIsOpen(false)}
+              className='px-4 py-1.5 bg-[#E4DD3B] hover:bg-[#E4DD3B]/90 text-black text-sm font-semibold transition-colors duration-75 cursor-pointer'
+            >
+              {locale === 'et' ? 'Valmis' : 'Done'}
+            </button>
           </div>
         </div>
       )}

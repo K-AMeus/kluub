@@ -5,6 +5,10 @@ import { useTranslations } from 'next-intl';
 import { createBrowserSupabaseClient } from '@/supabase/client';
 import { useBackstage } from '@/components/backstage/BackstageProvider';
 import type { City, PriceTier, Venue } from '@/lib/types';
+import { formatPriceTier } from '@/lib/types';
+import { formatTime } from '@/lib/date-utils';
+import { DEFAULT_EVENT_IMAGE } from '@/lib/constants';
+import { LocationIcon, CalendarIcon, TicketIcon } from '@/components/shared/icons';
 import { formatDateTimeForInput } from '@/lib/event-utils';
 import PriceInfoTooltip from '@/components/shared/PriceInfoTooltip';
 import ImageUpload from '@/components/shared/ImageUpload';
@@ -300,281 +304,327 @@ export default function EventUploadForm() {
   const inputClasses = 'w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] text-white placeholder-white/25 focus:outline-none focus:border-[#E4DD3B]/40 focus:ring-1 focus:ring-[#E4DD3B]/20 transition-all duration-200 disabled:opacity-40 text-sm';
   const labelClasses = 'block text-white/60 text-xs font-medium mb-2 uppercase tracking-wider';
 
+  const previewVenue = userVenues.find((v) => v.id === venueId);
+  const previewImage = imageUrl || DEFAULT_EVENT_IMAGE;
+  const previewPrice = priceTier === 0 ? t('priceTierFree') : formatPriceTier(priceTier);
+
   return (
-    <div className='max-w-2xl space-y-4'>
-      {/* Facebook Import Card */}
-      <div className='bg-white/2 border border-white/6 p-5'>
-        <div className='flex items-center gap-3 mb-4'>
-          <div className='w-8 h-8 bg-[#1877F2] flex items-center justify-center shrink-0'>
-            <svg className='w-4 h-4 text-white' viewBox='0 0 24 24' fill='currentColor'>
-              <path d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' />
-            </svg>
+    <div className='grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start'>
+
+      {/* Left column: all form fields */}
+      <div className='space-y-4'>
+
+        {/* Facebook Import Card */}
+        <div className='bg-white/2 border border-white/6 p-5'>
+          <div className='flex items-center gap-3 mb-4'>
+            <div className='w-8 h-8 bg-[#1877F2] flex items-center justify-center shrink-0'>
+              <svg className='w-4 h-4 text-white' viewBox='0 0 24 24' fill='currentColor'>
+                <path d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' />
+              </svg>
+            </div>
+            <div>
+              <h3 className='text-white font-medium text-sm'>{t('importFromFacebook')}</h3>
+              <p className='text-white/30 text-xs'>{t('importDescription')}</p>
+            </div>
           </div>
-          <div>
-            <h3 className='text-white font-medium text-sm'>
-              {t('importFromFacebook')}
-            </h3>
-            <p className='text-white/30 text-xs'>
-              {t('importDescription')}
-            </p>
-          </div>
-        </div>
-
-        <div className='flex gap-2'>
-          <input
-            type='url'
-            value={importUrl}
-            onChange={(e) => setImportUrl(e.target.value)}
-            disabled={isImporting}
-            className={inputClasses + ' focus:border-[#1877F2]/50 focus:ring-[#1877F2]/20'}
-            placeholder={t('fbUrlPlaceholder')}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleFacebookImport();
-              }
-            }}
-          />
-          <button
-            type='button'
-            onClick={handleFacebookImport}
-            disabled={isImporting || !importUrl.trim()}
-            className='px-5 py-3 bg-[#1877F2] hover:bg-[#1877F2]/90 text-white text-sm font-medium transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 shrink-0'
-          >
-            {isImporting ? (
-              <>
-                <div className='w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin' />
-                {t('importing')}
-              </>
-            ) : (
-              t('importButton')
-            )}
-          </button>
-        </div>
-
-        {!importedFrom && (
-          <p className='text-white/25 text-xs mt-3'>
-            {t('orCreateManually')}
-          </p>
-        )}
-      </div>
-
-      {/* Event Form Card */}
-      <div id='event-form' className='bg-white/2 border border-white/6 p-5 md:p-6'>
-
-        {importedFrom && (
-          <div className='mb-5 p-3 bg-[#1877F2]/6 border border-[#1877F2]/20 text-[#6CB4EE] text-sm flex items-center gap-3'>
-            <svg className='w-4 h-4 shrink-0' viewBox='0 0 24 24' fill='currentColor'>
-              <path d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' />
-            </svg>
-            <span className='text-xs flex-1'>{t('reviewAndPublish')}</span>
-            <svg className='w-6 h-6 shrink-0 text-emerald-400' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
-              <path strokeLinecap='round' strokeLinejoin='round' d='M9 12.75L11.25 15 15 9.75' />
-            </svg>
-          </div>
-        )}
-
-        {/* Error message */}
-        {error && (
-          <div className='mb-5 p-3 bg-red-500/6 border border-red-500/20 text-red-400 text-sm flex items-center gap-3'>
-            <svg className='w-4 h-4 shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
-              <path strokeLinecap='round' strokeLinejoin='round' d='M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z' />
-            </svg>
-            <span className='text-xs'>{error}</span>
-          </div>
-        )}
-
-        {success && !importedFrom && (
-          <div className='mb-5 p-3 bg-emerald-500/6 border border-emerald-500/20 text-emerald-400 text-sm flex items-center gap-3'>
-            <svg className='w-4 h-4 shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
-              <path strokeLinecap='round' strokeLinejoin='round' d='M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
-            </svg>
-            <span className='text-xs'>{success}</span>
-          </div>
-        )}
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className='space-y-5'>
-          {/* Title */}
-          <div>
-            <label htmlFor='title' className={labelClasses}>
-              {t('eventTitle')} <span className='text-red-400'>*</span>
-            </label>
+          <div className='flex gap-2'>
             <input
-              id='title'
-              type='text'
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              disabled={isSubmitting}
-              className={inputClasses}
-              placeholder={t('eventTitlePlaceholder')}
-            />
-            {validationErrors.title && (
-              <p className='mt-1.5 text-xs text-red-400'>{validationErrors.title}</p>
-            )}
-          </div>
-
-          {/* Description */}
-          <div>
-            <label htmlFor='description' className={labelClasses}>
-              {t('eventDescription')} <span className='text-red-400'>*</span>
-            </label>
-            <textarea
-              id='description'
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-              disabled={isSubmitting}
-              rows={4}
-              className={inputClasses + ' min-h-30 resize-y'}
-              placeholder={t('eventDescriptionPlaceholder')}
-            />
-            {validationErrors.description && (
-              <p className='mt-1.5 text-xs text-red-400'>{validationErrors.description}</p>
-            )}
-          </div>
-
-          {/* Venue + Price Tier */}
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-            <div className='md:col-span-2'>
-              <label htmlFor='venue' className={labelClasses}>
-                {t('venue')} <span className='text-red-400'>*</span>
-              </label>
-              <select
-                id='venue'
-                value={venueId}
-                onChange={(e) => handleVenueChange(e.target.value)}
-                required
-                disabled={isSubmitting}
-                className={inputClasses}
-              >
-                <option value='' className='bg-[#111]'>
-                  {t('venueSelect')}
-                </option>
-                {userVenues.map((venue) => (
-                  <option key={venue.id} value={venue.id} className='bg-[#111]'>
-                    {venue.name}
-                  </option>
-                ))}
-              </select>
-              {validationErrors.venueId && (
-                <p className='mt-1.5 text-xs text-red-400'>{validationErrors.venueId}</p>
-              )}
-            </div>
-
-            <div className='md:col-span-1'>
-              <label htmlFor='priceTier' className={labelClasses + ' flex items-center gap-1'}>
-                {t('priceTier')} <span className='text-red-400'>*</span>
-                <PriceInfoTooltip size={14} />
-              </label>
-              <select
-                id='priceTier'
-                value={priceTier}
-                onChange={(e) => setPriceTier(Number(e.target.value) as PriceTier)}
-                required
-                disabled={isSubmitting}
-                className={inputClasses}
-              >
-                <option value={0} className='bg-[#111]'>{t('priceTierFree')}</option>
-                <option value={1} className='bg-[#111]'>{t('priceTierLow')}</option>
-                <option value={2} className='bg-[#111]'>{t('priceTierMedium')}</option>
-                <option value={3} className='bg-[#111]'>{t('priceTierHigh')}</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Start Time + End Time */}
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <div>
-              <label htmlFor='startTime' className={labelClasses}>
-                {t('startTime')} <span className='text-red-400'>*</span>
-              </label>
-              <DateTimePicker
-                id='startTime'
-                value={startTime}
-                onChange={setStartTime}
-                required
-                disabled={isSubmitting}
-              />
-              {validationErrors.startTime && (
-                <p className='mt-1.5 text-xs text-red-400'>{validationErrors.startTime}</p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor='endTime' className={labelClasses}>
-                {t('endTime')} <span className='text-red-400'>*</span>
-              </label>
-              <DateTimePicker
-                id='endTime'
-                value={endTime}
-                onChange={setEndTime}
-                required
-                disabled={isSubmitting}
-                defaultHour='02'
-              />
-              {validationErrors.endTime && (
-                <p className='mt-1.5 text-xs text-red-400'>{validationErrors.endTime}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Image Upload */}
-          <div>
-            <label className={labelClasses}>
-              {t('eventImage')}
-            </label>
-            <ImageUpload
-              value={imageUrl}
-              onChange={setImageUrl}
-              disabled={isSubmitting}
-              labels={{
-                dropzone: t('imageDropzone'),
-                dropzoneHint: t('imageDropzoneHint'),
-                uploading: t('imageUploading'),
-                removeImage: t('imageRemove'),
-                dragActive: t('imageDragActive'),
+              type='url'
+              value={importUrl}
+              onChange={(e) => setImportUrl(e.target.value)}
+              disabled={isImporting}
+              className={inputClasses + ' focus:border-[#1877F2]/50 focus:ring-[#1877F2]/20'}
+              placeholder={t('fbUrlPlaceholder')}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleFacebookImport();
+                }
               }}
             />
+            <button
+              type='button'
+              onClick={handleFacebookImport}
+              disabled={isImporting || !importUrl.trim()}
+              className='px-5 py-3 bg-[#1877F2] hover:bg-[#1877F2]/90 text-white text-sm font-medium transition-all duration-75 hover:duration-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 shrink-0'
+            >
+              {isImporting ? (
+                <>
+                  <div className='w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin' />
+                  {t('importing')}
+                </>
+              ) : (
+                t('importButton')
+              )}
+            </button>
           </div>
+          {!importedFrom && (
+            <p className='text-white/25 text-xs mt-3'>{t('orCreateManually')}</p>
+          )}
+        </div>
 
-          {/* Facebook URL */}
-          <div>
-            <label htmlFor='facebookUrl' className={labelClasses}>
-              {t('facebookUrl')}
-            </label>
-            <input
-              id='facebookUrl'
-              type='url'
-              value={facebookUrl}
-              onChange={(e) => setFacebookUrl(e.target.value)}
+        {/* Event Form Card */}
+        <div id='event-form' className='bg-white/2 border border-white/6 p-5 md:p-6'>
+
+          {importedFrom && (
+            <div className='mb-5 p-3 bg-[#1877F2]/6 border border-[#1877F2]/20 text-[#6CB4EE] text-sm flex items-center gap-3'>
+              <svg className='w-4 h-4 shrink-0' viewBox='0 0 24 24' fill='currentColor'>
+                <path d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' />
+              </svg>
+              <span className='text-xs flex-1'>{t('reviewAndPublish')}</span>
+              <svg className='w-6 h-6 shrink-0 text-emerald-400' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
+                <path strokeLinecap='round' strokeLinejoin='round' d='M9 12.75L11.25 15 15 9.75' />
+              </svg>
+            </div>
+          )}
+
+          {error && (
+            <div className='mb-5 p-3 bg-red-500/6 border border-red-500/20 text-red-400 text-sm flex items-center gap-3'>
+              <svg className='w-4 h-4 shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+                <path strokeLinecap='round' strokeLinejoin='round' d='M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z' />
+              </svg>
+              <span className='text-xs'>{error}</span>
+            </div>
+          )}
+
+          {success && !importedFrom && (
+            <div className='mb-5 p-3 bg-emerald-500/6 border border-emerald-500/20 text-emerald-400 text-sm flex items-center gap-3'>
+              <svg className='w-4 h-4 shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+                <path strokeLinecap='round' strokeLinejoin='round' d='M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
+              </svg>
+              <span className='text-xs'>{success}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className='space-y-5'>
+            {/* Title */}
+            <div>
+              <label htmlFor='title' className={labelClasses}>
+                {t('eventTitle')} <span className='text-red-400'>*</span>
+              </label>
+              <input
+                id='title'
+                type='text'
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                disabled={isSubmitting}
+                className={inputClasses}
+                placeholder={t('eventTitlePlaceholder')}
+              />
+              {validationErrors.title && (
+                <p className='mt-1.5 text-xs text-red-400'>{validationErrors.title}</p>
+              )}
+            </div>
+
+            {/* Description */}
+            <div>
+              <label htmlFor='description' className={labelClasses}>
+                {t('eventDescription')} <span className='text-red-400'>*</span>
+              </label>
+              <textarea
+                id='description'
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+                disabled={isSubmitting}
+                rows={4}
+                className={inputClasses + ' min-h-30 resize-y'}
+                placeholder={t('eventDescriptionPlaceholder')}
+              />
+              {validationErrors.description && (
+                <p className='mt-1.5 text-xs text-red-400'>{validationErrors.description}</p>
+              )}
+            </div>
+
+            {/* Venue + Price Tier */}
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+              <div className='md:col-span-2'>
+                <label htmlFor='venue' className={labelClasses}>
+                  {t('venue')} <span className='text-red-400'>*</span>
+                </label>
+                <select
+                  id='venue'
+                  value={venueId}
+                  onChange={(e) => handleVenueChange(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                  className={inputClasses}
+                >
+                  <option value='' className='bg-[#111]'>{t('venueSelect')}</option>
+                  {userVenues.map((venue) => (
+                    <option key={venue.id} value={venue.id} className='bg-[#111]'>
+                      {venue.name}
+                    </option>
+                  ))}
+                </select>
+                {validationErrors.venueId && (
+                  <p className='mt-1.5 text-xs text-red-400'>{validationErrors.venueId}</p>
+                )}
+              </div>
+              <div className='md:col-span-1'>
+                <label htmlFor='priceTier' className={labelClasses + ' flex items-center gap-1'}>
+                  {t('priceTier')} <span className='text-red-400'>*</span>
+                  <PriceInfoTooltip size={14} />
+                </label>
+                <select
+                  id='priceTier'
+                  value={priceTier}
+                  onChange={(e) => setPriceTier(Number(e.target.value) as PriceTier)}
+                  required
+                  disabled={isSubmitting}
+                  className={inputClasses}
+                >
+                  <option value={0} className='bg-[#111]'>{t('priceTierFree')}</option>
+                  <option value={1} className='bg-[#111]'>{t('priceTierLow')}</option>
+                  <option value={2} className='bg-[#111]'>{t('priceTierMedium')}</option>
+                  <option value={3} className='bg-[#111]'>{t('priceTierHigh')}</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Start Time + End Time */}
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <div>
+                <label htmlFor='startTime' className={labelClasses}>
+                  {t('startTime')} <span className='text-red-400'>*</span>
+                </label>
+                <DateTimePicker
+                  id='startTime'
+                  value={startTime}
+                  onChange={setStartTime}
+                  required
+                  disabled={isSubmitting}
+                />
+                {validationErrors.startTime && (
+                  <p className='mt-1.5 text-xs text-red-400'>{validationErrors.startTime}</p>
+                )}
+              </div>
+              <div>
+                <label htmlFor='endTime' className={labelClasses}>
+                  {t('endTime')} <span className='text-red-400'>*</span>
+                </label>
+                <DateTimePicker
+                  id='endTime'
+                  value={endTime}
+                  onChange={setEndTime}
+                  required
+                  disabled={isSubmitting}
+                  defaultHour='02'
+                />
+                {validationErrors.endTime && (
+                  <p className='mt-1.5 text-xs text-red-400'>{validationErrors.endTime}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Image Upload */}
+            <div>
+              <label className={labelClasses}>{t('eventImage')}</label>
+              <ImageUpload
+                value={imageUrl}
+                onChange={setImageUrl}
+                disabled={isSubmitting}
+                labels={{
+                  dropzone: t('imageDropzone'),
+                  dropzoneHint: t('imageDropzoneHint'),
+                  uploading: t('imageUploading'),
+                  removeImage: t('imageRemove'),
+                  dragActive: t('imageDragActive'),
+                }}
+              />
+            </div>
+
+            {/* Facebook URL */}
+            <div>
+              <label htmlFor='facebookUrl' className={labelClasses}>
+                {t('facebookUrl')}
+              </label>
+              <input
+                id='facebookUrl'
+                type='url'
+                value={facebookUrl}
+                onChange={(e) => setFacebookUrl(e.target.value)}
+                disabled={isSubmitting}
+                className={inputClasses}
+                placeholder={t('facebookUrlPlaceholder')}
+              />
+              {validationErrors.facebookUrl && (
+                <p className='mt-1.5 text-xs text-red-400'>{validationErrors.facebookUrl}</p>
+              )}
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type='submit'
               disabled={isSubmitting}
-              className={inputClasses}
-              placeholder={t('facebookUrlPlaceholder')}
+              className='w-full py-3 bg-[#E4DD3B] hover:bg-[#E4DD3B]/90 text-black font-semibold text-sm transition-all duration-75 hover:duration-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2'
+            >
+              {isSubmitting ? (
+                <>
+                  <div className='w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin' />
+                  {t('creatingEvent')}
+                </>
+              ) : (
+                t('createEvent')
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* Right column: live preview (sticky) */}
+      <div className='lg:sticky lg:top-24 space-y-3'>
+        <p className='text-white/30 text-xs font-semibold uppercase tracking-wider'>Preview</p>
+
+        {/* Preview card — mirrors EventCard desktop layout */}
+        <div className='relative bg-[#060606] border border-white/20 flex flex-col overflow-hidden'>
+          {/* Image */}
+          <div className='relative w-full aspect-video overflow-hidden'>
+            <img
+              src={previewImage}
+              alt={title || 'Event preview'}
+              className='w-full h-full object-cover'
             />
-            {validationErrors.facebookUrl && (
-              <p className='mt-1.5 text-xs text-red-400'>{validationErrors.facebookUrl}</p>
-            )}
           </div>
 
-          {/* Submit Button */}
-          <button
-            type='submit'
-            disabled={isSubmitting}
-            className='w-full py-3 bg-[#E4DD3B] hover:bg-[#E4DD3B]/90 text-black font-semibold text-sm transition-all duration-200 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2'
-          >
-            {isSubmitting ? (
-              <>
-                <div className='w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin' />
-                {t('creatingEvent')}
-              </>
-            ) : (
-              t('createEvent')
-            )}
-          </button>
-        </form>
+          {/* Content */}
+          <div className='p-4 flex flex-col gap-3'>
+            <div>
+              <h3 className='font-display text-base uppercase tracking-wide line-clamp-2 leading-snug'>
+                {title ? <span className='text-white'>{title}</span> : <span className='text-white/25'>{t('eventTitle')}</span>}
+              </h3>
+              {description && (
+                <p className='text-white/70 text-xs mt-2 line-clamp-3 leading-relaxed'>
+                  {description}
+                </p>
+              )}
+            </div>
+
+            <div className='border-t border-white/8 pt-3 flex flex-col gap-2'>
+              <div className='flex items-center gap-2 text-xs text-white/70'>
+                <LocationIcon size={14} className='text-[#E4DD3B] shrink-0' />
+                <span className='truncate'>
+                  {previewVenue ? previewVenue.name : <span className='text-white/25'>{t('venueSelect')}</span>}
+                </span>
+              </div>
+              <div className='flex items-center gap-2 text-xs text-white/70'>
+                <CalendarIcon size={14} className='text-[#E4DD3B] shrink-0' />
+                <span>
+                  {startTime && endTime
+                    ? `${formatTime(startTime)} – ${formatTime(endTime)}`
+                    : <span className='text-white/25'>{t('startTime')} – {t('endTime')}</span>}
+                </span>
+              </div>
+              <div className='flex items-center gap-2 text-xs text-white/70'>
+                <TicketIcon size={14} className='text-[#E4DD3B] shrink-0' />
+                <span>{previewPrice}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
     </div>
   );
 }
