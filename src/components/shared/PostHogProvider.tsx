@@ -12,22 +12,3 @@ export default function PostHogProvider({
 }
 
 
-//id
-// name
-// slug
-// description
-// logo_url
-// website_url
-// contact_email (admin field)
-// contact_phone (admin field)
-// audit fields
-
-
-// id
-// host_users
-// host_id
-// user_id
-// role (maybe)
-
-
-// events (venue_id -> host_id)
