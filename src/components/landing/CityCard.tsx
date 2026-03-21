@@ -42,8 +42,8 @@ export default function CityCard({ name, isActive, href }: CityCardProps) {
     <div
       className={`flex items-center justify-center gap-3 px-7 py-3.5 md:px-12 md:py-4.5 w-full transition-all duration-300 ${
         isActive
-          ? 'bg-[#E4DD3B] group-hover:bg-[#d4cd2b]'
-          : 'bg-white/6 backdrop-blur-sm'
+          ? 'bg-[#E4DD3B] border border-[#E4DD3B] group-hover:bg-[#d4cd2b]'
+          : 'bg-white/6 border border-white/10 backdrop-blur-sm'
       }`}
     >
       <span
