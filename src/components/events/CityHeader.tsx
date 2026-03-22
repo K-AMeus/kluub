@@ -8,17 +8,16 @@ interface CityHeaderProps {
 }
 
 export default function CityHeader({ city }: CityHeaderProps) {
-  const [currentTime, setCurrentTime] = useState<string>(() => formatTime());
+  const [currentTime, setCurrentTime] = useState<string>('');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setCurrentTime(formatTime());
     setMounted(true);
 
-    const updateTime = () => {
+    const intervalId = setInterval(() => {
       setCurrentTime(formatTime());
-    };
-
-    const intervalId = setInterval(updateTime, 30000);
+    }, 30000);
 
     return () => clearInterval(intervalId);
   }, []);
