@@ -3,10 +3,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useMounted } from '@/lib/hooks';
 import { useTranslations, useLocale } from 'next-intl';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { createBrowserSupabaseClient } from '@/supabase/client';
 import { useBackstage } from '@/components/backstage/BackstageProvider';
 import EventEditModal from '@/components/backstage/EventEditModal';
-import type { Event, Venue } from '@/lib/types';
+import type { Event } from '@/lib/types';
 import { formatDateTimeWithYear } from '@/lib/event-utils';
 
 interface EventAnalyticsData {
@@ -18,6 +19,8 @@ export default function MyEventsPage() {
   const t = useTranslations('backstage');
   const locale = useLocale();
   const { venues: userVenues, venueIds, isLoading: contextLoading } = useBackstage();
+  const searchParams = useSearchParams();
+  const routerNav = useRouter();
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
@@ -119,6 +122,19 @@ export default function MyEventsPage() {
     if (contextLoading) return;
     fetchEvents();
   }, [contextLoading, fetchEvents]);
+
+  // Auto-open edit modal from ?edit= query param
+  useEffect(() => {
+    const editId = searchParams.get('edit');
+    if (!editId || isLoading) return;
+    const allEvents = [...upcomingEvents, ...pastEvents];
+    const target = allEvents.find((e) => e.id === editId);
+    if (target) {
+      setSelectedEvent(target);
+      // Clean up the URL
+      routerNav.replace(`/${locale}/backstage/events`, { scroll: false });
+    }
+  }, [searchParams, isLoading, upcomingEvents, pastEvents, locale, routerNav]);
 
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);
