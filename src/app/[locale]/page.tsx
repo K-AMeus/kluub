@@ -1,5 +1,12 @@
 import LandingPage from '@/components/landing/LandingPage';
+import { setRequestLocale } from 'next-intl/server';
 
-export default function Home() {
+export const revalidate = 86400;
+
+type Params = Promise<{ locale: string }>;
+
+export default async function Home({ params }: { params: Params }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return <LandingPage />;
 }

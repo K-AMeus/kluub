@@ -363,130 +363,125 @@ export default function EventUploadForm() {
           )}
         </div>
 
-      {/* Event Form Card */}
-      <div id='event-form' className='bg-white/2 border border-white/6 p-5 md:p-6'>
+        {/* Event Form Card */}
+        <div id='event-form' className='bg-white/2 border border-white/6 p-5 md:p-6'>
 
-        {importedFrom && (
-          <div className='mb-5 p-3 bg-[#1877F2]/6 border border-[#1877F2]/20 text-[#6CB4EE] text-sm flex items-center gap-3'>
-            <svg className='w-4 h-4 shrink-0' viewBox='0 0 24 24' fill='currentColor'>
-              <path d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' />
-            </svg>
-            <span className='text-xs flex-1'>{t('reviewAndPublish')}</span>
-            <svg className='w-6 h-6 shrink-0 text-emerald-400' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
-              <path strokeLinecap='round' strokeLinejoin='round' d='M9 12.75L11.25 15 15 9.75' />
-            </svg>
-          </div>
-        )}
+          {importedFrom && (
+            <div className='mb-5 p-3 bg-[#1877F2]/6 border border-[#1877F2]/20 text-[#6CB4EE] text-sm flex items-center gap-3'>
+              <svg className='w-4 h-4 shrink-0' viewBox='0 0 24 24' fill='currentColor'>
+                <path d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' />
+              </svg>
+              <span className='text-xs flex-1'>{t('reviewAndPublish')}</span>
+              <svg className='w-6 h-6 shrink-0 text-emerald-400' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
+                <path strokeLinecap='round' strokeLinejoin='round' d='M9 12.75L11.25 15 15 9.75' />
+              </svg>
+            </div>
+          )}
 
-        {/* Error message */}
-        {error && (
-          <div className='mb-5 p-3 bg-red-500/6 border border-red-500/20 text-red-400 text-sm flex items-center gap-3'>
-            <svg className='w-4 h-4 shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
-              <path strokeLinecap='round' strokeLinejoin='round' d='M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z' />
-            </svg>
-            <span className='text-xs'>{error}</span>
-          </div>
-        )}
+          {error && (
+            <div className='mb-5 p-3 bg-red-500/6 border border-red-500/20 text-red-400 text-sm flex items-center gap-3'>
+              <svg className='w-4 h-4 shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+                <path strokeLinecap='round' strokeLinejoin='round' d='M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z' />
+              </svg>
+              <span className='text-xs'>{error}</span>
+            </div>
+          )}
 
-        {success && !importedFrom && (
-          <div className='mb-5 p-3 bg-emerald-500/6 border border-emerald-500/20 text-emerald-400 text-sm flex items-center gap-3'>
-            <svg className='w-4 h-4 shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
-              <path strokeLinecap='round' strokeLinejoin='round' d='M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
-            </svg>
-            <span className='text-xs'>{success}</span>
-          </div>
-        )}
+          {success && !importedFrom && (
+            <div className='mb-5 p-3 bg-emerald-500/6 border border-emerald-500/20 text-emerald-400 text-sm flex items-center gap-3'>
+              <svg className='w-4 h-4 shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+                <path strokeLinecap='round' strokeLinejoin='round' d='M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
+              </svg>
+              <span className='text-xs'>{success}</span>
+            </div>
+          )}
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className='space-y-5'>
-          {/* Title */}
-          <div>
-            <label htmlFor='title' className={labelClasses}>
-              {t('eventTitle')} <span className='text-red-400'>*</span>
-            </label>
-            <input
-              id='title'
-              type='text'
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              disabled={isSubmitting}
-              className={inputClasses}
-              placeholder={t('eventTitlePlaceholder')}
-            />
-            {validationErrors.title && (
-              <p className='mt-1.5 text-xs text-red-400'>{validationErrors.title}</p>
-            )}
-          </div>
-
-          {/* Description */}
-          <div>
-            <label htmlFor='description' className={labelClasses}>
-              {t('eventDescription')} <span className='text-red-400'>*</span>
-            </label>
-            <textarea
-              id='description'
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-              disabled={isSubmitting}
-              rows={4}
-              className={inputClasses + ' min-h-30 resize-y'}
-              placeholder={t('eventDescriptionPlaceholder')}
-            />
-            {validationErrors.description && (
-              <p className='mt-1.5 text-xs text-red-400'>{validationErrors.description}</p>
-            )}
-          </div>
-
-          {/* Venue + Price Tier */}
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-            <div className='md:col-span-2'>
-              <label htmlFor='venue' className={labelClasses}>
-                {t('venue')} <span className='text-red-400'>*</span>
+          <form onSubmit={handleSubmit} className='space-y-5'>
+            {/* Title */}
+            <div>
+              <label htmlFor='title' className={labelClasses}>
+                {t('eventTitle')} <span className='text-red-400'>*</span>
               </label>
-              <select
-                id='venue'
-                value={venueId}
-                onChange={(e) => handleVenueChange(e.target.value)}
+              <input
+                id='title'
+                type='text'
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 required
                 disabled={isSubmitting}
                 className={inputClasses}
-              >
-                <option value='' className='bg-[#111]'>
-                  {t('venueSelect')}
-                </option>
-                {userVenues.map((venue) => (
-                  <option key={venue.id} value={venue.id} className='bg-[#111]'>
-                    {venue.name}
-                  </option>
-                ))}
-              </select>
-              {validationErrors.venueId && (
-                <p className='mt-1.5 text-xs text-red-400'>{validationErrors.venueId}</p>
+                placeholder={t('eventTitlePlaceholder')}
+              />
+              {validationErrors.title && (
+                <p className='mt-1.5 text-xs text-red-400'>{validationErrors.title}</p>
               )}
             </div>
 
-            <div className='md:col-span-1'>
-              <label htmlFor='priceTier' className={labelClasses + ' flex items-center gap-1'}>
-                {t('priceTier')} <span className='text-red-400'>*</span>
-                <PriceInfoTooltip size={14} />
+            {/* Description */}
+            <div>
+              <label htmlFor='description' className={labelClasses}>
+                {t('eventDescription')} <span className='text-red-400'>*</span>
               </label>
-              <select
-                id='priceTier'
-                value={priceTier}
-                onChange={(e) => setPriceTier(Number(e.target.value) as PriceTier)}
+              <textarea
+                id='description'
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
                 required
                 disabled={isSubmitting}
-                className={inputClasses}
-              >
-                <option value={0} className='bg-[#111]'>{t('priceTierFree')}</option>
-                <option value={1} className='bg-[#111]'>{t('priceTierLow')}</option>
-                <option value={2} className='bg-[#111]'>{t('priceTierMedium')}</option>
-                <option value={3} className='bg-[#111]'>{t('priceTierHigh')}</option>
-              </select>
+                rows={4}
+                className={inputClasses + ' min-h-30 resize-y'}
+                placeholder={t('eventDescriptionPlaceholder')}
+              />
+              {validationErrors.description && (
+                <p className='mt-1.5 text-xs text-red-400'>{validationErrors.description}</p>
+              )}
             </div>
-          </div>
+
+            {/* Venue + Price Tier */}
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+              <div className='md:col-span-2'>
+                <label htmlFor='venue' className={labelClasses}>
+                  {t('venue')} <span className='text-red-400'>*</span>
+                </label>
+                <select
+                  id='venue'
+                  value={venueId}
+                  onChange={(e) => handleVenueChange(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                  className={inputClasses}
+                >
+                  <option value='' className='bg-[#111]'>{t('venueSelect')}</option>
+                  {userVenues.map((venue) => (
+                    <option key={venue.id} value={venue.id} className='bg-[#111]'>
+                      {venue.name}
+                    </option>
+                  ))}
+                </select>
+                {validationErrors.venueId && (
+                  <p className='mt-1.5 text-xs text-red-400'>{validationErrors.venueId}</p>
+                )}
+              </div>
+              <div className='md:col-span-1'>
+                <label htmlFor='priceTier' className={labelClasses + ' flex items-center gap-1'}>
+                  {t('priceTier')} <span className='text-red-400'>*</span>
+                  <PriceInfoTooltip size={14} />
+                </label>
+                <select
+                  id='priceTier'
+                  value={priceTier}
+                  onChange={(e) => setPriceTier(Number(e.target.value) as PriceTier)}
+                  required
+                  disabled={isSubmitting}
+                  className={inputClasses}
+                >
+                  <option value={0} className='bg-[#111]'>{t('priceTierFree')}</option>
+                  <option value={1} className='bg-[#111]'>{t('priceTierLow')}</option>
+                  <option value={2} className='bg-[#111]'>{t('priceTierMedium')}</option>
+                  <option value={3} className='bg-[#111]'>{t('priceTierHigh')}</option>
+                </select>
+              </div>
+            </div>
 
             {/* Start Time + End Time */}
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -523,43 +518,41 @@ export default function EventUploadForm() {
               </div>
             </div>
 
-          {/* Image Upload */}
-          <div>
-            <label className={labelClasses}>
-              {t('eventImage')}
-            </label>
-            <ImageUpload
-              value={imageUrl}
-              onChange={setImageUrl}
-              disabled={isSubmitting}
-              labels={{
-                dropzone: t('imageDropzone'),
-                dropzoneHint: t('imageDropzoneHint'),
-                uploading: t('imageUploading'),
-                removeImage: t('imageRemove'),
-                dragActive: t('imageDragActive'),
-              }}
-            />
-          </div>
+            {/* Image Upload */}
+            <div>
+              <label className={labelClasses}>{t('eventImage')}</label>
+              <ImageUpload
+                value={imageUrl}
+                onChange={setImageUrl}
+                disabled={isSubmitting}
+                labels={{
+                  dropzone: t('imageDropzone'),
+                  dropzoneHint: t('imageDropzoneHint'),
+                  uploading: t('imageUploading'),
+                  removeImage: t('imageRemove'),
+                  dragActive: t('imageDragActive'),
+                }}
+              />
+            </div>
 
-          {/* Facebook URL */}
-          <div>
-            <label htmlFor='facebookUrl' className={labelClasses}>
-              {t('facebookUrl')}
-            </label>
-            <input
-              id='facebookUrl'
-              type='url'
-              value={facebookUrl}
-              onChange={(e) => setFacebookUrl(e.target.value)}
-              disabled={isSubmitting}
-              className={inputClasses}
-              placeholder={t('facebookUrlPlaceholder')}
-            />
-            {validationErrors.facebookUrl && (
-              <p className='mt-1.5 text-xs text-red-400'>{validationErrors.facebookUrl}</p>
-            )}
-          </div>
+            {/* Facebook URL */}
+            <div>
+              <label htmlFor='facebookUrl' className={labelClasses}>
+                {t('facebookUrl')}
+              </label>
+              <input
+                id='facebookUrl'
+                type='url'
+                value={facebookUrl}
+                onChange={(e) => setFacebookUrl(e.target.value)}
+                disabled={isSubmitting}
+                className={inputClasses}
+                placeholder={t('facebookUrlPlaceholder')}
+              />
+              {validationErrors.facebookUrl && (
+                <p className='mt-1.5 text-xs text-red-400'>{validationErrors.facebookUrl}</p>
+              )}
+            </div>
 
             {/* Submit Button */}
             <button
@@ -625,6 +618,7 @@ export default function EventUploadForm() {
           </div>
         </div>
       </div>
+
     </div>
   );
 }

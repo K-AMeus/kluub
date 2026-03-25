@@ -10,3 +10,5 @@ export default function PostHogProvider({
 }) {
   return <PHProvider client={posthog}>{children}</PHProvider>;
 }
+
+

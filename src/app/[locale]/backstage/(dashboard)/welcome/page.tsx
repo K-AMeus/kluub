@@ -6,6 +6,7 @@ import { createBrowserSupabaseClient } from '@/supabase/client';
 import { useBackstage } from '@/components/backstage/BackstageProvider';
 import Link from 'next/link';
 import { formatDateTime } from '@/lib/event-utils';
+import { useMounted } from '@/lib/hooks';
 
 interface RecentEvent {
   id: string;
@@ -18,7 +19,7 @@ export default function WelcomePage() {
   const t = useTranslations('backstage');
   const locale = useLocale();
   const { user, venueIds, isLoading: contextLoading } = useBackstage();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
     total: 0,
@@ -27,13 +28,6 @@ export default function WelcomePage() {
   });
   const [recentEvents, setRecentEvents] = useState<RecentEvent[]>([]);
 
-  useEffect(() => {
-    const frameId = requestAnimationFrame(() => {
-      setMounted(true);
-    });
-
-    return () => cancelAnimationFrame(frameId);
-  }, []);
 
   useEffect(() => {
     if (contextLoading) return;
@@ -178,16 +172,16 @@ export default function WelcomePage() {
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
             <Link
               href={`/${locale}/backstage/events/upload`}
-              className='group relative bg-[#E4DD3B]/4 hover:bg-[#E4DD3B]/8 border border-[#E4DD3B]/12 hover:border-[#E4DD3B]/25 p-5 transition-all duration-300'
+              className='group relative bg-[#E4DD3B]/4 hover:bg-[#E4DD3B]/8 border border-[#E4DD3B]/12 hover:border-[#E4DD3B]/25 p-5 transition-all duration-75 hover:duration-0'
             >
               <div className='flex items-center gap-4'>
-                <div className='w-10 h-10 bg-[#E4DD3B] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-300'>
+                <div className='w-10 h-10 bg-[#E4DD3B] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-75'>
                   <svg className='w-5 h-5 text-black' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
                     <path strokeLinecap='round' strokeLinejoin='round' d='M12 4.5v15m7.5-7.5h-15' />
                   </svg>
                 </div>
                 <div>
-                  <h3 className='text-white font-semibold text-sm mb-0.5 group-hover:text-[#E4DD3B] transition-colors duration-200'>
+                  <h3 className='text-white font-semibold text-sm mb-0.5 group-hover:text-[#E4DD3B] transition-colors duration-75 hover:duration-0'>
                     {t('addNewEvent')}
                   </h3>
                   <p className='text-white/35 text-xs'>{t('uploadEventSubtitle')}</p>
@@ -197,16 +191,16 @@ export default function WelcomePage() {
 
             <Link
               href={`/${locale}/backstage/events`}
-              className='group bg-white/2 hover:bg-white/5 border border-white/6 hover:border-white/12 p-5 transition-all duration-300'
+              className='group bg-white/2 hover:bg-white/5 border border-white/6 hover:border-white/12 p-5 transition-all duration-75 hover:duration-0'
             >
               <div className='flex items-center gap-4'>
-                <div className='w-10 h-10 bg-white/6 flex items-center justify-center shrink-0 group-hover:bg-white/1 transition-colors duration-300'>
+                <div className='w-10 h-10 bg-white/6 flex items-center justify-center shrink-0 group-hover:bg-white/1 transition-colors duration-75 hover:duration-0'>
                   <svg className='w-5 h-5 text-white/60' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
                     <path strokeLinecap='round' strokeLinejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' />
                   </svg>
                 </div>
                 <div>
-                  <h3 className='text-white font-semibold text-sm mb-0.5 group-hover:text-[#E4DD3B] transition-colors duration-200'>
+                  <h3 className='text-white font-semibold text-sm mb-0.5 group-hover:text-[#E4DD3B] transition-colors duration-75 hover:duration-0'>
                     {t('myEvents')}
                   </h3>
                   <p className='text-white/35 text-xs'>{t('viewAll')}</p>
@@ -223,7 +217,7 @@ export default function WelcomePage() {
               <h2 className='text-white/60 text-xs font-semibold uppercase tracking-wider'>{t('recentEvents')}</h2>
               <Link
                 href={`/${locale}/backstage/events`}
-                className='text-[#E4DD3B]/70 hover:text-[#E4DD3B] text-xs font-medium transition-colors duration-200 flex items-center gap-1'
+                className='text-[#E4DD3B]/70 hover:text-[#E4DD3B] text-xs font-medium transition-colors duration-75 hover:duration-0 flex items-center gap-1'
               >
                 {t('viewAll')}
                 <svg className='w-3 h-3' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
@@ -237,10 +231,10 @@ export default function WelcomePage() {
                   <Link
                     key={event.id}
                     href={`/${locale}/backstage/events`}
-                    className='flex items-center justify-between p-4 hover:bg-white/3 transition-colors duration-200 group'
+                    className='flex items-center justify-between p-4 hover:bg-white/3 transition-colors duration-75 hover:duration-0 group'
                   >
                     <div className='min-w-0'>
-                      <h3 className='text-white text-sm font-medium truncate group-hover:text-[#E4DD3B] transition-colors duration-200'>
+                      <h3 className='text-white text-sm font-medium truncate group-hover:text-[#E4DD3B] transition-colors duration-75 hover:duration-0'>
                         {event.title}
                       </h3>
                       <p className='text-white/30 text-xs truncate'>{event.venue}</p>

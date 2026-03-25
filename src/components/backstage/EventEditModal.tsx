@@ -171,6 +171,14 @@ export default function EventEditModal({
     setIsDeleting(true);
 
     try {
+      if (event.imageUrl?.includes('res.cloudinary.com')) {
+        fetch('/api/cloudinary/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: event.imageUrl }),
+        }).catch(() => {});
+      }
+
       const { error: deleteError } = await supabase
         .from('events')
         .delete()
