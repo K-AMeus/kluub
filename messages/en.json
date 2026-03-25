@@ -162,6 +162,7 @@
     "facebookUrlPlaceholder": "https://facebook.com/events/123456789",
     "startTime": "Start Time",
     "endTime": "End Time",
+    "mobilePreview": "Mobile Preview",
     "createEvent": "Create Event",
     "creatingEvent": "Creating Event...",
     "noVenuesTitle": "No Venues Available",

@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { createBrowserSupabaseClient } from '@/supabase/client';
 import { useBackstage } from '@/components/backstage/BackstageProvider';
-import type { City, PriceTier, Venue } from '@/lib/types';
+import type { City, PriceTier } from '@/lib/types';
 import { formatPriceTier } from '@/lib/types';
 import { formatTime } from '@/lib/date-utils';
+import { formatDateTimeForInput } from '@/lib/event-utils';
 import { DEFAULT_EVENT_IMAGE } from '@/lib/constants';
 import { LocationIcon, CalendarIcon, TicketIcon } from '@/components/shared/icons';
-import { formatDateTimeForInput } from '@/lib/event-utils';
 import PriceInfoTooltip from '@/components/shared/PriceInfoTooltip';
 import ImageUpload from '@/components/shared/ImageUpload';
 import DateTimePicker from '@/components/backstage/DateTimePicker';
@@ -309,7 +309,7 @@ export default function EventUploadForm() {
   const previewPrice = priceTier === 0 ? t('priceTierFree') : formatPriceTier(priceTier);
 
   return (
-    <div className='grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start'>
+    <div className='grid grid-cols-1 lg:grid-cols-[1fr_375px] gap-6 items-start'>
 
       {/* Left column: all form fields */}
       <div className='space-y-4'>
@@ -510,7 +510,7 @@ export default function EventUploadForm() {
                   onChange={setEndTime}
                   required
                   disabled={isSubmitting}
-                  defaultHour='02'
+                  defaultHour='04'
                 />
                 {validationErrors.endTime && (
                   <p className='mt-1.5 text-xs text-red-400'>{validationErrors.endTime}</p>
@@ -573,14 +573,13 @@ export default function EventUploadForm() {
         </div>
       </div>
 
-      {/* Right column: live preview (sticky) */}
-      <div className='lg:sticky lg:top-24 space-y-3'>
-        <p className='text-white/30 text-xs font-semibold uppercase tracking-wider'>Preview</p>
-
-        {/* Preview card — mirrors EventCard desktop layout */}
-        <div className='relative bg-[#060606] border border-white/20 flex flex-col overflow-hidden'>
+      {/* Right column: mobile preview (sticky) */}
+      <div className='lg:sticky lg:top-24 lg:-mt-7'>
+        <p className='text-white/30 text-xs font-semibold uppercase tracking-wider mb-3'>{t('mobilePreview')}</p>
+        {/* Event card — mirrors EventCard mobile layout */}
+        <div className='relative bg-[#060606] border border-white/20 flex'>
           {/* Image */}
-          <div className='relative w-full aspect-video overflow-hidden'>
+          <div className='relative w-28 h-28 m-4 rounded-lg overflow-hidden shrink-0'>
             <img
               src={previewImage}
               alt={title || 'Event preview'}
@@ -589,37 +588,32 @@ export default function EventUploadForm() {
           </div>
 
           {/* Content */}
-          <div className='p-4 flex flex-col gap-3'>
+          <div className='flex-1 flex flex-col justify-between min-w-0 py-4 pr-4'>
             <div>
-              <h3 className='font-display text-base uppercase tracking-wide line-clamp-2 leading-snug'>
-                {title ? <span className='text-white'>{title}</span> : <span className='text-white/25'>{t('eventTitle')}</span>}
+              <h3 className='text-white font-display text-base uppercase tracking-wide line-clamp-2 leading-snug'>
+                {title || <span className='text-white/25'>{t('eventTitle')}</span>}
               </h3>
-              {description && (
-                <p className='text-white/70 text-xs mt-2 line-clamp-3 leading-relaxed'>
-                  {description}
-                </p>
-              )}
+              <div className='mt-2 space-y-1.5'>
+                <div className='flex items-center gap-2 text-xs text-white/95'>
+                  <LocationIcon size={14} className='text-[#E4DD3B] shrink-0' />
+                  <span className='truncate'>
+                    {previewVenue ? previewVenue.name : <span className='text-white/25'>{t('venueSelect')}</span>}
+                  </span>
+                </div>
+                <div className='flex items-center gap-2 text-xs text-white/95'>
+                  <CalendarIcon size={14} className='text-[#E4DD3B] shrink-0' />
+                  <span>
+                    {startTime && endTime
+                      ? `${formatTime(startTime)} – ${formatTime(endTime)}`
+                      : <span className='text-white/25'>{t('startTime')} – {t('endTime')}</span>}
+                  </span>
+                </div>
+              </div>
             </div>
 
-            <div className='border-t border-white/8 pt-3 flex flex-col gap-2'>
-              <div className='flex items-center gap-2 text-xs text-white/70'>
-                <LocationIcon size={14} className='text-[#E4DD3B] shrink-0' />
-                <span className='truncate'>
-                  {previewVenue ? previewVenue.name : <span className='text-white/25'>{t('venueSelect')}</span>}
-                </span>
-              </div>
-              <div className='flex items-center gap-2 text-xs text-white/70'>
-                <CalendarIcon size={14} className='text-[#E4DD3B] shrink-0' />
-                <span>
-                  {startTime && endTime
-                    ? `${formatTime(startTime)} – ${formatTime(endTime)}`
-                    : <span className='text-white/25'>{t('startTime')} – {t('endTime')}</span>}
-                </span>
-              </div>
-              <div className='flex items-center gap-2 text-xs text-white/70'>
-                <TicketIcon size={14} className='text-[#E4DD3B] shrink-0' />
-                <span>{previewPrice}</span>
-              </div>
+            <div className='flex items-center gap-2 text-xs mt-2'>
+              <TicketIcon size={14} className='text-[#E4DD3B]' />
+              <span className='text-white/95'>{previewPrice}</span>
             </div>
           </div>
         </div>
