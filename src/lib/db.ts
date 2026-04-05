@@ -5,7 +5,6 @@ import { createStaticClient } from '@/supabase/server';
 import {
   Event,
   City,
-  PriceTier,
   EventFilterParams,
   EventsResult,
   VenueOption,
@@ -28,7 +27,8 @@ interface EventDbRow {
   id: string;
   title: string;
   description: string;
-  price_tier: number;
+  price: string;
+  host_id: string;
   venue_id: string;
   city: City;
   top_pick: boolean;
@@ -44,7 +44,8 @@ function transformEvent(row: EventDbRow): Event {
     id: row.id,
     title: row.title,
     description: row.description,
-    priceTier: row.price_tier as PriceTier,
+    price: row.price,
+    hostId: row.host_id,
     venueId: row.venue_id,
     venue: row.venues?.name ?? 'Unknown Venue',
     city: row.city,
@@ -75,7 +76,8 @@ async function fetchEvents(
       id,
       title,
       description,
-      price_tier,
+      price,
+      host_id,
       venue_id,
       city,
       top_pick,
@@ -95,7 +97,7 @@ async function fetchEvents(
   }
 
   if (filters.freeOnly) {
-    query = query.eq('price_tier', 0);
+    query = query.eq('price', '0');
   }
 
   if (filters.venueId) {
@@ -157,7 +159,8 @@ async function fetchTopPicks(city: City): Promise<Event[]> {
       id,
       title,
       description,
-      price_tier,
+      price,
+      host_id,
       venue_id,
       city,
       top_pick,
@@ -200,7 +203,8 @@ async function fetchEventById(id: string): Promise<Event | null> {
       id,
       title,
       description,
-      price_tier,
+      price,
+      host_id,
       venue_id,
       city,
       top_pick,

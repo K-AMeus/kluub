@@ -6,7 +6,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { createBrowserSupabaseClient } from '@/supabase/client';
 import { useBackstage } from '@/components/backstage/BackstageProvider';
 import EventEditModal from '@/components/backstage/EventEditModal';
-import type { Event, Venue } from '@/lib/types';
+import type { Event } from '@/lib/types';
 import { formatDateTimeWithYear } from '@/lib/event-utils';
 
 interface EventAnalyticsData {
@@ -17,7 +17,7 @@ interface EventAnalyticsData {
 export default function MyEventsPage() {
   const t = useTranslations('backstage');
   const locale = useLocale();
-  const { venues: userVenues, venueIds, isLoading: contextLoading } = useBackstage();
+  const { hosts, hostIds, venues: allVenues, isLoading: contextLoading } = useBackstage();
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
@@ -28,7 +28,7 @@ export default function MyEventsPage() {
   const mounted = useMounted();
 
   const fetchEvents = useCallback(async () => {
-    if (venueIds.length === 0) {
+    if (hostIds.length === 0) {
       setIsLoading(false);
       return;
     }
@@ -46,7 +46,8 @@ export default function MyEventsPage() {
           id,
           title,
           description,
-          price_tier,
+          price,
+          host_id,
           venue_id,
           city,
           top_pick,
@@ -57,7 +58,7 @@ export default function MyEventsPage() {
           venues (name)
         `
         )
-        .in('venue_id', venueIds)
+        .in('host_id', hostIds)
         .order('start_time', { ascending: true });
 
       if (eventsError) {
@@ -76,7 +77,8 @@ export default function MyEventsPage() {
           id: row.id,
           title: row.title,
           description: row.description,
-          priceTier: row.price_tier,
+          price: row.price,
+          hostId: row.host_id,
           venueId: row.venue_id,
           venue: row.venues?.name || '',
           city: row.city,
@@ -113,7 +115,7 @@ export default function MyEventsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [venueIds, t]);
+  }, [hostIds, t]);
 
   useEffect(() => {
     if (contextLoading) return;
@@ -137,21 +139,6 @@ export default function MyEventsPage() {
   };
 
   const eventsToShow = activeTab === 'upcoming' ? upcomingEvents : pastEvents;
-
-  const priceTierLabel = (tier: number) => {
-    switch (tier) {
-      case 0:
-        return t('priceTierFree');
-      case 1:
-        return t('priceTierLow');
-      case 2:
-        return t('priceTierMedium');
-      case 3:
-        return t('priceTierHigh');
-      default:
-        return '';
-    }
-  };
 
   return (
     <>
@@ -192,23 +179,25 @@ export default function MyEventsPage() {
             </div>
           )}
 
-          {/* No Venues State */}
-          {!contextLoading && !isLoading && !error && userVenues.length === 0 && (
-            <div className='text-center py-16'>
-              <div className='mb-5 inline-flex items-center justify-center w-14 h-14 bg-white/4 border border-white/6'>
-                <svg className='w-7 h-7 text-white/30' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
-                  <path strokeLinecap='round' strokeLinejoin='round' d='M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z' />
-                </svg>
+          {/* No Hosts State */}
+          {!contextLoading && !isLoading && !error && hosts.length === 0 && (
+            <div className='bg-white/2 border border-white/6 p-8 md:p-12'>
+              <div className='text-center max-w-sm mx-auto'>
+                <div className='mb-5 inline-flex items-center justify-center w-14 h-14 bg-white/4 border border-white/6'>
+                  <svg className='w-7 h-7 text-white/30' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+                    <path strokeLinecap='round' strokeLinejoin='round' d='M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z' />
+                  </svg>
+                </div>
+                <h2 className='text-white text-lg font-semibold mb-2'>
+                  {t('noHostsTitle')}
+                </h2>
+                <p className='text-white/40 text-sm'>{t('noHostsMessage')}</p>
               </div>
-              <h2 className='text-white text-lg font-semibold mb-2'>
-                {t('noVenuesTitle')}
-              </h2>
-              <p className='text-white/40 text-sm max-w-sm mx-auto'>{t('noVenuesMessage')}</p>
             </div>
           )}
 
           {/* Events Content */}
-          {!contextLoading && !isLoading && !error && userVenues.length > 0 && (
+          {!contextLoading && !isLoading && !error && hosts.length > 0 && (
             <>
               {/* Tabs */}
               <div className='flex gap-1 mb-6 bg-white/3 border border-white/6 p-1 w-fit'>
@@ -309,7 +298,7 @@ export default function MyEventsPage() {
                                 <span>·</span>
                                 <span className='font-mono'>{formatDateTimeWithYear(event.startTime)}</span>
                                 <span>·</span>
-                                <span className='font-medium'>{priceTierLabel(event.priceTier)}</span>
+                                <span className='font-medium'>{event.price === '0' ? t('priceFree') : event.price}</span>
                               </div>
                             </div>
 
@@ -395,7 +384,7 @@ export default function MyEventsPage() {
       {selectedEvent && (
         <EventEditModal
           event={selectedEvent}
-          venues={userVenues}
+          venues={allVenues}
           onClose={handleCloseModal}
           onEventUpdated={handleEventUpdated}
           onEventDeleted={handleEventDeleted}

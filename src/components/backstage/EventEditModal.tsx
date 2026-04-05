@@ -3,11 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { createBrowserSupabaseClient } from '@/supabase/client';
-import type { City, PriceTier, Event, Venue } from '@/lib/types';
+import type { City, Event, Venue } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { formatDateTimeForInput } from '@/lib/event-utils';
 import { revalidateEvents } from '@/lib/db';
-import PriceInfoTooltip from '@/components/shared/PriceInfoTooltip';
 import ImageUpload from '@/components/shared/ImageUpload';
 import DateTimePicker from '@/components/backstage/DateTimePicker';
 
@@ -32,7 +31,8 @@ export default function EventEditModal({
 
   const [title, setTitle] = useState(event.title);
   const [description, setDescription] = useState(event.description);
-  const [priceTier, setPriceTier] = useState<PriceTier>(event.priceTier);
+  const [isFree, setIsFree] = useState(event.price === '0');
+  const [price, setPrice] = useState(event.price === '0' ? '' : event.price);
   const [venueId, setVenueId] = useState(event.venueId);
   const [city, setCity] = useState<City>(event.city);
   const [imageUrl, setImageUrl] = useState(event.imageUrl || '');
@@ -50,6 +50,8 @@ export default function EventEditModal({
   >({});
 
   const supabase = createBrowserSupabaseClient();
+
+  const cityVenues = venues.filter((v) => v.city === city);
 
   useEffect(() => {
     setStartTime(formatDateTimeForInput(event.startTime));
@@ -70,6 +72,7 @@ export default function EventEditModal({
 
     if (!title.trim()) errors.title = t('titleRequired');
     if (!description.trim()) errors.description = t('descriptionRequired');
+    if (!isFree && !price.trim()) errors.price = t('priceRequired');
     if (!venueId) errors.venueId = t('venueRequired');
     if (!startTime) errors.startTime = t('startTimeRequired');
     if (!endTime) errors.endTime = t('endTimeRequired');
@@ -118,7 +121,7 @@ export default function EventEditModal({
         .update({
           title: title.trim(),
           description: description.trim(),
-          price_tier: priceTier,
+          price: isFree ? '0' : price.trim(),
           venue_id: venueId,
           city: city,
           image_url: imageUrl.trim() || null,
@@ -153,7 +156,8 @@ export default function EventEditModal({
     const duplicateData = {
       title: event.title,
       description: event.description,
-      priceTier: event.priceTier,
+      price: event.price,
+      hostId: event.hostId,
       venueId: event.venueId,
       city: event.city,
       imageUrl: event.imageUrl,
@@ -300,7 +304,7 @@ export default function EventEditModal({
                 )}
               </div>
 
-              {/* Venue + Price Tier */}
+              {/* Venue + Price */}
               <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                 <div className='md:col-span-2'>
                   <label htmlFor='venue' className={labelClasses}>
@@ -317,7 +321,7 @@ export default function EventEditModal({
                     <option value='' className='bg-[#111]'>
                       {t('venueSelect')}
                     </option>
-                    {venues.map((venue) => (
+                    {cityVenues.map((venue) => (
                       <option key={venue.id} value={venue.id} className='bg-[#111]'>
                         {venue.name}
                       </option>
@@ -329,23 +333,50 @@ export default function EventEditModal({
                 </div>
 
                 <div className='md:col-span-1'>
-                  <label htmlFor='priceTier' className={labelClasses + ' flex items-center gap-1'}>
-                    {t('priceTier')} <span className='text-red-400'>*</span>
-                    <PriceInfoTooltip size={14} />
+                  <label className={labelClasses}>
+                    {t('price')} <span className='text-red-400'>*</span>
                   </label>
-                  <select
-                    id='priceTier'
-                    value={priceTier}
-                    onChange={(e) => setPriceTier(Number(e.target.value) as PriceTier)}
-                    required
-                    disabled={isSubmitting || isDeleting}
-                    className={inputClasses}
-                  >
-                    <option value={0} className='bg-[#111]'>{t('priceTierFree')}</option>
-                    <option value={1} className='bg-[#111]'>{t('priceTierLow')}</option>
-                    <option value={2} className='bg-[#111]'>{t('priceTierMedium')}</option>
-                    <option value={3} className='bg-[#111]'>{t('priceTierHigh')}</option>
-                  </select>
+                  <div className='flex gap-1 bg-white/[0.03] border border-white/[0.08] p-1 mb-2'>
+                    <button
+                      type='button'
+                      onClick={() => setIsFree(true)}
+                      disabled={isSubmitting || isDeleting}
+                      className={`flex-1 py-2 text-sm font-medium transition-all duration-75 cursor-pointer ${
+                        isFree
+                          ? 'bg-[#E4DD3B]/12 text-[#E4DD3B]'
+                          : 'text-white/40 hover:text-white/60'
+                      }`}
+                    >
+                      {t('priceFree')}
+                    </button>
+                    <button
+                      type='button'
+                      onClick={() => setIsFree(false)}
+                      disabled={isSubmitting || isDeleting}
+                      className={`flex-1 py-2 text-sm font-medium transition-all duration-75 cursor-pointer ${
+                        !isFree
+                          ? 'bg-[#E4DD3B]/12 text-[#E4DD3B]'
+                          : 'text-white/40 hover:text-white/60'
+                      }`}
+                    >
+                      {t('pricePaid')}
+                    </button>
+                  </div>
+                  {!isFree && (
+                    <input
+                      id='price'
+                      type='text'
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      required
+                      disabled={isSubmitting || isDeleting}
+                      className={inputClasses}
+                      placeholder={t('pricePlaceholder')}
+                    />
+                  )}
+                  {validationErrors.price && (
+                    <p className='mt-1.5 text-xs text-red-400'>{validationErrors.price}</p>
+                  )}
                 </div>
               </div>
 

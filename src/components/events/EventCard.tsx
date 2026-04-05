@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
-import { Event, formatPriceTier } from '@/lib/types';
+import { Event } from '@/lib/types';
 import {
   LocationIcon,
   CalendarIcon,
@@ -26,10 +26,7 @@ interface EventCardProps {
 
 export default function EventCard({ event, translations }: EventCardProps) {
   const imageUrl = event.imageUrl || DEFAULT_EVENT_IMAGE;
-  const priceDisplay =
-    event.priceTier === 0
-      ? translations.free
-      : formatPriceTier(event.priceTier);
+  const priceDisplay = event.price === '0' ? translations.free : event.price;
 
   const citySlug = event.city.toLowerCase();
 
