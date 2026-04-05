@@ -4,13 +4,11 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { createBrowserSupabaseClient } from '@/supabase/client';
 import { useBackstage } from '@/components/backstage/BackstageProvider';
-import type { City, PriceTier } from '@/lib/types';
-import { formatPriceTier } from '@/lib/types';
+import type { City } from '@/lib/types';
 import { formatTime } from '@/lib/date-utils';
 import { formatDateTimeForInput } from '@/lib/event-utils';
 import { DEFAULT_EVENT_IMAGE } from '@/lib/constants';
 import { LocationIcon, CalendarIcon, TicketIcon } from '@/components/shared/icons';
-import PriceInfoTooltip from '@/components/shared/PriceInfoTooltip';
 import ImageUpload from '@/components/shared/ImageUpload';
 import DateTimePicker from '@/components/backstage/DateTimePicker';
 import { revalidateEvents } from '@/lib/db';
@@ -26,11 +24,13 @@ interface FacebookImportData {
 
 export default function EventUploadForm() {
   const t = useTranslations('backstage');
-  const { venues: userVenues, isLoading: contextLoading } = useBackstage();
+  const { hosts, venues: allVenues, isLoading: contextLoading } = useBackstage();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [priceTier, setPriceTier] = useState<PriceTier>(0);
+  const [isFree, setIsFree] = useState(true);
+  const [price, setPrice] = useState('');
+  const [hostId, setHostId] = useState('');
   const [venueId, setVenueId] = useState('');
   const [city, setCity] = useState<City>('TARTU');
   const [imageUrl, setImageUrl] = useState('');
@@ -50,12 +50,19 @@ export default function EventUploadForm() {
     Record<string, string>
   >({});
 
+  const cityVenues = allVenues.filter((v) => v.city === city);
+
   useEffect(() => {
-    if (!contextLoading && userVenues.length > 0 && !venueId) {
-      setVenueId(userVenues[0].id);
-      setCity(userVenues[0].city);
+    if (!contextLoading && hosts.length > 0 && !hostId) {
+      setHostId(hosts[0].id);
     }
-  }, [contextLoading, userVenues, venueId]);
+  }, [contextLoading, hosts, hostId]);
+
+  useEffect(() => {
+    if (!contextLoading && cityVenues.length > 0 && !venueId) {
+      setVenueId(cityVenues[0].id);
+    }
+  }, [contextLoading, cityVenues, venueId]);
 
   // Check for duplicated event data in localStorage
   useEffect(() => {
@@ -66,7 +73,14 @@ export default function EventUploadForm() {
 
         setTitle(event.title);
         setDescription(event.description);
-        setPriceTier(event.priceTier);
+        if (event.price === '0') {
+          setIsFree(true);
+          setPrice('');
+        } else {
+          setIsFree(false);
+          setPrice(event.price || '');
+        }
+        setHostId(event.hostId || '');
         setVenueId(event.venueId);
         setCity(event.city);
         setImageUrl(event.imageUrl || '');
@@ -99,6 +113,7 @@ export default function EventUploadForm() {
 
     if (!title.trim()) errors.title = t('titleRequired');
     if (!description.trim()) errors.description = t('descriptionRequired');
+    if (!isFree && !price.trim()) errors.price = t('priceRequired');
     if (!venueId) errors.venueId = t('venueRequired');
     if (!startTime) errors.startTime = t('startTimeRequired');
     if (!endTime) errors.endTime = t('endTimeRequired');
@@ -123,7 +138,8 @@ export default function EventUploadForm() {
   const resetForm = () => {
     setTitle('');
     setDescription('');
-    setPriceTier(0);
+    setIsFree(true);
+    setPrice('');
     setImageUrl('');
     setFacebookUrl('');
     setStartTime('');
@@ -132,20 +148,15 @@ export default function EventUploadForm() {
     setImportedFrom(false);
     setImportUrl('');
 
-    if (userVenues.length > 0) {
-      setVenueId(userVenues[0].id);
-      setCity(userVenues[0].city);
+    if (cityVenues.length > 0) {
+      setVenueId(cityVenues[0].id);
     }
   };
 
   const handleVenueChange = (newVenueId: string) => {
     setVenueId(newVenueId);
-
-    const selectedVenue = userVenues.find((v) => v.id === newVenueId);
-    if (selectedVenue) {
-      setCity(selectedVenue.city);
-    }
   };
+
 
   const handleFacebookImport = async () => {
     const url = importUrl.trim();
@@ -238,7 +249,8 @@ export default function EventUploadForm() {
       const { error: submitError } = await supabase.from('events').insert({
         title: title.trim(),
         description: description.trim(),
-        price_tier: priceTier,
+        price: isFree ? '0' : price.trim(),
+        host_id: hostId,
         venue_id: venueId,
         city: city,
         top_pick: false,
@@ -273,14 +285,14 @@ export default function EventUploadForm() {
       <div className='flex items-center justify-center py-16'>
         <div className='text-center'>
           <div className='w-8 h-8 border-2 border-[#E4DD3B]/20 border-t-[#E4DD3B] rounded-full animate-spin mx-auto mb-4' />
-          <p className='text-white/40 text-sm'>{t('loadingVenues')}</p>
+          <p className='text-white/40 text-sm'>{t('loadingData')}</p>
         </div>
       </div>
     );
   }
 
-  // No venues state
-  if (userVenues.length === 0) {
+  // No hosts state
+  if (hosts.length === 0) {
     return (
       <div className='bg-white/2 border border-white/6 p-8 md:p-12'>
         <div className='text-center max-w-sm mx-auto'>
@@ -291,10 +303,10 @@ export default function EventUploadForm() {
           </div>
 
           <h2 className='text-white text-lg font-semibold mb-2'>
-            {t('noVenuesTitle')}
+            {t('noHostsTitle')}
           </h2>
 
-          <p className='text-white/40 text-sm'>{t('noVenuesMessage')}</p>
+          <p className='text-white/40 text-sm'>{t('noHostsMessage')}</p>
         </div>
       </div>
     );
@@ -304,9 +316,9 @@ export default function EventUploadForm() {
   const inputClasses = 'w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] text-white placeholder-white/25 focus:outline-none focus:border-[#E4DD3B]/40 focus:ring-1 focus:ring-[#E4DD3B]/20 transition-all duration-200 disabled:opacity-40 text-sm';
   const labelClasses = 'block text-white/60 text-xs font-medium mb-2 uppercase tracking-wider';
 
-  const previewVenue = userVenues.find((v) => v.id === venueId);
+  const previewVenue = allVenues.find((v) => v.id === venueId);
   const previewImage = imageUrl || DEFAULT_EVENT_IMAGE;
-  const previewPrice = priceTier === 0 ? t('priceTierFree') : formatPriceTier(priceTier);
+  const previewPrice = isFree ? t('priceFree') : (price || t('price'));
 
   return (
     <div className='grid grid-cols-1 lg:grid-cols-[1fr_375px] gap-6 items-start'>
@@ -437,9 +449,32 @@ export default function EventUploadForm() {
               )}
             </div>
 
-            {/* Venue + Price Tier */}
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-              <div className='md:col-span-2'>
+            {/* Host selector (if multiple hosts) */}
+            {hosts.length > 1 && (
+              <div>
+                <label htmlFor='host' className={labelClasses}>
+                  {t('host')} <span className='text-red-400'>*</span>
+                </label>
+                <select
+                  id='host'
+                  value={hostId}
+                  onChange={(e) => setHostId(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                  className={inputClasses}
+                >
+                  {hosts.map((host) => (
+                    <option key={host.id} value={host.id} className='bg-[#111]'>
+                      {host.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Venue + Price */}
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <div>
                 <label htmlFor='venue' className={labelClasses}>
                   {t('venue')} <span className='text-red-400'>*</span>
                 </label>
@@ -452,7 +487,7 @@ export default function EventUploadForm() {
                   className={inputClasses}
                 >
                   <option value='' className='bg-[#111]'>{t('venueSelect')}</option>
-                  {userVenues.map((venue) => (
+                  {cityVenues.map((venue) => (
                     <option key={venue.id} value={venue.id} className='bg-[#111]'>
                       {venue.name}
                     </option>
@@ -462,24 +497,51 @@ export default function EventUploadForm() {
                   <p className='mt-1.5 text-xs text-red-400'>{validationErrors.venueId}</p>
                 )}
               </div>
-              <div className='md:col-span-1'>
-                <label htmlFor='priceTier' className={labelClasses + ' flex items-center gap-1'}>
-                  {t('priceTier')} <span className='text-red-400'>*</span>
-                  <PriceInfoTooltip size={14} />
+              <div>
+                <label className={labelClasses}>
+                  {t('price')} <span className='text-red-400'>*</span>
                 </label>
-                <select
-                  id='priceTier'
-                  value={priceTier}
-                  onChange={(e) => setPriceTier(Number(e.target.value) as PriceTier)}
-                  required
-                  disabled={isSubmitting}
-                  className={inputClasses}
-                >
-                  <option value={0} className='bg-[#111]'>{t('priceTierFree')}</option>
-                  <option value={1} className='bg-[#111]'>{t('priceTierLow')}</option>
-                  <option value={2} className='bg-[#111]'>{t('priceTierMedium')}</option>
-                  <option value={3} className='bg-[#111]'>{t('priceTierHigh')}</option>
-                </select>
+                <div className='flex gap-1 bg-white/[0.03] border border-white/[0.08] p-1 mb-2'>
+                  <button
+                    type='button'
+                    onClick={() => setIsFree(true)}
+                    disabled={isSubmitting}
+                    className={`flex-1 py-2 text-sm font-medium transition-all duration-75 cursor-pointer ${
+                      isFree
+                        ? 'bg-[#E4DD3B]/12 text-[#E4DD3B]'
+                        : 'text-white/40 hover:text-white/60'
+                    }`}
+                  >
+                    {t('priceFree')}
+                  </button>
+                  <button
+                    type='button'
+                    onClick={() => setIsFree(false)}
+                    disabled={isSubmitting}
+                    className={`flex-1 py-2 text-sm font-medium transition-all duration-75 cursor-pointer ${
+                      !isFree
+                        ? 'bg-[#E4DD3B]/12 text-[#E4DD3B]'
+                        : 'text-white/40 hover:text-white/60'
+                    }`}
+                  >
+                    {t('pricePaid')}
+                  </button>
+                </div>
+                {!isFree && (
+                  <input
+                    id='price'
+                    type='text'
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    required
+                    disabled={isSubmitting}
+                    className={inputClasses}
+                    placeholder={t('pricePlaceholder')}
+                  />
+                )}
+                {validationErrors.price && (
+                  <p className='mt-1.5 text-xs text-red-400'>{validationErrors.price}</p>
+                )}
               </div>
             </div>
 
