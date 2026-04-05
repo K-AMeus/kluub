@@ -7,16 +7,16 @@ interface EventDetailTrackerProps {
   eventId: string;
   eventTitle: string;
   city: string;
-  priceTier: number;
   venueId: string;
+  price: string;
 }
 
 export default function EventDetailTracker({
   eventId,
   eventTitle,
   city,
-  priceTier,
   venueId,
+  price,
 }: EventDetailTrackerProps) {
   const posthog = usePostHog();
 
@@ -25,10 +25,10 @@ export default function EventDetailTracker({
       event_id: eventId,
       event_title: eventTitle,
       city: city,
-      price_tier: priceTier,
       venue_id: venueId,
+      price: price,
     });
-  }, [eventId, eventTitle, city, priceTier, venueId]);
+  }, [eventId, eventTitle, city, venueId, price]);
 
   return null;
 }

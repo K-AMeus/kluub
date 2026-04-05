@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useMounted } from '@/lib/hooks';
 import { useTranslations, useLocale } from 'next-intl';
-import type { Venue } from '@/lib/types';
+import { useBackstage } from '@/components/backstage/BackstageProvider';
 
-interface VenueAnalytics {
-  venue: Venue;
+interface HostAnalyticsItem {
+  host: { id: string; name: string };
   detailViews: number;
   facebookClicks: number;
 }
@@ -38,7 +38,8 @@ function BarGraph({ data, labels, title }: { data: number[]; labels: string[]; t
 export default function AnalyticsPage() {
   const t = useTranslations('backstage');
   const locale = useLocale();
-  const [analytics, setAnalytics] = useState<VenueAnalytics[]>([]);
+  const { hosts: userHosts, isLoading: contextLoading } = useBackstage();
+  const [analytics, setAnalytics] = useState<HostAnalyticsItem[]>([]);
   const [viewsByWeekday, setViewsByWeekday] = useState<number[]>(Array(7).fill(0));
   const [viewsByHour, setViewsByHour] = useState<number[]>(Array(24).fill(0));
   const [isLoading, setIsLoading] = useState(true);
@@ -46,6 +47,13 @@ export default function AnalyticsPage() {
   const mounted = useMounted();
 
   useEffect(() => {
+    if (contextLoading) return;
+
+    if (userHosts.length === 0) {
+      setIsLoading(false);
+      return;
+    }
+
     const fetchAnalytics = async () => {
       try {
         setIsLoading(true);
@@ -60,13 +68,13 @@ export default function AnalyticsPage() {
           return;
         }
 
-        const { venues, analytics: counts, viewsByWeekday: wd, viewsByHour: hr } = await res.json();
+        const { hosts, hostAnalytics: counts, viewsByWeekday: wd, viewsByHour: hr } = await res.json();
 
         setAnalytics(
-          (venues as Venue[]).map((venue) => ({
-            venue,
-            detailViews: counts[venue.id]?.detailViews || 0,
-            facebookClicks: counts[venue.id]?.facebookClicks || 0,
+          (hosts as { id: string; name: string }[]).map((host) => ({
+            host,
+            detailViews: counts?.[host.id]?.detailViews || 0,
+            facebookClicks: counts?.[host.id]?.facebookClicks || 0,
           }))
         );
         if (wd) setViewsByWeekday(wd);
@@ -79,7 +87,7 @@ export default function AnalyticsPage() {
     };
 
     fetchAnalytics();
-  }, []);
+  }, [contextLoading, userHosts.length]);
 
   return (
     <div className='px-4 md:px-8 py-6 md:py-10'>
@@ -89,11 +97,10 @@ export default function AnalyticsPage() {
             <h1 className='font-display text-2xl md:text-3xl text-white tracking-wider mb-2'>
               {t('analyticsTitle')}
             </h1>
-            <p className='text-white/40 text-sm'>{t('analyticsSubtitle')}</p>
           </div>
 
           {/* Loading */}
-          {isLoading && (
+          {(contextLoading || isLoading) && (
             <div className='space-y-3'>
               {[1, 2].map((i) => (
                 <div key={i} className='bg-white/2 border border-white/6 p-6'>
@@ -121,18 +128,34 @@ export default function AnalyticsPage() {
             </div>
           )}
 
+          {/* No Hosts State */}
+          {!contextLoading && !isLoading && !error && userHosts.length === 0 && (
+            <div className='bg-white/2 border border-white/6 p-8 md:p-12'>
+              <div className='text-center max-w-sm mx-auto'>
+                <div className='mb-5 inline-flex items-center justify-center w-14 h-14 bg-white/4 border border-white/6'>
+                  <svg className='w-7 h-7 text-white/30' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+                    <path strokeLinecap='round' strokeLinejoin='round' d='M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z' />
+                  </svg>
+                </div>
+                <h2 className='text-white text-lg font-semibold mb-2'>
+                  {t('noHostsTitle')}
+                </h2>
+                <p className='text-white/40 text-sm'>{t('noHostsMessage')}</p>
+              </div>
+            </div>
+          )}
+
           {/* Analytics Cards */}
-          {!isLoading && !error && analytics.length > 0 && (
+          {!contextLoading && !isLoading && !error && analytics.length > 0 && (
             <div className='space-y-6'>
-              {analytics.map(({ venue, detailViews, facebookClicks }) => (
+              {analytics.map(({ host, detailViews, facebookClicks }) => (
                 <div
-                  key={venue.id}
+                  key={host.id}
                   className='bg-white/5 border border-white/10 p-6'
                 >
-                  <h2 className='text-white font-semibold text-lg mb-1'>
-                    {venue.name}
+                  <h2 className='text-white font-semibold text-lg mb-4'>
+                    {host.name}
                   </h2>
-                  <p className='text-white/40 text-sm mb-6'>{venue.city}</p>
 
                   <div className='grid grid-cols-2 gap-6'>
                     {/* Event Views */}
@@ -194,8 +217,14 @@ export default function AnalyticsPage() {
             </div>
           )}
 
+          {!contextLoading && !isLoading && !error && userHosts.length > 0 && analytics.length === 0 && (
+            <div className='text-center py-12'>
+              <p className='text-white/40'>{t('analyticsTitle')}</p>
+            </div>
+          )}
+
           {/* Bar Graphs */}
-          {!isLoading && !error && analytics.length > 0 && (
+          {!contextLoading && !isLoading && !error && analytics.length > 0 && (
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-6'>
               <BarGraph
                 data={viewsByWeekday}
@@ -213,13 +242,6 @@ export default function AnalyticsPage() {
                 labels={Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'))}
                 title={t('viewsByHour')}
               />
-            </div>
-          )}
-
-          {/* No venues */}
-          {!isLoading && !error && analytics.length === 0 && (
-            <div className='text-center py-12'>
-              <p className='text-white/40'>{t('noVenuesTitle')}</p>
             </div>
           )}
       </div>

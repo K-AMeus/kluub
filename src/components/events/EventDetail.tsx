@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
-import { Event, formatPriceTier } from '@/lib/types';
+import { Event } from '@/lib/types';
 import {
   LocationIcon,
   CalendarIcon,
@@ -11,7 +11,6 @@ import {
 } from '@/components/shared/icons';
 import { DEFAULT_EVENT_IMAGE } from '@/lib/constants';
 import { formatTime } from '@/lib/date-utils';
-import PriceInfoTooltip from '@/components/shared/PriceInfoTooltip';
 import EventDetailTracker from '@/components/events/EventDetailTracker';
 import FacebookEventLink from '@/components/events/FacebookEventLink';
 
@@ -37,10 +36,7 @@ function formatDateBubble(dateString: string): { day: string; month: string } {
 export default function EventDetail({ event, translations }: EventDetailProps) {
   const { day, month } = formatDateBubble(event.startTime);
   const imageUrl = event.imageUrl || DEFAULT_EVENT_IMAGE;
-  const priceDisplay =
-    event.priceTier === 0
-      ? translations.free
-      : formatPriceTier(event.priceTier);
+  const priceDisplay = event.price === '0' ? translations.free : event.price;
 
   const citySlug = event.city.toLowerCase();
   const backHref = `/events/${citySlug}`;
@@ -52,8 +48,8 @@ export default function EventDetail({ event, translations }: EventDetailProps) {
         eventId={event.id}
         eventTitle={event.title}
         city={event.city}
-        priceTier={event.priceTier}
         venueId={event.venueId}
+        price={event.price}
       />
 
       {/* Back Button */}
@@ -135,7 +131,6 @@ export default function EventDetail({ event, translations }: EventDetailProps) {
                   <span className='text-white/95 font-sans text-sm'>
                     {priceDisplay}
                   </span>
-                  <PriceInfoTooltip size={13} />
                 </div>
               </div>
 
