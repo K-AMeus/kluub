@@ -336,7 +336,7 @@ export default function EventEditModal({
                   <label className={labelClasses}>
                     {t('price')} <span className='text-red-400'>*</span>
                   </label>
-                  <div className='flex gap-1 bg-white/[0.03] border border-white/[0.08] p-1 mb-2'>
+                  <div className='flex gap-1 bg-white/3 border border-white/8 p-1 mb-2'>
                     <button
                       type='button'
                       onClick={() => setIsFree(true)}

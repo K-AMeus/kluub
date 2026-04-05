@@ -311,7 +311,7 @@ export default function MyEventsPage() {
                           {/* Desktop analytics boxes */}
                           <div className='hidden md:flex items-stretch self-stretch border-l border-white/10 shrink-0'>
                             {/* Views */}
-                            <div className='w-28 flex flex-col items-center justify-center px-3 py-4 bg-[#E4DD3B]/[0.03] border-r border-white/10'>
+                            <div className='w-28 flex flex-col items-center justify-center px-3 py-4 bg-[#E4DD3B]/3 border-r border-white/10'>
                               <div className='flex items-center gap-1.5 mb-1'>
                                 <svg className='w-3.5 h-3.5 text-[#E4DD3B]' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
                                   <path strokeLinecap='round' strokeLinejoin='round' d='M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z' />
@@ -322,7 +322,7 @@ export default function MyEventsPage() {
                               <span className='text-[#E4DD3B] font-extrabold text-xl font-mono leading-none'>{views}</span>
                             </div>
                             {/* Facebook clicks */}
-                            <div className='w-28 flex flex-col items-center justify-center px-3 py-4 bg-[#E4DD3B]/[0.03] border-r border-white/10'>
+                            <div className='w-28 flex flex-col items-center justify-center px-3 py-4 bg-[#E4DD3B]/3 border-r border-white/10'>
                               <div className='flex items-center gap-1.5 mb-1'>
                                 <svg className='w-3.5 h-3.5 text-[#E4DD3B]' fill='currentColor' viewBox='0 0 24 24'>
                                   <path d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' />
@@ -332,7 +332,7 @@ export default function MyEventsPage() {
                               <span className='text-[#E4DD3B] font-extrabold text-xl font-mono leading-none'>{clicks}</span>
                             </div>
                             {/* Conversion rate */}
-                            <div className='w-28 flex flex-col items-center justify-center px-3 py-4 bg-[#E4DD3B]/[0.03]'>
+                            <div className='w-28 flex flex-col items-center justify-center px-3 py-4 bg-[#E4DD3B]/3'>
                               <div className='flex items-center gap-1.5 mb-1'>
                                 <svg className='w-3.5 h-3.5 text-[#E4DD3B]' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
                                   <path strokeLinecap='round' strokeLinejoin='round' d='M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z' />
