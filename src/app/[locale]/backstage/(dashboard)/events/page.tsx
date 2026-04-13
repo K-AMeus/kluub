@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useMounted } from '@/lib/hooks';
 import { useTranslations, useLocale } from 'next-intl';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { createBrowserSupabaseClient } from '@/supabase/client';
 import { useBackstage } from '@/components/backstage/BackstageProvider';
 import EventEditModal from '@/components/backstage/EventEditModal';
@@ -20,8 +20,7 @@ export default function MyEventsPage() {
   const locale = useLocale();
   const { venues: userVenues, venueIds, isLoading: contextLoading } = useBackstage();
   const searchParams = useSearchParams();
-  const routerNav = useRouter();
-  const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
+const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -131,10 +130,8 @@ export default function MyEventsPage() {
     const target = allEvents.find((e) => e.id === editId);
     if (target) {
       setSelectedEvent(target);
-      // Clean up the URL
-      routerNav.replace(`/${locale}/backstage/events`, { scroll: false });
     }
-  }, [searchParams, isLoading, upcomingEvents, pastEvents, locale, routerNav]);
+  }, [searchParams, isLoading, upcomingEvents, pastEvents]);
 
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);

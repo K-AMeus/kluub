@@ -52,63 +52,25 @@ export default function WelcomePage() {
         const supabase = createBrowserSupabaseClient();
         const now = new Date().toISOString();
 
-        // Run all three queries in parallel:
-        // 1. Count upcoming events (head: true = no data, just count)
-        // 2. Count past events (head: true = no data, just count)
-        // 3. Fetch only 5 recent events with minimal columns
-        const [upcomingResult, pastResult, recentResult, calendarResult] = await Promise.all([
-          supabase
-            .from('events')
-            .select('*', { count: 'exact', head: true })
-            .in('venue_id', venueIds)
-            .gte('start_time', now),
-          supabase
-            .from('events')
-            .select('*', { count: 'exact', head: true })
-            .in('venue_id', venueIds)
-            .lt('start_time', now),
-          supabase
-            .from('events')
-            .select('id, title, start_time, venues (name)')
-            .in('venue_id', venueIds)
-            .order('start_time', { ascending: false })
-            .limit(5),
-          supabase
-            .from('events')
-            .select('id, title, start_time')
-            .in('venue_id', venueIds)
-            .order('start_time', { ascending: true }),
-        ]);
+        const { data: allEvents } = await supabase
+          .from('events')
+          .select('id, title, start_time, venues(name)')
+          .in('venue_id', venueIds)
+          .order('start_time', { ascending: true });
 
-        const upcomingCount = upcomingResult.count ?? 0;
-        const pastCount = pastResult.count ?? 0;
+        const events = (allEvents ?? []).map((row: any) => ({
+          id: row.id,
+          title: row.title,
+          startTime: row.start_time,
+          venue: row.venues?.name || '',
+        }));
 
-        setStats({
-          total: upcomingCount + pastCount,
-          upcoming: upcomingCount,
-          past: pastCount,
-        });
+        const upcomingCount = events.filter(e => e.startTime >= now).length;
+        const pastCount = events.filter(e => e.startTime < now).length;
 
-        if (recentResult.data) {
-          setRecentEvents(
-            recentResult.data.map((row: any) => ({
-              id: row.id,
-              title: row.title,
-              startTime: row.start_time,
-              venue: row.venues?.name || '',
-            }))
-          );
-        }
-
-        if (calendarResult.data) {
-          setCalendarEvents(
-            calendarResult.data.map((row: any) => ({
-              id: row.id,
-              title: row.title,
-              startTime: row.start_time,
-            }))
-          );
-        }
+        setStats({ total: events.length, upcoming: upcomingCount, past: pastCount });
+        setRecentEvents([...events].reverse().slice(0, 5));
+        setCalendarEvents(events);
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
       } finally {

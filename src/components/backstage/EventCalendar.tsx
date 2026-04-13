@@ -64,7 +64,10 @@ export default function EventCalendar({ events }: EventCalendarProps) {
   }, [events, year, month]);
 
   // Calendar grid
-  const firstDayOfMonth = new Date(year, month, 1).getDay();
+  const firstDayOfMonth = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(
+    new Intl.DateTimeFormat('en-US', { weekday: 'short', timeZone: TIMEZONE })
+      .format(new Date(`${year}-${String(month + 1).padStart(2, '0')}-01T12:00:00Z`))
+  );
   const startOffset = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
