@@ -15,9 +15,7 @@ export default function EventUploadPage() {
           <h1 className='font-display text-2xl md:text-3xl text-white tracking-wider mb-1'>
             {t('uploadEvent')}
           </h1>
-          <p className='text-white/40 text-sm'>{t('uploadEventSubtitle')}</p>
         </div>
-
         <EventUploadForm />
       </div>
     </div>

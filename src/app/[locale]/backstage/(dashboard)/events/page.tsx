@@ -18,9 +18,8 @@ interface EventAnalyticsData {
 export default function MyEventsPage() {
   const t = useTranslations('backstage');
   const locale = useLocale();
-  const { venues: userVenues, venueIds, isLoading: contextLoading } = useBackstage();
-  const searchParams = useSearchParams();
-const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
+  const { hosts, hostIds, venues: allVenues, isLoading: contextLoading } = useBackstage();
+  const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,7 +29,7 @@ const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
   const mounted = useMounted();
 
   const fetchEvents = useCallback(async () => {
-    if (venueIds.length === 0) {
+    if (hostIds.length === 0) {
       setIsLoading(false);
       return;
     }
@@ -48,7 +47,8 @@ const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
           id,
           title,
           description,
-          price_tier,
+          price,
+          host_id,
           venue_id,
           city,
           top_pick,
@@ -59,7 +59,7 @@ const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
           venues (name)
         `
         )
-        .in('venue_id', venueIds)
+        .in('host_id', hostIds)
         .order('start_time', { ascending: true });
 
       if (eventsError) {
@@ -78,7 +78,8 @@ const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
           id: row.id,
           title: row.title,
           description: row.description,
-          priceTier: row.price_tier,
+          price: row.price,
+          hostId: row.host_id,
           venueId: row.venue_id,
           venue: row.venues?.name || '',
           city: row.city,
@@ -115,7 +116,7 @@ const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
     } finally {
       setIsLoading(false);
     }
-  }, [venueIds, t]);
+  }, [hostIds, t]);
 
   useEffect(() => {
     if (contextLoading) return;
@@ -150,21 +151,6 @@ const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
   };
 
   const eventsToShow = activeTab === 'upcoming' ? upcomingEvents : pastEvents;
-
-  const priceTierLabel = (tier: number) => {
-    switch (tier) {
-      case 0:
-        return t('priceTierFree');
-      case 1:
-        return t('priceTierLow');
-      case 2:
-        return t('priceTierMedium');
-      case 3:
-        return t('priceTierHigh');
-      default:
-        return '';
-    }
-  };
 
   return (
     <>
@@ -205,23 +191,25 @@ const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
             </div>
           )}
 
-          {/* No Venues State */}
-          {!contextLoading && !isLoading && !error && userVenues.length === 0 && (
-            <div className='text-center py-16'>
-              <div className='mb-5 inline-flex items-center justify-center w-14 h-14 bg-white/4 border border-white/6'>
-                <svg className='w-7 h-7 text-white/30' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
-                  <path strokeLinecap='round' strokeLinejoin='round' d='M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z' />
-                </svg>
+          {/* No Hosts State */}
+          {!contextLoading && !isLoading && !error && hosts.length === 0 && (
+            <div className='bg-white/2 border border-white/6 p-8 md:p-12'>
+              <div className='text-center max-w-sm mx-auto'>
+                <div className='mb-5 inline-flex items-center justify-center w-14 h-14 bg-white/4 border border-white/6'>
+                  <svg className='w-7 h-7 text-white/30' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+                    <path strokeLinecap='round' strokeLinejoin='round' d='M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z' />
+                  </svg>
+                </div>
+                <h2 className='text-white text-lg font-semibold mb-2'>
+                  {t('noHostsTitle')}
+                </h2>
+                <p className='text-white/40 text-sm'>{t('noHostsMessage')}</p>
               </div>
-              <h2 className='text-white text-lg font-semibold mb-2'>
-                {t('noVenuesTitle')}
-              </h2>
-              <p className='text-white/40 text-sm max-w-sm mx-auto'>{t('noVenuesMessage')}</p>
             </div>
           )}
 
           {/* Events Content */}
-          {!contextLoading && !isLoading && !error && userVenues.length > 0 && (
+          {!contextLoading && !isLoading && !error && hosts.length > 0 && (
             <>
               {/* Tabs */}
               <div className='flex gap-1 mb-6 bg-white/3 border border-white/6 p-1 w-fit'>
@@ -322,7 +310,7 @@ const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
                                 <span>·</span>
                                 <span className='font-mono'>{formatDateTimeWithYear(event.startTime)}</span>
                                 <span>·</span>
-                                <span className='font-medium'>{priceTierLabel(event.priceTier)}</span>
+                                <span className='font-medium'>{event.price === '0' ? t('priceFree') : event.price}</span>
                               </div>
                             </div>
 
@@ -335,7 +323,7 @@ const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
                           {/* Desktop analytics boxes */}
                           <div className='hidden md:flex items-stretch self-stretch border-l border-white/10 shrink-0'>
                             {/* Views */}
-                            <div className='w-28 flex flex-col items-center justify-center px-3 py-4 bg-[#E4DD3B]/[0.03] border-r border-white/10'>
+                            <div className='w-28 flex flex-col items-center justify-center px-3 py-4 bg-[#E4DD3B]/3 border-r border-white/10'>
                               <div className='flex items-center gap-1.5 mb-1'>
                                 <svg className='w-3.5 h-3.5 text-[#E4DD3B]' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
                                   <path strokeLinecap='round' strokeLinejoin='round' d='M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z' />
@@ -346,7 +334,7 @@ const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
                               <span className='text-[#E4DD3B] font-extrabold text-xl font-mono leading-none'>{views}</span>
                             </div>
                             {/* Facebook clicks */}
-                            <div className='w-28 flex flex-col items-center justify-center px-3 py-4 bg-[#E4DD3B]/[0.03] border-r border-white/10'>
+                            <div className='w-28 flex flex-col items-center justify-center px-3 py-4 bg-[#E4DD3B]/3 border-r border-white/10'>
                               <div className='flex items-center gap-1.5 mb-1'>
                                 <svg className='w-3.5 h-3.5 text-[#E4DD3B]' fill='currentColor' viewBox='0 0 24 24'>
                                   <path d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' />
@@ -356,7 +344,7 @@ const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
                               <span className='text-[#E4DD3B] font-extrabold text-xl font-mono leading-none'>{clicks}</span>
                             </div>
                             {/* Conversion rate */}
-                            <div className='w-28 flex flex-col items-center justify-center px-3 py-4 bg-[#E4DD3B]/[0.03]'>
+                            <div className='w-28 flex flex-col items-center justify-center px-3 py-4 bg-[#E4DD3B]/3'>
                               <div className='flex items-center gap-1.5 mb-1'>
                                 <svg className='w-3.5 h-3.5 text-[#E4DD3B]' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
                                   <path strokeLinecap='round' strokeLinejoin='round' d='M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z' />
@@ -408,7 +396,7 @@ const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
       {selectedEvent && (
         <EventEditModal
           event={selectedEvent}
-          venues={userVenues}
+          venues={allVenues}
           onClose={handleCloseModal}
           onEventUpdated={handleEventUpdated}
           onEventDeleted={handleEventDeleted}

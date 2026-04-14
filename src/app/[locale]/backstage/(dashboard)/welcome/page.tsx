@@ -25,7 +25,7 @@ interface RecentEvent {
 export default function WelcomePage() {
   const t = useTranslations('backstage');
   const locale = useLocale();
-  const { user, venueIds, isLoading: contextLoading } = useBackstage();
+  const { user, hosts, hostIds, isLoading: contextLoading } = useBackstage();
   const mounted = useMounted();
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -40,7 +40,7 @@ export default function WelcomePage() {
   useEffect(() => {
     if (contextLoading) return;
 
-    if (!user || venueIds.length === 0) {
+    if (!user || hostIds.length === 0) {
       setIsLoading(false);
       return;
     }
@@ -52,11 +52,31 @@ export default function WelcomePage() {
         const supabase = createBrowserSupabaseClient();
         const now = new Date().toISOString();
 
-        const { data: allEvents } = await supabase
-          .from('events')
-          .select('id, title, start_time, venues(name)')
-          .in('venue_id', venueIds)
-          .order('start_time', { ascending: true });
+        // Run all three queries in parallel:
+        // 1. Count upcoming events (head: true = no data, just count)
+        // 2. Count past events (head: true = no data, just count)
+        // 3. Fetch only 5 recent events with minimal columns
+        const [upcomingResult, pastResult, recentResult] = await Promise.all([
+          supabase
+            .from('events')
+            .select('*', { count: 'exact', head: true })
+            .in('host_id', hostIds)
+            .gte('start_time', now),
+          supabase
+            .from('events')
+            .select('*', { count: 'exact', head: true })
+            .in('host_id', hostIds)
+            .lt('start_time', now),
+          supabase
+            .from('events')
+            .select('id, title, start_time, venues (name)')
+            .in('host_id', hostIds)
+            .order('start_time', { ascending: false })
+            .limit(5),
+        ]);
+
+        const upcomingCount = upcomingResult.count ?? 0;
+        const pastCount = pastResult.count ?? 0;
 
         const events = (allEvents ?? []).map((row: any) => ({
           id: row.id,
@@ -79,7 +99,7 @@ export default function WelcomePage() {
     };
 
     fetchDashboardData();
-  }, [contextLoading, user, venueIds]);
+  }, [contextLoading, user, hostIds]);
 
   const showLoading = contextLoading || isLoading;
 
@@ -97,59 +117,78 @@ export default function WelcomePage() {
           )}
         </div>
 
-        {/* Stats Row */}
-        <div className='grid grid-cols-3 gap-3 md:gap-4 mb-8'>
-          {/* Total */}
-          <div className='bg-white/3 border border-white/6 p-4 md:p-5'>
-            <p className='text-white/40 text-xs font-medium mb-2 uppercase tracking-wider'>{t('totalEvents')}</p>
-            <div className='flex items-end justify-between'>
-              <p className='text-2xl md:text-3xl font-bold text-white tabular-nums'>
-                {showLoading ? (
-                  <span className='inline-block w-8 h-7 bg-white/6 animate-pulse' />
-                ) : stats.total}
-              </p>
-              <div className='w-8 h-8 flex items-center justify-center bg-[#E4DD3B]/8'>
-                <svg className='w-4 h-4 text-[#E4DD3B]' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
-                  <path strokeLinecap='round' strokeLinejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' />
+        {/* No Hosts State */}
+        {!contextLoading && hosts.length === 0 && (
+          <div className='bg-white/2 border border-white/6 p-8 md:p-12'>
+            <div className='text-center max-w-sm mx-auto'>
+              <div className='mb-5 inline-flex items-center justify-center w-14 h-14 bg-white/4 border border-white/6'>
+                <svg className='w-7 h-7 text-white/30' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+                  <path strokeLinecap='round' strokeLinejoin='round' d='M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z' />
                 </svg>
               </div>
+              <h2 className='text-white text-lg font-semibold mb-2'>
+                {t('noHostsTitle')}
+              </h2>
+              <p className='text-white/40 text-sm'>{t('noHostsMessage')}</p>
             </div>
           </div>
+        )}
 
-          {/* Upcoming */}
-          <div className='bg-white/3 border border-white/6 p-4 md:p-5'>
-            <p className='text-white/40 text-xs font-medium mb-2 uppercase tracking-wider'>{t('upcomingCount')}</p>
-            <div className='flex items-end justify-between'>
-              <p className='text-2xl md:text-3xl font-bold text-white tabular-nums'>
-                {showLoading ? (
-                  <span className='inline-block w-8 h-7 bg-white/6 animate-pulse' />
-                ) : stats.upcoming}
-              </p>
-              <div className='w-8 h-8 flex items-center justify-center bg-emerald-500/8'>
-                <svg className='w-4 h-4 text-emerald-400' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
-                  <path strokeLinecap='round' strokeLinejoin='round' d='M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941' />
-                </svg>
+        {(contextLoading || hosts.length > 0) && (
+          <>
+            {/* Stats Row */}
+            <div className='grid grid-cols-3 gap-3 md:gap-4 mb-8'>
+              {/* Total */}
+              <div className='bg-white/3 border border-white/6 p-4 md:p-5'>
+                <p className='text-white/40 text-xs font-medium mb-2 uppercase tracking-wider'>{t('totalEvents')}</p>
+                <div className='flex items-end justify-between'>
+                  <p className='text-2xl md:text-3xl font-bold text-white tabular-nums'>
+                    {showLoading ? (
+                      <span className='inline-block w-8 h-7 bg-white/6 animate-pulse' />
+                    ) : stats.total}
+                  </p>
+                  <div className='w-8 h-8 flex items-center justify-center bg-[#E4DD3B]/8'>
+                    <svg className='w-4 h-4 text-[#E4DD3B]' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+                      <path strokeLinecap='round' strokeLinejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' />
+                    </svg>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
-          {/* Past */}
-          <div className='bg-white/3 border border-white/6 p-4 md:p-5'>
-            <p className='text-white/40 text-xs font-medium mb-2 uppercase tracking-wider'>{t('pastCount')}</p>
-            <div className='flex items-end justify-between'>
-              <p className='text-2xl md:text-3xl font-bold text-white tabular-nums'>
-                {showLoading ? (
-                  <span className='inline-block w-8 h-7 bg-white/6 animate-pulse' />
-                ) : stats.past}
-              </p>
-              <div className='w-8 h-8 flex items-center justify-center bg-blue-500/8'>
-                <svg className='w-4 h-4 text-blue-400' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
-                  <path strokeLinecap='round' strokeLinejoin='round' d='M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z' />
-                </svg>
+              {/* Upcoming */}
+              <div className='bg-white/3 border border-white/6 p-4 md:p-5'>
+                <p className='text-white/40 text-xs font-medium mb-2 uppercase tracking-wider'>{t('upcomingCount')}</p>
+                <div className='flex items-end justify-between'>
+                  <p className='text-2xl md:text-3xl font-bold text-white tabular-nums'>
+                    {showLoading ? (
+                      <span className='inline-block w-8 h-7 bg-white/6 animate-pulse' />
+                    ) : stats.upcoming}
+                  </p>
+                  <div className='w-8 h-8 flex items-center justify-center bg-emerald-500/8'>
+                    <svg className='w-4 h-4 text-emerald-400' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+                      <path strokeLinecap='round' strokeLinejoin='round' d='M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941' />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Past */}
+              <div className='bg-white/3 border border-white/6 p-4 md:p-5'>
+                <p className='text-white/40 text-xs font-medium mb-2 uppercase tracking-wider'>{t('pastCount')}</p>
+                <div className='flex items-end justify-between'>
+                  <p className='text-2xl md:text-3xl font-bold text-white tabular-nums'>
+                    {showLoading ? (
+                      <span className='inline-block w-8 h-7 bg-white/6 animate-pulse' />
+                    ) : stats.past}
+                  </p>
+                  <div className='w-8 h-8 flex items-center justify-center bg-blue-500/8'>
+                    <svg className='w-4 h-4 text-blue-400' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+                      <path strokeLinecap='round' strokeLinejoin='round' d='M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z' />
+                    </svg>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
         {/* Quick Actions + Calendar row */}
         <div className='flex flex-col md:flex-row gap-6 mb-8 md:items-stretch'>
@@ -225,60 +264,62 @@ export default function WelcomePage() {
           )}
         </div>
 
-        {/* Recent Events */}
-        {!showLoading && recentEvents.length > 0 && (
-          <div>
-            <div className='flex items-center justify-between mb-3'>
-              <h2 className='text-white/60 text-xs font-semibold uppercase tracking-wider'>{t('recentEvents')}</h2>
-              <Link
-                href={`/${locale}/backstage/events`}
-                className='text-[#E4DD3B]/70 hover:text-[#E4DD3B] text-xs font-medium transition-colors duration-75 hover:duration-0 flex items-center gap-1'
-              >
-                {t('viewAll')}
-                <svg className='w-3 h-3' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
-                  <path strokeLinecap='round' strokeLinejoin='round' d='M8.25 4.5l7.5 7.5-7.5 7.5' />
-                </svg>
-              </Link>
-            </div>
-
-            <div className='bg-white/2 border border-white/6 overflow-hidden divide-y divide-white/4'>
-              {recentEvents.map((event) => (
+            {/* Recent Events */}
+            {!showLoading && recentEvents.length > 0 && (
+              <div>
+                <div className='flex items-center justify-between mb-3'>
+                  <h2 className='text-white/60 text-xs font-semibold uppercase tracking-wider'>{t('recentEvents')}</h2>
                   <Link
-                    key={event.id}
                     href={`/${locale}/backstage/events`}
-                    className='flex items-center justify-between p-4 hover:bg-white/3 transition-colors duration-75 hover:duration-0 group'
+                    className='text-[#E4DD3B]/70 hover:text-[#E4DD3B] text-xs font-medium transition-colors duration-75 hover:duration-0 flex items-center gap-1'
                   >
-                    <div className='min-w-0'>
-                      <h3 className='text-white text-sm font-medium truncate group-hover:text-[#E4DD3B] transition-colors duration-75 hover:duration-0'>
-                        {event.title}
-                      </h3>
-                      <p className='text-white/30 text-xs truncate'>{event.venue}</p>
-                    </div>
-                    <div className='text-white/40 text-xs font-mono shrink-0 ml-4'>
-                      {formatDateTime(event.startTime)}
-                    </div>
+                    {t('viewAll')}
+                    <svg className='w-3 h-3' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
+                      <path strokeLinecap='round' strokeLinejoin='round' d='M8.25 4.5l7.5 7.5-7.5 7.5' />
+                    </svg>
                   </Link>
-                ))}
-            </div>
-          </div>
-        )}
-
-        {/* Loading skeleton for recent events */}
-        {showLoading && (
-          <div>
-            <div className='h-3 w-24 bg-white/4 mb-3' />
-            <div className='bg-white/2 border border-white/6 overflow-hidden divide-y divide-white/4'>
-              {[1, 2, 3].map((i) => (
-                <div key={i} className='flex items-center justify-between p-4'>
-                  <div>
-                    <div className='h-4 w-40 bg-white/4 mb-1' />
-                    <div className='h-3 w-24 bg-white/3' />
-                  </div>
-                  <div className='h-3 w-20 bg-white/4' />
                 </div>
-              ))}
-            </div>
-          </div>
+
+                <div className='bg-white/2 border border-white/6 overflow-hidden divide-y divide-white/4'>
+                  {recentEvents.map((event) => (
+                      <Link
+                        key={event.id}
+                        href={`/${locale}/backstage/events`}
+                        className='flex items-center justify-between p-4 hover:bg-white/3 transition-colors duration-75 hover:duration-0 group'
+                      >
+                        <div className='min-w-0'>
+                          <h3 className='text-white text-sm font-medium truncate group-hover:text-[#E4DD3B] transition-colors duration-75 hover:duration-0'>
+                            {event.title}
+                          </h3>
+                          <p className='text-white/30 text-xs truncate'>{event.venue}</p>
+                        </div>
+                        <div className='text-white/40 text-xs font-mono shrink-0 ml-4'>
+                          {formatDateTime(event.startTime)}
+                        </div>
+                      </Link>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/* Loading skeleton for recent events */}
+            {showLoading && (
+              <div>
+                <div className='h-3 w-24 bg-white/4 mb-3' />
+                <div className='bg-white/2 border border-white/6 overflow-hidden divide-y divide-white/4'>
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className='flex items-center justify-between p-4'>
+                      <div>
+                        <div className='h-4 w-40 bg-white/4 mb-1' />
+                        <div className='h-3 w-24 bg-white/3' />
+                      </div>
+                      <div className='h-3 w-20 bg-white/4' />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
 
       </div>

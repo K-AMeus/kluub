@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import Header from '@/components/shared/Header';
 import Footer from '@/components/shared/Footer';
@@ -8,7 +8,7 @@ import { getEventsByCity, getTopPicks } from '@/lib/db';
 import { City, DEFAULT_EVENT_FILTERS } from '@/lib/types';
 
 interface CityEventsPageProps {
-  params: Promise<{ city: string }>;
+  params: Promise<{ locale: string; city: string }>;
 }
 
 function toCityEnum(city: string): City | null {
@@ -23,7 +23,8 @@ export const revalidate = 86400;
 export const dynamicParams = true;
 
 export default async function CityEventsPage({ params }: CityEventsPageProps) {
-  const { city: cityParam } = await params;
+  const { locale, city: cityParam } = await params;
+  setRequestLocale(locale);
   const city = toCityEnum(cityParam);
 
   if (!city) {
