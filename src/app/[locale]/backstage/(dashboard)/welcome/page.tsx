@@ -7,6 +7,13 @@ import { useBackstage } from '@/components/backstage/BackstageProvider';
 import Link from 'next/link';
 import { formatDateTime } from '@/lib/event-utils';
 import { useMounted } from '@/lib/hooks';
+import EventCalendar from '@/components/backstage/EventCalendar';
+
+interface CalendarEvent {
+  id: string;
+  title: string;
+  startTime: string;
+}
 
 interface RecentEvent {
   id: string;
@@ -27,6 +34,7 @@ export default function WelcomePage() {
     past: 0,
   });
   const [recentEvents, setRecentEvents] = useState<RecentEvent[]>([]);
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
 
 
   useEffect(() => {
@@ -44,48 +52,25 @@ export default function WelcomePage() {
         const supabase = createBrowserSupabaseClient();
         const now = new Date().toISOString();
 
-        // Run all three queries in parallel:
-        // 1. Count upcoming events (head: true = no data, just count)
-        // 2. Count past events (head: true = no data, just count)
-        // 3. Fetch only 5 recent events with minimal columns
-        const [upcomingResult, pastResult, recentResult] = await Promise.all([
-          supabase
-            .from('events')
-            .select('*', { count: 'exact', head: true })
-            .in('host_id', hostIds)
-            .gte('start_time', now),
-          supabase
-            .from('events')
-            .select('*', { count: 'exact', head: true })
-            .in('host_id', hostIds)
-            .lt('start_time', now),
-          supabase
-            .from('events')
-            .select('id, title, start_time, venues (name)')
-            .in('host_id', hostIds)
-            .order('start_time', { ascending: false })
-            .limit(5),
-        ]);
+        const { data: allEvents } = await supabase
+          .from('events')
+          .select('id, title, start_time, venues(name)')
+          .in('host_id', hostIds)
+          .order('start_time', { ascending: true });
 
-        const upcomingCount = upcomingResult.count ?? 0;
-        const pastCount = pastResult.count ?? 0;
+        const events = (allEvents ?? []).map((row: any) => ({
+          id: row.id,
+          title: row.title,
+          startTime: row.start_time,
+          venue: row.venues?.name || '',
+        }));
 
-        setStats({
-          total: upcomingCount + pastCount,
-          upcoming: upcomingCount,
-          past: pastCount,
-        });
+        const upcomingCount = events.filter(e => e.startTime >= now).length;
+        const pastCount = events.filter(e => e.startTime < now).length;
 
-        if (recentResult.data) {
-          setRecentEvents(
-            recentResult.data.map((row: any) => ({
-              id: row.id,
-              title: row.title,
-              startTime: row.start_time,
-              venue: row.venues?.name || '',
-            }))
-          );
-        }
+        setStats({ total: events.length, upcoming: upcomingCount, past: pastCount });
+        setRecentEvents([...events].reverse().slice(0, 5));
+        setCalendarEvents(events);
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
       } finally {
@@ -185,48 +170,79 @@ export default function WelcomePage() {
               </div>
             </div>
 
-            {/* Quick Actions */}
-            <div className='mb-8'>
-              <h2 className='text-white/60 text-xs font-semibold uppercase tracking-wider mb-3'>{t('quickActions')}</h2>
-              <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
-                <Link
-                  href={`/${locale}/backstage/events/upload`}
-                  className='group relative bg-[#E4DD3B]/4 hover:bg-[#E4DD3B]/8 border border-[#E4DD3B]/12 hover:border-[#E4DD3B]/25 p-5 transition-all duration-75 hover:duration-0'
-                >
-                  <div className='flex items-center gap-4'>
-                    <div className='w-10 h-10 bg-[#E4DD3B] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-75'>
-                      <svg className='w-5 h-5 text-black' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
-                        <path strokeLinecap='round' strokeLinejoin='round' d='M12 4.5v15m7.5-7.5h-15' />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className='text-white font-semibold text-sm mb-0.5 group-hover:text-[#E4DD3B] transition-colors duration-75 hover:duration-0'>
-                        {t('addNewEvent')}
-                      </h3>
-                    </div>
+        {/* Quick Actions + Calendar row */}
+        <div className='flex flex-col md:flex-row gap-6 mb-8 md:items-stretch'>
+          {/* Quick Actions — left column */}
+          <div className='flex-1 min-w-0 flex flex-col'>
+            <h2 className='text-white/60 text-xs font-semibold uppercase tracking-wider mb-3'>{t('quickActions')}</h2>
+            <div className='flex flex-col gap-3 flex-1'>
+              <Link
+                href={`/${locale}/backstage/events/upload`}
+                className='group relative flex-1 bg-[#E4DD3B]/4 hover:bg-[#E4DD3B]/8 border border-[#E4DD3B]/12 hover:border-[#E4DD3B]/25 p-5 transition-all duration-75 hover:duration-0 flex items-center'
+              >
+                <div className='flex items-center gap-4'>
+                  <div className='w-10 h-10 bg-[#E4DD3B] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-75'>
+                    <svg className='w-5 h-5 text-black' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
+                      <path strokeLinecap='round' strokeLinejoin='round' d='M12 4.5v15m7.5-7.5h-15' />
+                    </svg>
                   </div>
-                </Link>
+                  <div>
+                    <h3 className='text-white font-semibold text-sm mb-0.5 group-hover:text-[#E4DD3B] transition-colors duration-75 hover:duration-0'>
+                      {t('addNewEvent')}
+                    </h3>
+                    <p className='text-white/35 text-xs'>{t('uploadEventSubtitle')}</p>
+                  </div>
+                </div>
+              </Link>
 
-                <Link
-                  href={`/${locale}/backstage/events`}
-                  className='group bg-white/2 hover:bg-white/5 border border-white/6 hover:border-white/12 p-5 transition-all duration-75 hover:duration-0'
-                >
-                  <div className='flex items-center gap-4'>
-                    <div className='w-10 h-10 bg-white/6 flex items-center justify-center shrink-0 group-hover:bg-white/1 transition-colors duration-75 hover:duration-0'>
-                      <svg className='w-5 h-5 text-white/60' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
-                        <path strokeLinecap='round' strokeLinejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className='text-white font-semibold text-sm mb-0.5 group-hover:text-[#E4DD3B] transition-colors duration-75 hover:duration-0'>
-                        {t('myEvents')}
-                      </h3>
-                      <p className='text-white/35 text-xs'>{t('viewAll')}</p>
-                    </div>
+              <Link
+                href={`/${locale}/backstage/events`}
+                className='group flex-1 bg-white/2 hover:bg-white/5 border border-white/6 hover:border-white/12 p-5 transition-all duration-75 hover:duration-0 flex items-center'
+              >
+                <div className='flex items-center gap-4'>
+                  <div className='w-10 h-10 bg-white/6 flex items-center justify-center shrink-0 group-hover:bg-white/1 transition-colors duration-75 hover:duration-0'>
+                    <svg className='w-5 h-5 text-white/60' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+                      <path strokeLinecap='round' strokeLinejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' />
+                    </svg>
                   </div>
-                </Link>
-              </div>
+                  <div>
+                    <h3 className='text-white font-semibold text-sm mb-0.5 group-hover:text-[#E4DD3B] transition-colors duration-75 hover:duration-0'>
+                      {t('myEvents')}
+                    </h3>
+                    <p className='text-white/35 text-xs'>{t('viewAll')}</p>
+                  </div>
+                </div>
+              </Link>
+
+              <Link
+                href={`/${locale}/backstage/analytics`}
+                className='group flex-1 bg-white/2 hover:bg-white/5 border border-white/6 hover:border-white/12 p-5 transition-all duration-75 hover:duration-0 flex items-center'
+              >
+                <div className='flex items-center gap-4'>
+                  <div className='w-10 h-10 bg-white/6 flex items-center justify-center shrink-0 group-hover:bg-white/1 transition-colors duration-75 hover:duration-0'>
+                    <svg className='w-5 h-5 text-white/60' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
+                      <path strokeLinecap='round' strokeLinejoin='round' d='M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z' />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className='text-white font-semibold text-sm mb-0.5 group-hover:text-[#E4DD3B] transition-colors duration-75 hover:duration-0'>
+                      {t('analytics')}
+                    </h3>
+                    <p className='text-white/35 text-xs'>{t('analyticsSubtitle')}</p>
+                  </div>
+                </div>
+              </Link>
             </div>
+          </div>
+
+          {/* Calendar — right side */}
+          {!showLoading && (
+            <div className='shrink-0'>
+              <h2 className='text-white/60 text-xs font-semibold uppercase tracking-wider mb-3'>{t('eventCalendar')}</h2>
+              <EventCalendar events={calendarEvents} />
+            </div>
+          )}
+        </div>
 
             {/* Recent Events */}
             {!showLoading && recentEvents.length > 0 && (

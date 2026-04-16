@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useMounted } from '@/lib/hooks';
 import { useTranslations, useLocale } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { createBrowserSupabaseClient } from '@/supabase/client';
 import { useBackstage } from '@/components/backstage/BackstageProvider';
 import EventEditModal from '@/components/backstage/EventEditModal';
@@ -18,6 +19,7 @@ export default function MyEventsPage() {
   const t = useTranslations('backstage');
   const locale = useLocale();
   const { hosts, hostIds, venues: allVenues, isLoading: contextLoading } = useBackstage();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);
@@ -121,6 +123,17 @@ export default function MyEventsPage() {
     if (contextLoading) return;
     fetchEvents();
   }, [contextLoading, fetchEvents]);
+
+  // Auto-open edit modal from ?edit= query param
+  useEffect(() => {
+    const editId = searchParams.get('edit');
+    if (!editId || isLoading) return;
+    const allEvents = [...upcomingEvents, ...pastEvents];
+    const target = allEvents.find((e) => e.id === editId);
+    if (target) {
+      setSelectedEvent(target);
+    }
+  }, [searchParams, isLoading, upcomingEvents, pastEvents]);
 
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);
