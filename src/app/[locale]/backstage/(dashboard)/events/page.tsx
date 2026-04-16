@@ -19,6 +19,7 @@ export default function MyEventsPage() {
   const t = useTranslations('backstage');
   const locale = useLocale();
   const { hosts, hostIds, venues: allVenues, isLoading: contextLoading } = useBackstage();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [pastEvents, setPastEvents] = useState<Event[]>([]);

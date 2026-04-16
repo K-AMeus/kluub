@@ -52,31 +52,11 @@ export default function WelcomePage() {
         const supabase = createBrowserSupabaseClient();
         const now = new Date().toISOString();
 
-        // Run all three queries in parallel:
-        // 1. Count upcoming events (head: true = no data, just count)
-        // 2. Count past events (head: true = no data, just count)
-        // 3. Fetch only 5 recent events with minimal columns
-        const [upcomingResult, pastResult, recentResult] = await Promise.all([
-          supabase
-            .from('events')
-            .select('*', { count: 'exact', head: true })
-            .in('host_id', hostIds)
-            .gte('start_time', now),
-          supabase
-            .from('events')
-            .select('*', { count: 'exact', head: true })
-            .in('host_id', hostIds)
-            .lt('start_time', now),
-          supabase
-            .from('events')
-            .select('id, title, start_time, venues (name)')
-            .in('host_id', hostIds)
-            .order('start_time', { ascending: false })
-            .limit(5),
-        ]);
-
-        const upcomingCount = upcomingResult.count ?? 0;
-        const pastCount = pastResult.count ?? 0;
+        const { data: allEvents } = await supabase
+          .from('events')
+          .select('id, title, start_time, venues(name)')
+          .in('host_id', hostIds)
+          .order('start_time', { ascending: true });
 
         const events = (allEvents ?? []).map((row: any) => ({
           id: row.id,
