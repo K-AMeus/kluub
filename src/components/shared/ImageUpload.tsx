@@ -8,6 +8,7 @@ interface ImageUploadProps {
   value: string;
   onChange: (url: string) => void;
   disabled?: boolean;
+  eventId?: string;
   labels: {
     dropzone: string;
     dropzoneHint: string;
@@ -17,13 +18,13 @@ interface ImageUploadProps {
   };
 }
 
-const deleteFromCloudinary = async (url: string) => {
+const deleteFromCloudinary = async (url: string, eventId?: string) => {
   if (!url.includes('res.cloudinary.com')) return;
   try {
     await fetch('/api/cloudinary/delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url }),
+      body: JSON.stringify({ url, ...(eventId ? { eventId } : {}) }),
     });
   } catch {
     // Silent fail - don't block UX for cleanup
@@ -34,6 +35,7 @@ export default function ImageUpload({
   value,
   onChange,
   disabled = false,
+  eventId,
   labels,
 }: ImageUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
@@ -43,7 +45,13 @@ export default function ImageUpload({
   const dragCounter = useRef(0);
 
   const uploadFile = async (file: File) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+    const allowedTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'image/heic',
+      'image/heif',
+    ];
     if (!allowedTypes.includes(file.type)) {
       setError('Please upload a JPG, PNG, WebP, or HEIC image');
       return;
@@ -78,7 +86,7 @@ export default function ImageUpload({
   };
 
   const handleRemove = () => {
-    if (value) deleteFromCloudinary(value);
+    if (value) deleteFromCloudinary(value, eventId);
     onChange('');
   };
 
@@ -119,7 +127,7 @@ export default function ImageUpload({
       const file = e.dataTransfer.files?.[0];
       if (file) uploadFile(file);
     },
-    [disabled, isUploading]
+    [disabled, isUploading],
   );
 
   const handleClick = () => {
@@ -128,19 +136,19 @@ export default function ImageUpload({
 
   if (value) {
     return (
-      <div className="relative w-full aspect-video overflow-hidden bg-white/5 border border-white/10">
+      <div className='relative w-full aspect-video overflow-hidden bg-white/5 border border-white/10'>
         <Image
           src={value}
-          alt="Event image"
+          alt='Event image'
           fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, 600px"
+          className='object-cover'
+          sizes='(max-width: 768px) 100vw, 600px'
         />
         {!disabled && (
           <button
-            type="button"
+            type='button'
             onClick={handleRemove}
-            className="absolute top-2 right-2 p-2 bg-black/70 hover:bg-red-500/80 text-white transition-colors"
+            className='absolute top-2 right-2 p-2 bg-black/70 hover:bg-red-500/80 text-white transition-colors'
             title={labels.removeImage}
           >
             <CloseIcon size={16} />
@@ -154,10 +162,10 @@ export default function ImageUpload({
     <>
       <input
         ref={fileInputRef}
-        type="file"
-        accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+        type='file'
+        accept='image/jpeg,image/png,image/webp,image/heic,image/heif'
         onChange={handleFileSelect}
-        className="hidden"
+        className='hidden'
         disabled={disabled || isUploading}
       />
       <div
@@ -170,33 +178,36 @@ export default function ImageUpload({
           w-full aspect-video border-2 border-dashed transition-all
           flex flex-col items-center justify-center gap-3
           ${disabled || isUploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-          ${isDragging
-            ? 'border-[#E4DD3B] bg-[#E4DD3B]/10'
-            : 'border-white/20 hover:border-[#E4DD3B]/50 bg-white/5 hover:bg-white/10'
+          ${
+            isDragging
+              ? 'border-[#E4DD3B] bg-[#E4DD3B]/10'
+              : 'border-white/20 hover:border-[#E4DD3B]/50 bg-white/5 hover:bg-white/10'
           }
         `}
       >
         {isUploading ? (
           <>
-            <SpinnerIcon size={40} className="animate-spin text-[#E4DD3B]" />
-            <p className="text-white/70 text-sm">{labels.uploading}</p>
+            <SpinnerIcon size={40} className='animate-spin text-[#E4DD3B]' />
+            <p className='text-white/70 text-sm'>{labels.uploading}</p>
           </>
         ) : isDragging ? (
           <>
-            <CloudUploadIcon size={40} className="text-[#E4DD3B]" />
-            <p className="text-[#E4DD3B] font-medium">{labels.dragActive}</p>
+            <CloudUploadIcon size={40} className='text-[#E4DD3B]' />
+            <p className='text-[#E4DD3B] font-medium'>{labels.dragActive}</p>
           </>
         ) : (
           <>
-            <ImageIcon size={40} className="text-white/40" />
-            <div className="text-center">
-              <p className="text-white/70 text-sm">{labels.dropzone}</p>
-              <p className="text-white/40 text-xs mt-1">{labels.dropzoneHint}</p>
+            <ImageIcon size={40} className='text-white/40' />
+            <div className='text-center'>
+              <p className='text-white/70 text-sm'>{labels.dropzone}</p>
+              <p className='text-white/40 text-xs mt-1'>
+                {labels.dropzoneHint}
+              </p>
             </div>
           </>
         )}
       </div>
-      {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
+      {error && <p className='mt-2 text-sm text-red-400'>{error}</p>}
     </>
   );
 }

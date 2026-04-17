@@ -180,7 +180,9 @@ export async function POST(request: Request) {
             if (buffer.byteLength > MAX_IMAGE_SIZE) {
               console.warn('Facebook cover image exceeds 5MB, skipping upload');
             } else {
-              persistentImageUrl = await uploadToCloudinary(buffer, contentType);
+              persistentImageUrl = await uploadToCloudinary(buffer, contentType, {
+                uploaderId: user.id,
+              });
             }
           }
         }
