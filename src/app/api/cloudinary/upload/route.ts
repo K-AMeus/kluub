@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/supabase/server';
 import { uploadToCloudinary } from '@/lib/cloudinary';
+import { enforceRateLimit, limiters } from '@/lib/rate-limit';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
@@ -13,6 +14,9 @@ export async function POST(request: Request) {
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const blocked = await enforceRateLimit(limiters.cloudinaryUpload, user.id);
+    if (blocked) return blocked;
 
     const formData = await request.formData();
     const file = formData.get('file') as File;

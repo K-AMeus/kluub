@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/supabase/server';
+import { enforceRateLimit, limiters } from '@/lib/rate-limit';
 
 const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST!;
 const POSTHOG_PERSONAL_API_KEY = process.env.POSTHOG_PERSONAL_API_KEY!;
@@ -79,6 +80,9 @@ export async function GET() {
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const blocked = await enforceRateLimit(limiters.analytics, user.id);
+    if (blocked) return blocked;
 
     const hostUsersQuery = await supabase
       .from('host_users')
