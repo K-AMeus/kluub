@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createClient } from '@/supabase/server';
 import cloudinary, { parseCloudinaryPublicId } from '@/lib/cloudinary';
+import { enforceRateLimit, limiters } from '@/lib/rate-limit';
 
 interface DeleteRequestBody {
   url?: unknown;
@@ -57,6 +58,9 @@ export async function POST(request: Request) {
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const blocked = await enforceRateLimit(limiters.cloudinaryDelete, user.id);
+    if (blocked) return blocked;
 
     const body = (await request
       .json()

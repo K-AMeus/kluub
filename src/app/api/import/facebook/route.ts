@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { uploadToCloudinary } from '@/lib/cloudinary';
 import { parse as parseHTML, HTMLElement } from 'node-html-parser';
 import { createClient } from '@/supabase/server';
+import { enforceRateLimit, limiters } from '@/lib/rate-limit';
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
@@ -162,6 +163,9 @@ export async function POST(request: Request) {
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const blocked = await enforceRateLimit(limiters.facebookImport, user.id);
+    if (blocked) return blocked;
 
     const body = await request.json();
     const { url } = body;
