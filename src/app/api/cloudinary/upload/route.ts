@@ -37,7 +37,7 @@ export async function POST(request: Request) {
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const url = await uploadToCloudinary(buffer, file.type);
+    const url = await uploadToCloudinary(buffer, file.type, { uploaderId: user.id });
 
     return NextResponse.json({ url });
   } catch (error) {

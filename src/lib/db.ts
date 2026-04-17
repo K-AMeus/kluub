@@ -1,7 +1,8 @@
 'use server';
 
 import { unstable_cache } from 'next/cache';
-import { createStaticClient } from '@/supabase/server';
+import { createClient, createStaticClient } from '@/supabase/server';
+import cloudinary, { parseCloudinaryPublicId } from '@/lib/cloudinary';
 import {
   Event,
   City,
@@ -17,7 +18,7 @@ const CACHE_REVALIDATE_SECONDS = 86400;
 function toUTC(dateStr: string, timeStr: string): string {
   const asUTC = new Date(`${dateStr}T${timeStr}Z`);
   const inTallinn = new Date(
-    asUTC.toLocaleString('en-US', { timeZone: TIMEZONE })
+    asUTC.toLocaleString('en-US', { timeZone: TIMEZONE }),
   );
   const offsetMs = inTallinn.getTime() - asUTC.getTime();
   return new Date(asUTC.getTime() - offsetMs).toISOString();
@@ -61,7 +62,7 @@ async function fetchEvents(
   city: City,
   filtersJson: string,
   page: number,
-  pageSize: number
+  pageSize: number,
 ): Promise<EventsResult> {
   const filters: EventFilterParams = JSON.parse(filtersJson);
   const supabase = createStaticClient();
@@ -86,7 +87,7 @@ async function fetchEvents(
       start_time,
       end_time,
       venues (name)
-    `
+    `,
     )
     .eq('city', city)
     .gte('start_time', new Date().toISOString())
@@ -135,7 +136,7 @@ export async function getEventsByCity(
   city: City,
   filters: EventFilterParams,
   page: number,
-  pageSize: number = EVENTS_PAGE_SIZE
+  pageSize: number = EVENTS_PAGE_SIZE,
 ): Promise<EventsResult> {
   const filtersJson = JSON.stringify(filters);
 
@@ -145,7 +146,7 @@ export async function getEventsByCity(
     {
       revalidate: CACHE_REVALIDATE_SECONDS,
       tags: ['events'],
-    }
+    },
   )(city, filtersJson, page, pageSize);
 }
 
@@ -169,7 +170,7 @@ async function fetchTopPicks(city: City): Promise<Event[]> {
       start_time,
       end_time,
       venues (name)
-    `
+    `,
     )
     .eq('city', city)
     .eq('top_pick', true)
@@ -182,7 +183,7 @@ async function fetchTopPicks(city: City): Promise<Event[]> {
   }
 
   return (data ?? []).map((row) =>
-    transformEvent(row as unknown as EventDbRow)
+    transformEvent(row as unknown as EventDbRow),
   );
 }
 
@@ -213,7 +214,7 @@ async function fetchEventById(id: string): Promise<Event | null> {
       start_time,
       end_time,
       venues (name)
-    `
+    `,
     )
     .eq('id', id)
     .single();
@@ -239,6 +240,69 @@ export async function revalidateEvents() {
   revalidateTag('events', 'max');
   revalidatePath('/et/events/tartu');
   revalidatePath('/en/events/tartu');
+}
+
+export type DeleteEventResult =
+  | { ok: true }
+  | {
+      ok: false;
+      error: 'unauthorized' | 'forbidden' | 'not_found' | 'delete_failed';
+    };
+
+export async function deleteEventWithImage(
+  eventId: string,
+): Promise<DeleteEventResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: 'unauthorized' };
+
+  const { data: event } = await supabase
+    .from('events')
+    .select('host_id, image_url')
+    .eq('id', eventId)
+    .maybeSingle();
+
+  if (!event) return { ok: false, error: 'not_found' };
+
+  const { data: membership } = await supabase
+    .from('host_users')
+    .select('user_id')
+    .eq('user_id', user.id)
+    .eq('host_id', event.host_id)
+    .maybeSingle();
+
+  if (!membership) return { ok: false, error: 'forbidden' };
+
+  const { error: deleteError } = await supabase
+    .from('events')
+    .delete()
+    .eq('id', eventId);
+
+  if (deleteError) {
+    console.error('Error deleting event:', deleteError);
+    return { ok: false, error: 'delete_failed' };
+  }
+
+  if (event.image_url) {
+    const publicId = parseCloudinaryPublicId(event.image_url);
+    if (publicId) {
+      try {
+        await cloudinary.uploader.destroy(publicId);
+      } catch (err) {
+        console.error(
+          'Failed to delete Cloudinary image for event',
+          eventId,
+          err,
+        );
+      }
+    }
+  }
+
+  await revalidateEvents();
+
+  return { ok: true };
 }
 
 async function fetchVenuesByCity(city: City): Promise<VenueOption[]> {
