@@ -28,7 +28,9 @@ function extractFromScripts(root: HTMLElement) {
     const text = el.rawText;
 
     if (!description) {
-      const match = text.match(/"event_description"\s*:\s*\{\s*"text"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+      const match = text.match(
+        /"event_description"\s*:\s*\{\s*"text"\s*:\s*"((?:[^"\\]|\\.)*)"/,
+      );
       if (match?.[1]) description = unescapeJsonString(match[1]);
     }
 
@@ -68,7 +70,9 @@ function unescapeJsonString(str: string): string {
 
 function normalizeFacebookUrl(url: string): string {
   const trimmed = url.trim();
-  const withProtocol = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  const withProtocol = /^https?:\/\//i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed}`;
   try {
     return new URL(withProtocol).href;
   } catch {
@@ -80,7 +84,8 @@ function isFacebookEventUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
     const hostname = parsed.hostname.replace('www.', '').replace('m.', '');
-    if (hostname === 'facebook.com' && parsed.pathname.includes('/events/')) return true;
+    if (hostname === 'facebook.com' && parsed.pathname.includes('/events/'))
+      return true;
     if (hostname === 'fb.me') return true;
     return false;
   } catch {
@@ -100,13 +105,59 @@ function isLoginWall(ogTitle: string | null): boolean {
 }
 
 function isTimeoutError(error: unknown): boolean {
-  return error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError');
+  return (
+    error instanceof Error &&
+    (error.name === 'TimeoutError' || error.name === 'AbortError')
+  );
+}
+
+async function fetchFacebookImage(
+  url: string,
+  maxBytes: number,
+): Promise<{ buffer: Buffer; contentType: string } | null> {
+  const res = await fetch(url, {
+    headers: {
+      'User-Agent':
+        'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+      Accept: 'image/webp,image/apng,image/*,*/*;q=0.8',
+    },
+    redirect: 'follow',
+    signal: AbortSignal.timeout(15_000),
+  });
+
+  if (!res.ok) return null;
+
+  const contentType = res.headers.get('content-type') ?? '';
+  if (!contentType.startsWith('image/')) return null;
+
+  const declaredLength = Number(res.headers.get('content-length'));
+  if (Number.isFinite(declaredLength) && declaredLength > maxBytes) return null;
+
+  if (!res.body) return null;
+
+  const reader = res.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let received = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    received += value.byteLength;
+    if (received > maxBytes) {
+      await reader.cancel();
+      return null;
+    }
+    chunks.push(value);
+  }
+
+  return { buffer: Buffer.concat(chunks), contentType };
 }
 
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -130,8 +181,10 @@ export async function POST(request: Request) {
 
     const response = await fetch(normalizedUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'User-Agent':
+          'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+        Accept:
+          'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language': 'en-US,en;q=0.9',
       },
       redirect: 'follow',
@@ -153,7 +206,10 @@ export async function POST(request: Request) {
 
     if (isLoginWall(ogTitle)) {
       return NextResponse.json(
-        { error: 'This event appears to be private or requires login. Only public Facebook events can be imported.' },
+        {
+          error:
+            'This event appears to be private or requires login. Only public Facebook events can be imported.',
+        },
         { status: 422 },
       );
     }
@@ -163,28 +219,13 @@ export async function POST(request: Request) {
     let persistentImageUrl: string | null = null;
     if (ogImage) {
       try {
-        const imgResponse = await fetch(ogImage, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-            'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8',
-          },
-          redirect: 'follow',
-          signal: AbortSignal.timeout(15_000),
-        });
-
-        if (imgResponse.ok) {
-          const contentType = imgResponse.headers.get('content-type') || '';
-          if (contentType.startsWith('image/')) {
-            const buffer = Buffer.from(await imgResponse.arrayBuffer());
-
-            if (buffer.byteLength > MAX_IMAGE_SIZE) {
-              console.warn('Facebook cover image exceeds 5MB, skipping upload');
-            } else {
-              persistentImageUrl = await uploadToCloudinary(buffer, contentType, {
-                uploaderId: user.id,
-              });
-            }
-          }
+        const fetched = await fetchFacebookImage(ogImage, MAX_IMAGE_SIZE);
+        if (fetched) {
+          persistentImageUrl = await uploadToCloudinary(
+            fetched.buffer,
+            fetched.contentType,
+            { uploaderId: user.id },
+          );
         }
       } catch (imgError) {
         console.error('Failed to upload FB image to Cloudinary:', imgError);
@@ -203,7 +244,8 @@ export async function POST(request: Request) {
     if (!result.title) {
       return NextResponse.json(
         {
-          error: 'Could not extract event data. The event may be private or the page structure has changed.',
+          error:
+            'Could not extract event data. The event may be private or the page structure has changed.',
           partial: result,
         },
         { status: 422 },
