@@ -96,6 +96,7 @@
     "noAccount": "Ei ole veel kontot?",
     "joinUs": "Liitu Kluubiga",
     "loginError": "Vale e-post või parool. Palun proovi uuesti.",
+    "authFailed": "Autentimine ebaõnnestus. Palun proovi uuesti.",
     "welcomeTitle": "Tere tulemast!",
     "welcomeSubtitle": "Oled edukalt sisse loginud.",
     "welcomeMessage": "Toimumiskoha juhtpaneel on peagi tulemas. Siin saad hallata oma üritusi.",

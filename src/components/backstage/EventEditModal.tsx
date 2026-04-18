@@ -166,7 +166,7 @@ export default function EventEditModal({
       endTime: event.endTime,
     };
 
-    localStorage.setItem('duplicateEvent', JSON.stringify(duplicateData));
+    sessionStorage.setItem('duplicateEvent', JSON.stringify(duplicateData));
     router.push(`/${locale}/backstage/events/upload`);
   };
 

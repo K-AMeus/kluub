@@ -1,7 +1,12 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
-import { Event, City, EVENTS_PAGE_SIZE, DEFAULT_EVENT_FILTERS } from '@/lib/types';
+import { useState, useMemo, useCallback, useRef } from 'react';
+import {
+  Event,
+  City,
+  EVENTS_PAGE_SIZE,
+  DEFAULT_EVENT_FILTERS,
+} from '@/lib/types';
 import { groupEventsByDate } from '@/lib/event-utils';
 import { getEventsByCity } from '@/lib/db';
 import EventCard, { EventCardTranslations } from './EventCard';
@@ -53,14 +58,16 @@ export default function EventList({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const requestIdRef = useRef(0);
+
   const handleFiltersChange = useCallback(
     async (newFilters: EventFilters) => {
-      // Capture filter applied analytics
       const activeFilters = [];
       if (newFilters.topPicks) activeFilters.push('top_picks');
       if (newFilters.freeOnly) activeFilters.push('free_only');
       if (newFilters.venueId) activeFilters.push('venue');
-      if (newFilters.startDate || newFilters.endDate) activeFilters.push('date_range');
+      if (newFilters.startDate || newFilters.endDate)
+        activeFilters.push('date_range');
 
       if (activeFilters.length > 0) {
         posthog.capture('events_filter_applied', {
@@ -73,50 +80,73 @@ export default function EventList({
         });
       }
 
+      const requestId = ++requestIdRef.current;
       setFilters(newFilters);
       setPage(0);
       setIsLoading(true);
       setError(null);
 
       try {
-        const result = await getEventsByCity(city, newFilters, 0, EVENTS_PAGE_SIZE);
+        const result = await getEventsByCity(
+          city,
+          newFilters,
+          0,
+          EVENTS_PAGE_SIZE,
+        );
+        if (requestId !== requestIdRef.current) return;
         setEvents(result.events);
         setHasMore(result.hasMore);
       } catch {
+        if (requestId !== requestIdRef.current) return;
         setError(translations.loadError);
       } finally {
-        setIsLoading(false);
+        if (requestId === requestIdRef.current) setIsLoading(false);
       }
     },
-    [city, translations.loadError]
+    [city, posthog, translations.loadError],
   );
 
   const loadMore = useCallback(async () => {
     if (isLoading) return;
 
     const nextPage = page + 1;
+    const requestId = ++requestIdRef.current;
     setPage(nextPage);
     setIsLoading(true);
     setError(null);
 
     try {
-      const result = await getEventsByCity(city, filters, nextPage, EVENTS_PAGE_SIZE);
+      const result = await getEventsByCity(
+        city,
+        filters,
+        nextPage,
+        EVENTS_PAGE_SIZE,
+      );
+      if (requestId !== requestIdRef.current) return;
       setEvents((prev) => [...prev, ...result.events]);
       setHasMore(result.hasMore);
     } catch {
+      if (requestId !== requestIdRef.current) return;
       setPage(page);
       setError(translations.loadError);
     } finally {
-      setIsLoading(false);
+      if (requestId === requestIdRef.current) setIsLoading(false);
     }
   }, [city, filters, page, isLoading, translations.loadError]);
 
   const retry = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
     setIsLoading(true);
     setError(null);
 
     try {
-      const result = await getEventsByCity(city, filters, page, EVENTS_PAGE_SIZE);
+      const result = await getEventsByCity(
+        city,
+        filters,
+        page,
+        EVENTS_PAGE_SIZE,
+      );
+      if (requestId !== requestIdRef.current) return;
       if (page === 0) {
         setEvents(result.events);
       } else {
@@ -124,9 +154,10 @@ export default function EventList({
       }
       setHasMore(result.hasMore);
     } catch {
+      if (requestId !== requestIdRef.current) return;
       setError(translations.loadError);
     } finally {
-      setIsLoading(false);
+      if (requestId === requestIdRef.current) setIsLoading(false);
     }
   }, [city, filters, page, translations.loadError]);
 
@@ -198,7 +229,9 @@ export default function EventList({
               <button
                 onClick={loadMore}
                 disabled={isLoading}
-                aria-label={isLoading ? translations.loading : translations.loadMore}
+                aria-label={
+                  isLoading ? translations.loading : translations.loadMore
+                }
                 className='group relative px-6 md:px-9 py-2 md:py-3 border border-[#E4DD3B] bg-black/60 hover:bg-[#E4DD3B]/10 text-[#E4DD3B] hover:text-white font-display text-xs md:text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-wait'
               >
                 {isLoading && (

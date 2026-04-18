@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useMemo,
-} from 'react';
+import { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { createBrowserSupabaseClient } from '@/supabase/client';
 import type { Host, Venue } from '@/lib/types';
 import type { User } from '@supabase/supabase-js';
@@ -47,12 +41,16 @@ export default function BackstageProvider({
   useEffect(() => {
     const supabase = createBrowserSupabaseClient();
 
+    let cancelled = false;
+
     async function fetchData() {
       try {
         const {
           data: { user },
           error: authError,
         } = await supabase.auth.getUser();
+
+        if (cancelled) return;
 
         if (authError || !user) {
           setError('auth');
@@ -62,49 +60,57 @@ export default function BackstageProvider({
 
         setUser(user);
 
-        const { data: hostUserData, error: hostError } = await supabase
-          .from('host_users')
-          .select('host_id, hosts (id, name)')
-          .eq('user_id', user.id);
+        const [hostUsersResult, venuesResult] = await Promise.all([
+          supabase
+            .from('host_users')
+            .select('host_id, hosts (id, name)')
+            .eq('user_id', user.id),
+          supabase
+            .from('venues')
+            .select('id, name, city')
+            .order('name', { ascending: true }),
+        ]);
 
-        if (hostError) {
+        if (cancelled) return;
+
+        if (hostUsersResult.error) {
           setError('hosts');
           setIsLoading(false);
           return;
         }
 
-        const hostsList = (hostUserData
+        const hostsList = (hostUsersResult.data
           ?.map((hu: any) => hu.hosts as Host | null)
           .filter(Boolean) || []) as Host[];
 
         setHosts(hostsList);
 
-        const { data: venuesData, error: venuesError } = await supabase
-          .from('venues')
-          .select('id, name, city')
-          .order('name', { ascending: true });
-
-        if (venuesError) {
-          console.error('Error fetching venues:', venuesError);
+        if (venuesResult.error) {
+          console.error('Error fetching venues:', venuesResult.error);
         } else {
-          setVenues((venuesData || []) as Venue[]);
+          setVenues((venuesResult.data || []) as Venue[]);
         }
       } catch (err) {
+        if (cancelled) return;
         console.error('BackstageProvider error:', err);
         setError('unexpected');
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     }
 
     fetchData();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const hostIds = useMemo(() => hosts.map((h) => h.id), [hosts]);
 
   const value = useMemo(
     () => ({ user, hosts, hostIds, venues, isLoading, error }),
-    [user, hosts, hostIds, venues, isLoading, error]
+    [user, hosts, hostIds, venues, isLoading, error],
   );
 
   return (

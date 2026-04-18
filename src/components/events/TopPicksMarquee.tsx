@@ -39,7 +39,6 @@ function TopPickCard({ event }: { event: Event }) {
           fill
           className='object-cover object-bottom transition-transform duration-300 group-hover:scale-105'
           sizes='(max-width: 768px) 256px, 320px'
-          preload
         />
 
         <div className='absolute top-1 left-1 md:top-2 md:left-2'>

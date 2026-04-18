@@ -1,6 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import BackstageBackground from '@/components/backstage/BackstageBackground';
 import LoginForm from '@/components/backstage/LoginForm';
 import Header from '@/components/shared/Header';
@@ -9,6 +10,7 @@ import Footer from '@/components/shared/Footer';
 export default function BackstagePage() {
   const searchParams = useSearchParams();
   const hasError = searchParams.get('error');
+  const t = useTranslations('backstage');
 
   return (
     <div className='flex flex-col min-h-screen w-screen bg-[#0a0a0a] overflow-hidden'>
@@ -21,7 +23,7 @@ export default function BackstagePage() {
           <LoginForm />
           {hasError && (
             <div className='mt-4 p-3 bg-red-500/6 border border-red-500/20 text-red-400 text-xs text-center'>
-              Authentication failed. Please try again.
+              {t('authFailed')}
             </div>
           )}
         </div>
