@@ -1,6 +1,6 @@
 'use server';
 
-import { unstable_cache } from 'next/cache';
+import { revalidateTag, unstable_cache } from 'next/cache';
 import { createClient, createStaticClient } from '@/supabase/server';
 import cloudinary, { parseCloudinaryPublicId } from '@/lib/cloudinary';
 import {
@@ -15,13 +15,43 @@ import { TIMEZONE } from './date-utils';
 
 const CACHE_REVALIDATE_SECONDS = 86400;
 
+const TALLINN_PARTS_FORMATTER = new Intl.DateTimeFormat('en-GB', {
+  timeZone: TIMEZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hourCycle: 'h23',
+});
+
 function toUTC(dateStr: string, timeStr: string): string {
-  const asUTC = new Date(`${dateStr}T${timeStr}Z`);
-  const inTallinn = new Date(
-    asUTC.toLocaleString('en-US', { timeZone: TIMEZONE }),
+  const wallClock = new Date(`${dateStr}T${timeStr}Z`);
+  if (Number.isNaN(wallClock.getTime())) {
+    throw new Error(`Invalid date or time: "${dateStr}" "${timeStr}"`);
+  }
+
+  const parts = Object.fromEntries(
+    TALLINN_PARTS_FORMATTER.formatToParts(wallClock).map((p) => [
+      p.type,
+      p.value,
+    ]),
   );
-  const offsetMs = inTallinn.getTime() - asUTC.getTime();
-  return new Date(asUTC.getTime() - offsetMs).toISOString();
+
+  const hour = Number(parts.hour) === 24 ? 0 : Number(parts.hour);
+
+  const tallinnWallAsUTC = Date.UTC(
+    Number(parts.year),
+    Number(parts.month) - 1,
+    Number(parts.day),
+    hour,
+    Number(parts.minute),
+    Number(parts.second),
+  );
+
+  const offsetMs = tallinnWallAsUTC - wallClock.getTime();
+  return new Date(wallClock.getTime() - offsetMs).toISOString();
 }
 
 interface EventDbRow {
@@ -235,11 +265,7 @@ export async function getEventById(id: string) {
 }
 
 export async function revalidateEvents() {
-  const { revalidateTag, revalidatePath } = await import('next/cache');
-
   revalidateTag('events', 'max');
-  revalidatePath('/et/events/tartu');
-  revalidatePath('/en/events/tartu');
 }
 
 export type DeleteEventResult =

@@ -96,6 +96,7 @@
     "noAccount": "Don't have an account yet?",
     "joinUs": "Join Kluub",
     "loginError": "Invalid email or password. Please try again.",
+    "authFailed": "Authentication failed. Please try again.",
     "welcomeTitle": "Welcome!",
     "welcomeSubtitle": "You have successfully signed in.",
     "welcomeMessage": "The venue dashboard is coming soon. You'll be able to manage your events here.",

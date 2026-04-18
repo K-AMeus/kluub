@@ -8,7 +8,11 @@ import type { City } from '@/lib/types';
 import { formatTime } from '@/lib/date-utils';
 import { formatDateTimeForInput } from '@/lib/event-utils';
 import { DEFAULT_EVENT_IMAGE } from '@/lib/constants';
-import { LocationIcon, CalendarIcon, TicketIcon } from '@/components/shared/icons';
+import {
+  LocationIcon,
+  CalendarIcon,
+  TicketIcon,
+} from '@/components/shared/icons';
 import ImageUpload from '@/components/shared/ImageUpload';
 import DateTimePicker from '@/components/backstage/DateTimePicker';
 import { revalidateEvents } from '@/lib/db';
@@ -24,7 +28,11 @@ interface FacebookImportData {
 
 export default function EventUploadForm() {
   const t = useTranslations('backstage');
-  const { hosts, venues: allVenues, isLoading: contextLoading } = useBackstage();
+  const {
+    hosts,
+    venues: allVenues,
+    isLoading: contextLoading,
+  } = useBackstage();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -64,38 +72,37 @@ export default function EventUploadForm() {
     }
   }, [contextLoading, cityVenues, venueId]);
 
-  // Check for duplicated event data in localStorage
   useEffect(() => {
-    const duplicateData = localStorage.getItem('duplicateEvent');
-    if (duplicateData) {
-      try {
-        const event = JSON.parse(duplicateData);
+    const duplicateData = sessionStorage.getItem('duplicateEvent');
+    if (!duplicateData) return;
 
-        setTitle(event.title);
-        setDescription(event.description);
-        if (event.price === '0') {
-          setIsFree(true);
-          setPrice('');
-        } else {
-          setIsFree(false);
-          setPrice(event.price || '');
-        }
-        setHostId(event.hostId || '');
-        setVenueId(event.venueId);
-        setCity(event.city);
-        setImageUrl(event.imageUrl || '');
-        setFacebookUrl(event.facebookUrl || '');
+    sessionStorage.removeItem('duplicateEvent');
 
-        setStartTime(formatDateTimeForInput(event.startTime));
-        setEndTime(formatDateTimeForInput(event.endTime));
+    try {
+      const event = JSON.parse(duplicateData);
 
-        localStorage.removeItem('duplicateEvent');
-
-        setSuccess(t('eventDuplicated'));
-        setTimeout(() => setSuccess(null), 3000);
-      } catch (err) {
-        console.error('Error parsing duplicate event data:', err);
+      setTitle(event.title);
+      setDescription(event.description);
+      if (event.price === '0') {
+        setIsFree(true);
+        setPrice('');
+      } else {
+        setIsFree(false);
+        setPrice(event.price || '');
       }
+      setHostId(event.hostId || '');
+      setVenueId(event.venueId);
+      setCity(event.city);
+      setImageUrl(event.imageUrl || '');
+      setFacebookUrl(event.facebookUrl || '');
+
+      setStartTime(formatDateTimeForInput(event.startTime));
+      setEndTime(formatDateTimeForInput(event.endTime));
+
+      setSuccess(t('eventDuplicated'));
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      console.error('Error parsing duplicate event data:', err);
     }
   }, [t]);
 
@@ -153,8 +160,6 @@ export default function EventUploadForm() {
     }
   };
 
-
-
   const handleFacebookImport = async () => {
     const url = importUrl.trim();
     if (!url) return;
@@ -201,14 +206,12 @@ export default function EventUploadForm() {
       if (imported.startTime) {
         try {
           setStartTime(formatDateTimeForInput(imported.startTime));
-        } catch {
-        }
+        } catch {}
       }
       if (imported.endTime) {
         try {
           setEndTime(formatDateTimeForInput(imported.endTime));
-        } catch {
-        }
+        } catch {}
       }
 
       setImportedFrom(true);
@@ -294,8 +297,18 @@ export default function EventUploadForm() {
       <div className='bg-white/2 border border-white/6 p-8 md:p-12'>
         <div className='text-center max-w-sm mx-auto'>
           <div className='mb-5 inline-flex items-center justify-center w-14 h-14 bg-white/4 border border-white/6'>
-            <svg className='w-7 h-7 text-white/30' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
-              <path strokeLinecap='round' strokeLinejoin='round' d='M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z' />
+            <svg
+              className='w-7 h-7 text-white/30'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                d='M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z'
+              />
             </svg>
           </div>
 
@@ -310,29 +323,35 @@ export default function EventUploadForm() {
   }
 
   // Shared input classes
-  const inputClasses = 'w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] text-white placeholder-white/25 focus:outline-none focus:border-[#E4DD3B]/40 focus:ring-1 focus:ring-[#E4DD3B]/20 transition-all duration-200 disabled:opacity-40 text-sm';
-  const labelClasses = 'block text-white/60 text-xs font-medium mb-2 uppercase tracking-wider';
+  const inputClasses =
+    'w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] text-white placeholder-white/25 focus:outline-none focus:border-[#E4DD3B]/40 focus:ring-1 focus:ring-[#E4DD3B]/20 transition-all duration-200 disabled:opacity-40 text-sm';
+  const labelClasses =
+    'block text-white/60 text-xs font-medium mb-2 uppercase tracking-wider';
 
   const previewVenue = allVenues.find((v) => v.id === venueId);
   const previewImage = imageUrl || DEFAULT_EVENT_IMAGE;
-  const previewPrice = isFree ? t('priceFree') : (price || t('price'));
+  const previewPrice = isFree ? t('priceFree') : price || t('price');
 
   return (
     <div className='grid grid-cols-1 lg:grid-cols-[1fr_375px] gap-6 items-start'>
-
       {/* Left column: all form fields */}
       <div className='space-y-4'>
-
         {/* Facebook Import Card */}
         <div className='bg-white/2 border border-white/6 p-5'>
           <div className='flex items-center gap-3 mb-4'>
             <div className='w-8 h-8 bg-[#1877F2] flex items-center justify-center shrink-0'>
-              <svg className='w-4 h-4 text-white' viewBox='0 0 24 24' fill='currentColor'>
+              <svg
+                className='w-4 h-4 text-white'
+                viewBox='0 0 24 24'
+                fill='currentColor'
+              >
                 <path d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' />
               </svg>
             </div>
             <div>
-              <h3 className='text-white font-medium text-sm'>{t('importFromFacebook')}</h3>
+              <h3 className='text-white font-medium text-sm'>
+                {t('importFromFacebook')}
+              </h3>
               <p className='text-white/30 text-xs'>{t('importDescription')}</p>
             </div>
           </div>
@@ -342,7 +361,10 @@ export default function EventUploadForm() {
               value={importUrl}
               onChange={(e) => setImportUrl(e.target.value)}
               disabled={isImporting}
-              className={inputClasses + ' focus:border-[#1877F2]/50 focus:ring-[#1877F2]/20'}
+              className={
+                inputClasses +
+                ' focus:border-[#1877F2]/50 focus:ring-[#1877F2]/20'
+              }
               placeholder={t('fbUrlPlaceholder')}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -368,29 +390,57 @@ export default function EventUploadForm() {
             </button>
           </div>
           {!importedFrom && (
-            <p className='text-white/25 text-xs mt-3'>{t('orCreateManually')}</p>
+            <p className='text-white/25 text-xs mt-3'>
+              {t('orCreateManually')}
+            </p>
           )}
         </div>
 
         {/* Event Form Card */}
-        <div id='event-form' className='bg-white/2 border border-white/6 p-5 md:p-6'>
-
+        <div
+          id='event-form'
+          className='bg-white/2 border border-white/6 p-5 md:p-6'
+        >
           {importedFrom && (
             <div className='mb-5 p-3 bg-[#1877F2]/6 border border-[#1877F2]/20 text-[#6CB4EE] text-sm flex items-center gap-3'>
-              <svg className='w-4 h-4 shrink-0' viewBox='0 0 24 24' fill='currentColor'>
+              <svg
+                className='w-4 h-4 shrink-0'
+                viewBox='0 0 24 24'
+                fill='currentColor'
+              >
                 <path d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' />
               </svg>
               <span className='text-xs flex-1'>{t('reviewAndPublish')}</span>
-              <svg className='w-6 h-6 shrink-0 text-emerald-400' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
-                <path strokeLinecap='round' strokeLinejoin='round' d='M9 12.75L11.25 15 15 9.75' />
+              <svg
+                className='w-6 h-6 shrink-0 text-emerald-400'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  d='M9 12.75L11.25 15 15 9.75'
+                />
               </svg>
             </div>
           )}
 
           {error && (
             <div className='mb-5 p-3 bg-red-500/6 border border-red-500/20 text-red-400 text-sm flex items-center gap-3'>
-              <svg className='w-4 h-4 shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
-                <path strokeLinecap='round' strokeLinejoin='round' d='M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z' />
+              <svg
+                className='w-4 h-4 shrink-0'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  d='M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z'
+                />
               </svg>
               <span className='text-xs'>{error}</span>
             </div>
@@ -398,8 +448,18 @@ export default function EventUploadForm() {
 
           {success && !importedFrom && (
             <div className='mb-5 p-3 bg-emerald-500/6 border border-emerald-500/20 text-emerald-400 text-sm flex items-center gap-3'>
-              <svg className='w-4 h-4 shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
-                <path strokeLinecap='round' strokeLinejoin='round' d='M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
+              <svg
+                className='w-4 h-4 shrink-0'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  d='M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+                />
               </svg>
               <span className='text-xs'>{success}</span>
             </div>
@@ -422,7 +482,9 @@ export default function EventUploadForm() {
                 placeholder={t('eventTitlePlaceholder')}
               />
               {validationErrors.title && (
-                <p className='mt-1.5 text-xs text-red-400'>{validationErrors.title}</p>
+                <p className='mt-1.5 text-xs text-red-400'>
+                  {validationErrors.title}
+                </p>
               )}
             </div>
 
@@ -442,7 +504,9 @@ export default function EventUploadForm() {
                 placeholder={t('eventDescriptionPlaceholder')}
               />
               {validationErrors.description && (
-                <p className='mt-1.5 text-xs text-red-400'>{validationErrors.description}</p>
+                <p className='mt-1.5 text-xs text-red-400'>
+                  {validationErrors.description}
+                </p>
               )}
             </div>
 
@@ -483,15 +547,23 @@ export default function EventUploadForm() {
                   disabled={isSubmitting}
                   className={inputClasses}
                 >
-                  <option value='' className='bg-[#111]'>{t('venueSelect')}</option>
+                  <option value='' className='bg-[#111]'>
+                    {t('venueSelect')}
+                  </option>
                   {cityVenues.map((venue) => (
-                    <option key={venue.id} value={venue.id} className='bg-[#111]'>
+                    <option
+                      key={venue.id}
+                      value={venue.id}
+                      className='bg-[#111]'
+                    >
                       {venue.name}
                     </option>
                   ))}
                 </select>
                 {validationErrors.venueId && (
-                  <p className='mt-1.5 text-xs text-red-400'>{validationErrors.venueId}</p>
+                  <p className='mt-1.5 text-xs text-red-400'>
+                    {validationErrors.venueId}
+                  </p>
                 )}
               </div>
               <div>
@@ -537,7 +609,9 @@ export default function EventUploadForm() {
                   />
                 )}
                 {validationErrors.price && (
-                  <p className='mt-1.5 text-xs text-red-400'>{validationErrors.price}</p>
+                  <p className='mt-1.5 text-xs text-red-400'>
+                    {validationErrors.price}
+                  </p>
                 )}
               </div>
             </div>
@@ -556,7 +630,9 @@ export default function EventUploadForm() {
                   disabled={isSubmitting}
                 />
                 {validationErrors.startTime && (
-                  <p className='mt-1.5 text-xs text-red-400'>{validationErrors.startTime}</p>
+                  <p className='mt-1.5 text-xs text-red-400'>
+                    {validationErrors.startTime}
+                  </p>
                 )}
               </div>
               <div>
@@ -572,7 +648,9 @@ export default function EventUploadForm() {
                   defaultHour='04'
                 />
                 {validationErrors.endTime && (
-                  <p className='mt-1.5 text-xs text-red-400'>{validationErrors.endTime}</p>
+                  <p className='mt-1.5 text-xs text-red-400'>
+                    {validationErrors.endTime}
+                  </p>
                 )}
               </div>
             </div>
@@ -609,7 +687,9 @@ export default function EventUploadForm() {
                 placeholder={t('facebookUrlPlaceholder')}
               />
               {validationErrors.facebookUrl && (
-                <p className='mt-1.5 text-xs text-red-400'>{validationErrors.facebookUrl}</p>
+                <p className='mt-1.5 text-xs text-red-400'>
+                  {validationErrors.facebookUrl}
+                </p>
               )}
             </div>
 
@@ -634,7 +714,9 @@ export default function EventUploadForm() {
 
       {/* Right column: mobile preview (sticky) */}
       <div className='lg:sticky lg:top-24 lg:-mt-7'>
-        <p className='text-white/30 text-xs font-semibold uppercase tracking-wider mb-3'>{t('mobilePreview')}</p>
+        <p className='text-white/30 text-xs font-semibold uppercase tracking-wider mb-3'>
+          {t('mobilePreview')}
+        </p>
         {/* Event card — mirrors EventCard mobile layout */}
         <div className='relative bg-[#060606] border border-white/20 flex'>
           {/* Image */}
@@ -650,21 +732,31 @@ export default function EventUploadForm() {
           <div className='flex-1 flex flex-col justify-between min-w-0 py-4 pr-4'>
             <div>
               <h3 className='text-white font-display text-base uppercase tracking-wide line-clamp-2 leading-snug'>
-                {title || <span className='text-white/25'>{t('eventTitle')}</span>}
+                {title || (
+                  <span className='text-white/25'>{t('eventTitle')}</span>
+                )}
               </h3>
               <div className='mt-2 space-y-1.5'>
                 <div className='flex items-center gap-2 text-xs text-white/95'>
                   <LocationIcon size={14} className='text-[#E4DD3B] shrink-0' />
                   <span className='truncate'>
-                    {previewVenue ? previewVenue.name : <span className='text-white/25'>{t('venueSelect')}</span>}
+                    {previewVenue ? (
+                      previewVenue.name
+                    ) : (
+                      <span className='text-white/25'>{t('venueSelect')}</span>
+                    )}
                   </span>
                 </div>
                 <div className='flex items-center gap-2 text-xs text-white/95'>
                   <CalendarIcon size={14} className='text-[#E4DD3B] shrink-0' />
                   <span>
-                    {startTime && endTime
-                      ? `${formatTime(startTime)} – ${formatTime(endTime)}`
-                      : <span className='text-white/25'>{t('startTime')} – {t('endTime')}</span>}
+                    {startTime && endTime ? (
+                      `${formatTime(startTime)} – ${formatTime(endTime)}`
+                    ) : (
+                      <span className='text-white/25'>
+                        {t('startTime')} – {t('endTime')}
+                      </span>
+                    )}
                   </span>
                 </div>
               </div>
@@ -677,7 +769,6 @@ export default function EventUploadForm() {
           </div>
         </div>
       </div>
-
     </div>
   );
 }
