@@ -15,6 +15,9 @@ interface ImageUploadProps {
     uploading: string;
     removeImage: string;
     dragActive: string;
+    invalidType: string;
+    tooLarge: string;
+    uploadFailed: string;
   };
 }
 
@@ -53,12 +56,12 @@ export default function ImageUpload({
       'image/heif',
     ];
     if (!allowedTypes.includes(file.type)) {
-      setError('Please upload a JPG, PNG, WebP, or HEIC image');
+      setError(labels.invalidType);
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setError('Image must be less than 5MB');
+      setError(labels.tooLarge);
       return;
     }
 
@@ -79,7 +82,7 @@ export default function ImageUpload({
       const data = await response.json();
       onChange(data.url);
     } catch {
-      setError('Failed to upload image. Please try again.');
+      setError(labels.uploadFailed);
     } finally {
       setIsUploading(false);
     }

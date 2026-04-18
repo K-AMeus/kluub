@@ -460,6 +460,9 @@ export default function EventEditModal({
                     uploading: t('imageUploading'),
                     removeImage: t('imageRemove'),
                     dragActive: t('imageDragActive'),
+                    invalidType: t('imageInvalidType'),
+                    tooLarge: t('imageTooLarge'),
+                    uploadFailed: t('imageUploadFailed'),
                   }}
                 />
               </div>

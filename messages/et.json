@@ -52,6 +52,15 @@
   "eventDetail": {
     "backToEvents": "Tagasi ürituste juurde"
   },
+  "errors": {
+    "notFoundTitle": "Lehte ei leitud",
+    "notFoundMessage": "Otsitavat lehte ei eksisteeri või see on kolinud.",
+    "notFoundCta": "Tagasi avalehele",
+    "errorTitle": "Midagi läks valesti",
+    "errorMessage": "Tekkis ootamatu viga. Palun proovi uuesti.",
+    "errorCta": "Proovi uuesti",
+    "goHome": "Tagasi avalehele"
+  },
   "joinPage": {
     "heroTitle": "Tee oma üritused nähtavaks",
     "heroSubtitle": "Kluub.ee on Eesti kasvav ööelu ja ürituste platvorm. Reklaami oma asutust ja üritusi tuhandetele külastajatele Tallinnas, Tartus ja Pärnus.",
@@ -147,6 +156,9 @@
     "imageUploading": "Üleslaadimine...",
     "imageRemove": "Eemalda pilt",
     "imageDragActive": "Aseta pilt siia",
+    "imageInvalidType": "Palun lae üles JPG, PNG, WebP või HEIC pilt.",
+    "imageTooLarge": "Pilt peab olema väiksem kui 5MB.",
+    "imageUploadFailed": "Pildi üleslaadimine ebaõnnestus. Palun proovi uuesti.",
     "facebookUrl": "Facebooki Ürituse URL (valikuline)",
     "facebookUrlPlaceholder": "https://facebook.com/events/123456789",
     "startTime": "Algusaeg",

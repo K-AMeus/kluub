@@ -10,7 +10,12 @@ import {
   ChevronRightIcon,
 } from '@/components/shared/icons';
 import { DEFAULT_EVENT_IMAGE } from '@/lib/constants';
-import { formatTime } from '@/lib/date-utils';
+import {
+  TIMEZONE,
+  formatTime,
+  getDateFormatter,
+  getDateLocale,
+} from '@/lib/date-utils';
 import EventDetailTracker from '@/components/events/EventDetailTracker';
 import FacebookEventLink from '@/components/events/FacebookEventLink';
 
@@ -23,18 +28,33 @@ interface EventDetailTranslations {
 interface EventDetailProps {
   event: Event;
   translations: EventDetailTranslations;
+  locale: string;
 }
 
-function formatDateBubble(dateString: string): { day: string; month: string } {
+function formatDateBubble(
+  dateString: string,
+  locale: string,
+): { day: string; month: string } {
   const date = new Date(dateString);
+  const dateLocale = getDateLocale(locale);
   return {
-    day: date.getDate().toString(),
-    month: date.toLocaleString('en-US', { month: 'short' }),
+    day: getDateFormatter(dateLocale, {
+      timeZone: TIMEZONE,
+      day: 'numeric',
+    }).format(date),
+    month: getDateFormatter(dateLocale, {
+      timeZone: TIMEZONE,
+      month: 'short',
+    }).format(date),
   };
 }
 
-export default function EventDetail({ event, translations }: EventDetailProps) {
-  const { day, month } = formatDateBubble(event.startTime);
+export default function EventDetail({
+  event,
+  translations,
+  locale,
+}: EventDetailProps) {
+  const { day, month } = formatDateBubble(event.startTime, locale);
   const imageUrl = event.imageUrl || DEFAULT_EVENT_IMAGE;
   const priceDisplay = event.price === '0' ? translations.free : event.price;
 

@@ -107,7 +107,11 @@ export default async function EventDetailPage({
       <div className='h-14 md:h-16' />
 
       <main className='flex-1'>
-        <EventDetail event={event} translations={translations} />
+        <EventDetail
+          event={event}
+          translations={translations}
+          locale={locale}
+        />
       </main>
 
       <div className='mt-20 md:mt-32'>

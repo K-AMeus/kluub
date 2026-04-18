@@ -52,6 +52,15 @@
   "eventDetail": {
     "backToEvents": "Back to Events"
   },
+  "errors": {
+    "notFoundTitle": "Page not found",
+    "notFoundMessage": "The page you're looking for doesn't exist or has been moved.",
+    "notFoundCta": "Back to home",
+    "errorTitle": "Something went wrong",
+    "errorMessage": "An unexpected error occurred. Please try again.",
+    "errorCta": "Try again",
+    "goHome": "Back to home"
+  },
   "joinPage": {
     "heroTitle": "Put your events on the map",
     "heroSubtitle": "Kluub.ee is Estonia's growing nightlife and events platform. Promote your venue and events to thousands of visitors in Tallinn, Tartu, and Pärnu.",
@@ -147,6 +156,9 @@
     "imageUploading": "Uploading...",
     "imageRemove": "Remove image",
     "imageDragActive": "Drop image here",
+    "imageInvalidType": "Please upload a JPG, PNG, WebP, or HEIC image.",
+    "imageTooLarge": "Image must be less than 5MB.",
+    "imageUploadFailed": "Failed to upload image. Please try again.",
     "facebookUrl": "Facebook Event URL (optional)",
     "facebookUrlPlaceholder": "https://facebook.com/events/123456789",
     "startTime": "Start Time",
