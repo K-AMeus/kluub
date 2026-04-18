@@ -10,9 +10,10 @@ import Header from '@/components/shared/Header';
 import Footer from '@/components/shared/Footer';
 import { Link } from '@/i18n/navigation';
 
-const ParticleField = dynamic(() => import('./ParticleField'), {
-  ssr: false,
-});
+const ParticleField = dynamic(
+  () => import('@/components/shared/ParticleField'),
+  { ssr: false },
+);
 
 export default function LandingPage() {
   const t = useTranslations('landingPage');
@@ -32,7 +33,7 @@ export default function LandingPage() {
       <div className='absolute inset-0 overflow-hidden'>
         <BackgroundEffects />
         <HoneycombPattern />
-        <ParticleField />
+        <ParticleField variant='landing' />
       </div>
 
       <Header />

@@ -2,16 +2,18 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useLocale } from 'next-intl';
-import { TIMEZONE } from '@/lib/date-utils';
+import {
+  TIMEZONE,
+  getDateFormatter,
+  getTodayInTallinn,
+} from '@/lib/date-utils';
 
 function getLocalizedWeekdays(locale: string): string[] {
   const dateLocale = locale === 'et' ? 'et-EE' : 'en-US';
+  const fmt = getDateFormatter(dateLocale, { weekday: 'narrow' });
   const weekdays: string[] = [];
   for (let i = 0; i < 7; i++) {
-    const date = new Date(2025, 0, 6 + i);
-    weekdays.push(
-      date.toLocaleDateString(dateLocale, { weekday: 'narrow' }).toUpperCase()
-    );
+    weekdays.push(fmt.format(new Date(2025, 0, 6 + i)).toUpperCase());
   }
   return weekdays;
 }
@@ -42,11 +44,16 @@ export default function DateTimePicker({
   const selectedDateStr = parsedDate
     ? `${parsedDate.getFullYear()}-${String(parsedDate.getMonth() + 1).padStart(2, '0')}-${String(parsedDate.getDate()).padStart(2, '0')}`
     : null;
-  const selectedHour = parsedDate ? String(parsedDate.getHours()).padStart(2, '0') : defaultHour;
-  const selectedMinute = parsedDate ? String(parsedDate.getMinutes()).padStart(2, '0') : '00';
+  const selectedHour = parsedDate
+    ? String(parsedDate.getHours()).padStart(2, '0')
+    : defaultHour;
+  const selectedMinute = parsedDate
+    ? String(parsedDate.getMinutes()).padStart(2, '0')
+    : '00';
 
   const [viewDate, setViewDate] = useState(() => {
-    if (parsedDate) return new Date(parsedDate.getFullYear(), parsedDate.getMonth(), 1);
+    if (parsedDate)
+      return new Date(parsedDate.getFullYear(), parsedDate.getMonth(), 1);
     return new Date();
   });
   const [tempDate, setTempDate] = useState<string | null>(selectedDateStr);
@@ -68,24 +75,28 @@ export default function DateTimePicker({
   // Close on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
+      return () =>
+        document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [isOpen]);
 
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
   const dateLocale = locale === 'et' ? 'et-EE' : 'en-US';
-  const monthName = viewDate.toLocaleDateString(dateLocale, {
+  const monthName = getDateFormatter(dateLocale, {
     month: 'long',
     year: 'numeric',
     timeZone: TIMEZONE,
-  });
+  }).format(viewDate);
   const weekdays = getLocalizedWeekdays(locale);
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -102,7 +113,7 @@ export default function DateTimePicker({
     return `${year}-${m}-${d}`;
   };
 
-  const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: TIMEZONE });
+  const todayStr = getTodayInTallinn();
 
   const handleDayClick = (day: number) => {
     const dateStr = formatDayToString(day);
@@ -111,15 +122,14 @@ export default function DateTimePicker({
     onChange(`${dateStr}T${tempHour}:${tempMinute}`);
   };
 
-
   // Display value for the button
   const displayValue = parsedDate
-    ? parsedDate.toLocaleDateString(dateLocale, {
+    ? getDateFormatter(dateLocale, {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
         timeZone: TIMEZONE,
-      }) + `  ${selectedHour}:${selectedMinute}`
+      }).format(parsedDate) + `  ${selectedHour}:${selectedMinute}`
     : '';
 
   return (
@@ -130,13 +140,23 @@ export default function DateTimePicker({
         id={id}
         disabled={disabled}
         onClick={() => !disabled && setIsOpen(!isOpen)}
-        className={`w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] text-sm text-left transition-all duration-200 disabled:opacity-40 cursor-pointer flex items-center justify-between gap-2 ${
+        className={`w-full px-4 py-3 bg-white/3 border border-white/8 text-sm text-left transition-all duration-200 disabled:opacity-40 cursor-pointer flex items-center justify-between gap-2 ${
           isOpen ? 'border-[#E4DD3B]/40 ring-1 ring-[#E4DD3B]/20' : ''
         } ${value ? 'text-white' : 'text-white/25'}`}
       >
         <span>{displayValue || '\u00A0'}</span>
-        <svg className='w-4 h-4 text-[#E4DD3B]/60 shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={1.5}>
-          <path strokeLinecap='round' strokeLinejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5' />
+        <svg
+          className='w-4 h-4 text-[#E4DD3B]/60 shrink-0'
+          fill='none'
+          stroke='currentColor'
+          viewBox='0 0 24 24'
+          strokeWidth={1.5}
+        >
+          <path
+            strokeLinecap='round'
+            strokeLinejoin='round'
+            d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5'
+          />
         </svg>
       </button>
 
@@ -163,8 +183,18 @@ export default function DateTimePicker({
               onClick={() => setViewDate(new Date(year, month - 1, 1))}
               className='p-1.5 text-white/50 hover:text-[#E4DD3B] transition-colors cursor-pointer'
             >
-              <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
-                <path strokeLinecap='round' strokeLinejoin='round' d='M15.75 19.5L8.25 12l7.5-7.5' />
+              <svg
+                className='w-4 h-4'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  d='M15.75 19.5L8.25 12l7.5-7.5'
+                />
               </svg>
             </button>
             <span className='text-white font-medium text-sm capitalize'>
@@ -175,8 +205,18 @@ export default function DateTimePicker({
               onClick={() => setViewDate(new Date(year, month + 1, 1))}
               className='p-1.5 text-white/50 hover:text-[#E4DD3B] transition-colors cursor-pointer'
             >
-              <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
-                <path strokeLinecap='round' strokeLinejoin='round' d='M8.25 4.5l7.5 7.5-7.5 7.5' />
+              <svg
+                className='w-4 h-4'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  d='M8.25 4.5l7.5 7.5-7.5 7.5'
+                />
               </svg>
             </button>
           </div>
@@ -184,7 +224,10 @@ export default function DateTimePicker({
           {/* Weekday headers */}
           <div className='grid grid-cols-7 gap-1 mb-2'>
             {weekdays.map((day, i) => (
-              <div key={i} className='text-center text-[10px] text-white/40 font-semibold py-1'>
+              <div
+                key={i}
+                className='text-center text-[10px] text-white/40 font-semibold py-1'
+              >
                 {day}
               </div>
             ))}
@@ -222,7 +265,9 @@ export default function DateTimePicker({
           {/* Time picker + Save button */}
           <div className='mt-4 pt-3 border-t border-white/10 flex items-center justify-between gap-2'>
             <div className='flex items-center gap-2'>
-              <span className='text-white/40 text-xs font-semibold uppercase tracking-wider'>{locale === 'et' ? 'Kell' : 'Time'}</span>
+              <span className='text-white/40 text-xs font-semibold uppercase tracking-wider'>
+                {locale === 'et' ? 'Kell' : 'Time'}
+              </span>
               <input
                 type='text'
                 value={tempHour}
@@ -239,7 +284,7 @@ export default function DateTimePicker({
                 }}
                 maxLength={2}
                 placeholder='HH'
-                className='bg-white/[0.05] border border-white/10 text-white text-sm px-2 py-1.5 focus:outline-none focus:border-[#E4DD3B]/40 text-center w-12'
+                className='bg-white/5 border border-white/10 text-white text-sm px-2 py-1.5 focus:outline-none focus:border-[#E4DD3B]/40 text-center w-12'
               />
               <span className='text-[#E4DD3B] font-bold text-lg'>:</span>
               <input
@@ -254,11 +299,14 @@ export default function DateTimePicker({
                 onBlur={() => {
                   const padded = tempMinute.padStart(2, '0');
                   setTempMinute(padded);
-                  if (tempDate) onChange(`${tempDate}T${tempHour.padStart(2, '0')}:${padded}`);
+                  if (tempDate)
+                    onChange(
+                      `${tempDate}T${tempHour.padStart(2, '0')}:${padded}`,
+                    );
                 }}
                 maxLength={2}
                 placeholder='MM'
-                className='bg-white/[0.05] border border-white/10 text-white text-sm px-2 py-1.5 focus:outline-none focus:border-[#E4DD3B]/40 text-center w-12'
+                className='bg-white/5 border border-white/10 text-white text-sm px-2 py-1.5 focus:outline-none focus:border-[#E4DD3B]/40 text-center w-12'
               />
             </div>
             <button

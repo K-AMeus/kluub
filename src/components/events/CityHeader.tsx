@@ -15,11 +15,22 @@ export default function CityHeader({ city }: CityHeaderProps) {
     setCurrentTime(formatTime());
     setMounted(true);
 
-    const intervalId = setInterval(() => {
-      setCurrentTime(formatTime());
-    }, 30000);
+    let timeoutId: ReturnType<typeof setTimeout>;
 
-    return () => clearInterval(intervalId);
+    const tick = () => {
+      setCurrentTime(formatTime());
+      const now = new Date();
+      const msUntilNextMinute =
+        60_000 - (now.getSeconds() * 1000 + now.getMilliseconds());
+      timeoutId = setTimeout(tick, msUntilNextMinute);
+    };
+
+    const now = new Date();
+    const msUntilNextMinute =
+      60_000 - (now.getSeconds() * 1000 + now.getMilliseconds());
+    timeoutId = setTimeout(tick, msUntilNextMinute);
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
   return (

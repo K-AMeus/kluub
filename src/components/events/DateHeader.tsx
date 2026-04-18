@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import {
   TIMEZONE,
+  getDateFormatter,
   getTodayInTallinn,
   getTomorrowInTallinn,
 } from '@/lib/date-utils';
@@ -31,14 +32,13 @@ export default function DateHeader({
   } else if (isTomorrow) {
     displayText = t('tomorrow');
   } else {
-    // Format the date for display
-    const date = new Date(dateKey + 'T12:00:00'); // Add time to avoid timezone issues
-    displayText = date.toLocaleDateString('en-US', {
+    const date = new Date(dateKey + 'T12:00:00');
+    displayText = getDateFormatter('en-US', {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
       timeZone: TIMEZONE,
-    });
+    }).format(date);
   }
 
   return (

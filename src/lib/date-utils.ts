@@ -1,8 +1,25 @@
 export const TIMEZONE = 'Europe/Tallinn';
 
+const formatterCache = new Map<string, Intl.DateTimeFormat>();
+
+export function getDateFormatter(
+  locale: string,
+  options: Intl.DateTimeFormatOptions,
+): Intl.DateTimeFormat {
+  const key = `${locale}|${JSON.stringify(options)}`;
+  let formatter = formatterCache.get(key);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, options);
+    formatterCache.set(key, formatter);
+  }
+  return formatter;
+}
+
+const TALLINN_YMD = { timeZone: TIMEZONE } as const;
+
 // Convert a JS Date into a YYYY-MM-DD string in Tallinn time
 export function getTallinnDateString(date: Date): string {
-  return date.toLocaleDateString('en-CA', { timeZone: TIMEZONE });
+  return getDateFormatter('en-CA', TALLINN_YMD).format(date);
 }
 
 // Get today's date in Tallinn timezone (YYYY-MM-DD format)
@@ -23,13 +40,14 @@ export function getEventDateKey(startTime: string): string {
   return getTallinnDateString(date);
 }
 
+const TALLINN_HM = {
+  timeZone: TIMEZONE,
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+} as const;
+
 export function formatTime(dateString?: string): string {
   const date = dateString ? new Date(dateString) : new Date();
-  return date.toLocaleTimeString('et-EE', {
-    timeZone: TIMEZONE,
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
+  return getDateFormatter('et-EE', TALLINN_HM).format(date);
 }
-
