@@ -8,6 +8,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
         disallow: [
           '/api/',
+          '/pxy/',
           '/et/backstage/',
           '/en/backstage/',
           '/et/auth/',

@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { createBrowserSupabaseClient } from '@/supabase/client';
 import { useBackstage } from '@/components/backstage/BackstageProvider';
 import type { City } from '@/lib/types';
 import { formatTime } from '@/lib/date-utils';
-import { formatDateTimeForInput } from '@/lib/event-utils';
+import { formatDateTimeForInput, isValidUrl } from '@/lib/event-utils';
 import { DEFAULT_EVENT_IMAGE } from '@/lib/constants';
 import {
   LocationIcon,
@@ -105,15 +106,6 @@ export default function EventUploadForm() {
       console.error('Error parsing duplicate event data:', err);
     }
   }, [t]);
-
-  const isValidUrl = (url: string): boolean => {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  };
 
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
@@ -721,10 +713,12 @@ export default function EventUploadForm() {
         <div className='relative bg-[#060606] border border-white/20 flex'>
           {/* Image */}
           <div className='relative w-28 h-28 m-4 rounded-lg overflow-hidden shrink-0'>
-            <img
+            <Image
               src={previewImage}
               alt={title || 'Event preview'}
-              className='w-full h-full object-cover'
+              fill
+              sizes='112px'
+              className='object-cover'
             />
           </div>
 

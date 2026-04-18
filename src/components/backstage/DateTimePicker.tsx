@@ -6,17 +6,9 @@ import {
   TIMEZONE,
   getDateFormatter,
   getTodayInTallinn,
+  getDateLocale,
+  getLocalizedWeekdays,
 } from '@/lib/date-utils';
-
-function getLocalizedWeekdays(locale: string): string[] {
-  const dateLocale = locale === 'et' ? 'et-EE' : 'en-US';
-  const fmt = getDateFormatter(dateLocale, { weekday: 'narrow' });
-  const weekdays: string[] = [];
-  for (let i = 0; i < 7; i++) {
-    weekdays.push(fmt.format(new Date(2025, 0, 6 + i)).toUpperCase());
-  }
-  return weekdays;
-}
 
 interface DateTimePickerProps {
   value: string; // YYYY-MM-DDTHH:mm
@@ -72,8 +64,8 @@ export default function DateTimePicker({
     }
   }, [value]);
 
-  // Close on outside click
   useEffect(() => {
+    if (!isOpen) return;
     const handleClickOutside = (e: MouseEvent) => {
       if (
         containerRef.current &&
@@ -82,16 +74,20 @@ export default function DateTimePicker({
         setIsOpen(false);
       }
     };
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () =>
-        document.removeEventListener('mousedown', handleClickOutside);
-    }
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKey);
+    };
   }, [isOpen]);
 
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
-  const dateLocale = locale === 'et' ? 'et-EE' : 'en-US';
+  const dateLocale = getDateLocale(locale);
   const monthName = getDateFormatter(dateLocale, {
     month: 'long',
     year: 'numeric',

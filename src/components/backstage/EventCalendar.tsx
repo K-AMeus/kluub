@@ -8,6 +8,8 @@ import {
   getDateFormatter,
   getTallinnDateString,
   getTodayInTallinn,
+  getDateLocale,
+  getLocalizedWeekdays,
 } from '@/lib/date-utils';
 
 interface CalendarEvent {
@@ -18,16 +20,6 @@ interface CalendarEvent {
 
 interface EventCalendarProps {
   events: CalendarEvent[];
-}
-
-function getLocalizedWeekdays(locale: string): string[] {
-  const dateLocale = locale === 'et' ? 'et-EE' : 'en-US';
-  const fmt = getDateFormatter(dateLocale, { weekday: 'narrow' });
-  const weekdays: string[] = [];
-  for (let i = 0; i < 7; i++) {
-    weekdays.push(fmt.format(new Date(2025, 0, 6 + i)).toUpperCase());
-  }
-  return weekdays;
 }
 
 export default function EventCalendar({ events }: EventCalendarProps) {
@@ -43,7 +35,7 @@ export default function EventCalendar({ events }: EventCalendarProps) {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
-  const dateLocale = locale === 'et' ? 'et-EE' : 'en-US';
+  const dateLocale = getDateLocale(locale);
   const monthLabel = getDateFormatter(dateLocale, {
     month: 'long',
     year: 'numeric',
@@ -70,20 +62,7 @@ export default function EventCalendar({ events }: EventCalendarProps) {
     return map;
   }, [events, year, month]);
 
-  // Calendar grid
-  const firstDayOfMonth = [
-    'Sun',
-    'Mon',
-    'Tue',
-    'Wed',
-    'Thu',
-    'Fri',
-    'Sat',
-  ].indexOf(
-    getDateFormatter('en-US', { weekday: 'short', timeZone: TIMEZONE }).format(
-      new Date(`${year}-${String(month + 1).padStart(2, '0')}-01T12:00:00Z`),
-    ),
-  );
+  const firstDayOfMonth = new Date(year, month, 1).getDay();
   const startOffset = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 

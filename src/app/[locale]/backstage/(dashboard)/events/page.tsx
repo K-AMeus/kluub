@@ -75,7 +75,23 @@ export default function MyEventsPage() {
       const upcoming: Event[] = [];
       const past: Event[] = [];
 
-      (eventsData || []).forEach((row: any) => {
+      type MyEventRow = {
+        id: string;
+        title: string;
+        description: string;
+        price: string;
+        host_id: string;
+        venue_id: string;
+        city: Event['city'];
+        top_pick: boolean;
+        image_url: string | null;
+        facebook_url: string | null;
+        start_time: string;
+        end_time: string;
+        venues: { name: string } | { name: string }[] | null;
+      };
+
+      ((eventsData ?? []) as unknown as MyEventRow[]).forEach((row) => {
         const event: Event = {
           id: row.id,
           title: row.title,
@@ -83,7 +99,9 @@ export default function MyEventsPage() {
           price: row.price,
           hostId: row.host_id,
           venueId: row.venue_id,
-          venue: row.venues?.name || '',
+          venue: Array.isArray(row.venues)
+            ? row.venues[0]?.name ?? ''
+            : row.venues?.name ?? '',
           city: row.city,
           topPick: row.top_pick,
           imageUrl: row.image_url,

@@ -51,9 +51,15 @@ export function formatDateTimeWithYear(isoString: string): string {
   return `${day}/${month}/${year} ${hours}:${minutes}`;
 }
 
-/**
- * Format ISO date string for datetime-local input (yyyy-mm-ddThh:mm)
- */
+export function isValidUrl(url: string): boolean {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function formatDateTimeForInput(isoString: string): string {
   const date = new Date(isoString);
   const year = date.getFullYear();
