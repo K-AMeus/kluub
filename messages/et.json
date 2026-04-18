@@ -28,7 +28,7 @@
     "noEvents": "Üritusi ei leitud",
     "noEventsHint": "Proovi filtreid muuta",
     "free": "TASUTA",
-    "facebookEvent": "Facebooki üritus",
+    "facebookEvent": "Event",
     "topPicks": "Top Pick",
     "today": "Täna",
     "tomorrow": "Homme",
@@ -50,7 +50,11 @@
     "retry": "Proovi uuesti"
   },
   "eventDetail": {
-    "backToEvents": "Tagasi ürituste juurde"
+    "backToEvents": "Tagasi ürituste juurde",
+    "venueLabel": "Koht",
+    "timeLabel": "Aeg",
+    "priceLabel": "Hind",
+    "hostedBy": "Korraldaja"
   },
   "errors": {
     "notFoundTitle": "Lehte ei leitud",

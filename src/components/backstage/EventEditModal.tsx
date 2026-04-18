@@ -7,6 +7,7 @@ import type { City, Event, Venue } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 import { formatDateTimeForInput, isValidUrl } from '@/lib/event-utils';
 import { deleteEventWithImage, revalidateEvents } from '@/lib/db';
+import { deleteFromCloudinary } from '@/lib/cloudinary-client';
 import ImageUpload from '@/components/shared/ImageUpload';
 import DateTimePicker from '@/components/backstage/DateTimePicker';
 
@@ -36,6 +37,7 @@ export default function EventEditModal({
   const [venueId, setVenueId] = useState(event.venueId);
   const [city, setCity] = useState<City>(event.city);
   const [imageUrl, setImageUrl] = useState(event.imageUrl || '');
+  const [initialImageUrl] = useState(event.imageUrl || '');
   const [facebookUrl, setFacebookUrl] = useState(event.facebookUrl || '');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
@@ -126,6 +128,11 @@ export default function EventEditModal({
         setError(t('updateError'));
         console.error('Error updating event:', updateError);
         return;
+      }
+
+      const finalImageUrl = imageUrl.trim();
+      if (initialImageUrl && initialImageUrl !== finalImageUrl) {
+        deleteFromCloudinary(initialImageUrl, event.id);
       }
 
       await revalidateEvents();
@@ -451,6 +458,7 @@ export default function EventEditModal({
                 <label className={labelClasses}>{t('eventImage')}</label>
                 <ImageUpload
                   value={imageUrl}
+                  initialValue={initialImageUrl}
                   onChange={setImageUrl}
                   disabled={isSubmitting || isDeleting}
                   eventId={event.id}

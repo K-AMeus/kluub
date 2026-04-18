@@ -3,9 +3,11 @@
 import { useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { SpinnerIcon, CloudUploadIcon, ImageIcon, CloseIcon } from './icons';
+import { deleteFromCloudinary } from '@/lib/cloudinary-client';
 
 interface ImageUploadProps {
   value: string;
+  initialValue?: string;
   onChange: (url: string) => void;
   disabled?: boolean;
   eventId?: string;
@@ -21,21 +23,9 @@ interface ImageUploadProps {
   };
 }
 
-const deleteFromCloudinary = async (url: string, eventId?: string) => {
-  if (!url.includes('res.cloudinary.com')) return;
-  try {
-    await fetch('/api/cloudinary/delete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, ...(eventId ? { eventId } : {}) }),
-    });
-  } catch {
-    // Silent fail - don't block UX for cleanup
-  }
-};
-
 export default function ImageUpload({
   value,
+  initialValue = '',
   onChange,
   disabled = false,
   eventId,
@@ -80,6 +70,10 @@ export default function ImageUpload({
       if (!response.ok) throw new Error('Upload failed');
 
       const data = await response.json();
+      const prev = value;
+      if (prev && prev !== initialValue) {
+        deleteFromCloudinary(prev, eventId);
+      }
       onChange(data.url);
     } catch {
       setError(labels.uploadFailed);
@@ -89,7 +83,9 @@ export default function ImageUpload({
   };
 
   const handleRemove = () => {
-    if (value) deleteFromCloudinary(value, eventId);
+    if (value && value !== initialValue) {
+      deleteFromCloudinary(value, eventId);
+    }
     onChange('');
   };
 

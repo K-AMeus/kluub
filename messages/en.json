@@ -28,7 +28,7 @@
     "noEvents": "No events found",
     "noEventsHint": "Try adjusting your filters",
     "free": "FREE",
-    "facebookEvent": "Facebook Event",
+    "facebookEvent": "Event",
     "topPicks": "Top Pick",
     "today": "Today",
     "tomorrow": "Tomorrow",
@@ -50,7 +50,11 @@
     "retry": "Retry"
   },
   "eventDetail": {
-    "backToEvents": "Back to Events"
+    "backToEvents": "Back to Events",
+    "venueLabel": "Venue",
+    "timeLabel": "Time",
+    "priceLabel": "Price",
+    "hostedBy": "Host"
   },
   "errors": {
     "notFoundTitle": "Page not found",

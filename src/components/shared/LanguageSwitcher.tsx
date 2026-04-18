@@ -14,12 +14,18 @@ export default function LanguageSwitcher() {
   const pathname = usePathname();
 
   return (
-    <div className='flex items-center shrink-0 gap-1'>
-      {routing.locales.map((loc) =>
-        locale === loc ? (
+    <div className='inline-flex items-stretch shrink-0 border border-white/15'>
+      {routing.locales.map((loc, i) => {
+        const isActive = locale === loc;
+        const baseClasses =
+          'px-2.5 py-1.5 text-[10px] md:text-[11px] font-sans font-semibold uppercase tracking-wider leading-none flex items-center transition-colors duration-200';
+        const dividerClass = i > 0 ? 'border-l border-white/15' : '';
+
+        return isActive ? (
           <span
             key={loc}
-            className='px-2 py-1 text-[11px] font-sans font-semibold uppercase tracking-wider text-[#E4DD3B] cursor-default'
+            aria-current='true'
+            className={`${baseClasses} ${dividerClass} bg-[#E4DD3B] text-black cursor-default`}
           >
             {LOCALE_LABELS[loc]}
           </span>
@@ -28,12 +34,12 @@ export default function LanguageSwitcher() {
             key={loc}
             href={pathname}
             locale={loc}
-            className='px-2 py-1 text-[11px] font-sans font-semibold uppercase tracking-wider text-white/40 hover:text-white transition-colors duration-200'
+            className={`${baseClasses} ${dividerClass} text-white/50 hover:text-white hover:bg-white/5`}
           >
             {LOCALE_LABELS[loc]}
           </Link>
-        )
-      )}
+        );
+      })}
     </div>
   );
 }

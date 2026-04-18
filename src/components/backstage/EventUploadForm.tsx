@@ -43,6 +43,7 @@ export default function EventUploadForm() {
   const [venueId, setVenueId] = useState('');
   const [city, setCity] = useState<City>('TARTU');
   const [imageUrl, setImageUrl] = useState('');
+  const [initialImageUrl, setInitialImageUrl] = useState('');
   const [facebookUrl, setFacebookUrl] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
@@ -95,6 +96,7 @@ export default function EventUploadForm() {
       setVenueId(event.venueId);
       setCity(event.city);
       setImageUrl(event.imageUrl || '');
+      setInitialImageUrl(event.imageUrl || '');
       setFacebookUrl(event.facebookUrl || '');
 
       setStartTime(formatDateTimeForInput(event.startTime));
@@ -140,6 +142,7 @@ export default function EventUploadForm() {
     setIsFree(true);
     setPrice('');
     setImageUrl('');
+    setInitialImageUrl('');
     setFacebookUrl('');
     setStartTime('');
     setEndTime('');
@@ -652,6 +655,7 @@ export default function EventUploadForm() {
               <label className={labelClasses}>{t('eventImage')}</label>
               <ImageUpload
                 value={imageUrl}
+                initialValue={initialImageUrl}
                 onChange={setImageUrl}
                 disabled={isSubmitting}
                 labels={{
