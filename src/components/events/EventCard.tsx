@@ -37,7 +37,13 @@ export default function EventCard({ event, translations }: EventCardProps) {
 
       {event.topPick && (
         <div className='absolute -top-2 right-3 md:right-4 z-30 bg-[#E4DD3B] text-black px-2.5 py-1 text-[10px] md:text-[11px] font-sans font-bold uppercase tracking-wider flex items-center gap-1 shadow-[0_2px_8px_rgba(228,221,59,0.3)]'>
-          <svg width='12' height='12' viewBox='0 0 24 24' fill='currentColor' className='shrink-0'>
+          <svg
+            width='12'
+            height='12'
+            viewBox='0 0 24 24'
+            fill='currentColor'
+            className='shrink-0'
+          >
             <path d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z' />
           </svg>
           {translations.topPicks}
@@ -104,9 +110,10 @@ export default function EventCard({ event, translations }: EventCardProps) {
                 eventId={event.id}
                 eventTitle={event.title}
                 venueId={event.venueId}
-                className='relative z-20 text-[#E4DD3B] hover:text-[#E4DD3B]/80 transition-colors'
+                aria-label={translations.facebookEvent}
+                className='relative z-20 inline-flex items-center justify-center w-8 h-8 border border-[#E4DD3B]/40 hover:border-[#E4DD3B] hover:bg-[#E4DD3B]/10 text-[#E4DD3B] transition-colors'
               >
-                <FacebookIcon size={16} />
+                <FacebookIcon size={14} />
               </FacebookEventLink>
             )}
           </div>
@@ -140,9 +147,9 @@ export default function EventCard({ event, translations }: EventCardProps) {
               eventId={event.id}
               eventTitle={event.title}
               venueId={event.venueId}
-              className='relative z-20 flex items-center gap-2.5 text-sm text-white/95 hover:text-[#E4DD3B] transition-colors mt-2 pt-3 border-t border-white/10'
+              className='relative z-20 mt-2 self-start inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 border border-[#E4DD3B]/40 hover:border-[#E4DD3B] hover:bg-[#E4DD3B]/10 text-[#E4DD3B] font-sans text-[10px] font-semibold uppercase tracking-wider transition-colors'
             >
-              <FacebookIcon size={16} className='text-[#E4DD3B] shrink-0' />
+              <FacebookIcon size={13} />
               <span>{translations.facebookEvent}</span>
             </FacebookEventLink>
           )}

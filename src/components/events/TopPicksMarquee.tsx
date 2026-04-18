@@ -4,16 +4,20 @@ import Image from 'next/image';
 import Marquee from 'react-fast-marquee';
 import { Link } from '@/i18n/navigation';
 import { Event } from '@/lib/types';
-import { TIMEZONE, getDateFormatter } from '@/lib/date-utils';
+import {
+  TIMEZONE,
+  getDateFormatter,
+  getDateLocale,
+} from '@/lib/date-utils';
 import { DEFAULT_EVENT_IMAGE } from '@/lib/constants';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface TopPicksMarqueeProps {
   events: Event[];
 }
 
-function formatDate(dateString: string): string {
-  return getDateFormatter('en-US', {
+function formatDate(dateString: string, locale: string): string {
+  return getDateFormatter(getDateLocale(locale), {
     month: 'short',
     day: 'numeric',
     timeZone: TIMEZONE,
@@ -24,6 +28,7 @@ function TopPickCard({ event }: { event: Event }) {
   const citySlug = event.city.toLowerCase();
   const imageUrl = event.imageUrl || DEFAULT_EVENT_IMAGE;
   const t = useTranslations('eventsPage');
+  const locale = useLocale();
   
 
   return (
@@ -51,14 +56,20 @@ function TopPickCard({ event }: { event: Event }) {
           </div>
         </div>
 
-        <div className='absolute bottom-0 left-0 right-0 bg-black/80 backdrop-blur-[2px] px-2 py-1.5 md:px-3 md:py-2'>
+        <div
+          aria-hidden='true'
+          className='pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-linear-to-t from-black/95 via-black/55 to-transparent'
+        />
+
+        <div className='absolute bottom-0 left-0 right-0 px-2 pt-6 pb-2 md:px-3 md:pt-10 md:pb-2.5'>
           <h3 className='text-white font-display text-xs md:text-base uppercase tracking-wide line-clamp-1 group-hover:text-[#E4DD3B] transition-colors'>
             {event.title}
           </h3>
-          <div className='flex items-center gap-1.5 md:gap-2 mt-0.5 text-[9px] md:text-xs text-white/90'>
-            <span className='truncate max-w-20 md:max-w-40'>{event.venue}</span>
-            <span className='text-[#E4DD3B]/70'>•</span>
-            <span>{formatDate(event.startTime)}</span>
+          <div className='mt-0.5 md:mt-1 flex items-center justify-between gap-2 font-sans text-[10px] md:text-[11px] font-semibold uppercase tracking-[0.12em]'>
+            <span className='truncate text-white/60'>{event.venue}</span>
+            <span className='shrink-0 text-[#E4DD3B]'>
+              {formatDate(event.startTime, locale)}
+            </span>
           </div>
         </div>
       </div>

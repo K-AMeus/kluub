@@ -215,12 +215,14 @@ async function fetchEventById(id: string): Promise<Event | null> {
     .from('events')
     .select(EVENT_SELECT)
     .eq('id', id)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error fetching event by id:', error);
     return null;
   }
+
+  if (!data) return null;
 
   return transformEvent(data as unknown as EventDbRow);
 }
