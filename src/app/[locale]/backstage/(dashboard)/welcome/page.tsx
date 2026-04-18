@@ -52,18 +52,28 @@ export default function WelcomePage() {
         const supabase = createBrowserSupabaseClient();
         const now = new Date().toISOString();
 
+        type DashboardEventRow = {
+          id: string;
+          title: string;
+          start_time: string;
+          venues: { name: string } | { name: string }[] | null;
+        };
         const { data: allEvents } = await supabase
           .from('events')
           .select('id, title, start_time, venues(name)')
           .in('host_id', hostIds)
           .order('start_time', { ascending: true });
 
-        const events = (allEvents ?? []).map((row: any) => ({
-          id: row.id,
-          title: row.title,
-          startTime: row.start_time,
-          venue: row.venues?.name || '',
-        }));
+        const events = ((allEvents ?? []) as unknown as DashboardEventRow[]).map(
+          (row) => ({
+            id: row.id,
+            title: row.title,
+            startTime: row.start_time,
+            venue: Array.isArray(row.venues)
+              ? row.venues[0]?.name ?? ''
+              : row.venues?.name ?? '',
+          }),
+        );
 
         const upcomingCount = events.filter(e => e.startTime >= now).length;
         const pastCount = events.filter(e => e.startTime < now).length;

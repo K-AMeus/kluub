@@ -17,9 +17,12 @@ const SECURITY_HEADERS = [
   },
 ];
 
+const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -28,6 +31,9 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
+        pathname: CLOUDINARY_CLOUD_NAME
+          ? `/${CLOUDINARY_CLOUD_NAME}/**`
+          : '/**',
       },
     ],
   },

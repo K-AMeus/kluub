@@ -51,3 +51,16 @@ export function formatTime(dateString?: string): string {
   const date = dateString ? new Date(dateString) : new Date();
   return getDateFormatter('et-EE', TALLINN_HM).format(date);
 }
+
+export function getDateLocale(locale: string): string {
+  return locale === 'et' ? 'et-EE' : 'en-US';
+}
+
+export function getLocalizedWeekdays(locale: string): string[] {
+  const fmt = getDateFormatter(getDateLocale(locale), { weekday: 'narrow' });
+  const weekdays: string[] = [];
+  for (let i = 0; i < 7; i++) {
+    weekdays.push(fmt.format(new Date(2025, 0, 6 + i)).toUpperCase());
+  }
+  return weekdays;
+}

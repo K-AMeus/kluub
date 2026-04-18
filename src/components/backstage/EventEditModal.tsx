@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { createBrowserSupabaseClient } from '@/supabase/client';
 import type { City, Event, Venue } from '@/lib/types';
 import { useRouter } from 'next/navigation';
-import { formatDateTimeForInput } from '@/lib/event-utils';
+import { formatDateTimeForInput, isValidUrl } from '@/lib/event-utils';
 import { deleteEventWithImage, revalidateEvents } from '@/lib/db';
 import ImageUpload from '@/components/shared/ImageUpload';
 import DateTimePicker from '@/components/backstage/DateTimePicker';
@@ -57,15 +57,6 @@ export default function EventEditModal({
     setStartTime(formatDateTimeForInput(event.startTime));
     setEndTime(formatDateTimeForInput(event.endTime));
   }, [event]);
-
-  const isValidUrl = (url: string): boolean => {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  };
 
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};

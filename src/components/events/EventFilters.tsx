@@ -3,7 +3,13 @@
 import { useState, useEffect, useRef, ReactNode } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { City, DEFAULT_EVENT_FILTERS, VenueOption } from '@/lib/types';
-import { TIMEZONE, getTodayInTallinn, getDateFormatter } from '@/lib/date-utils';
+import {
+  TIMEZONE,
+  getTodayInTallinn,
+  getDateFormatter,
+  getDateLocale,
+  getLocalizedWeekdays,
+} from '@/lib/date-utils';
 import { ChevronDownIcon, CloseIcon } from '@/components/shared/icons';
 import { getVenuesByCity } from '@/lib/db';
 
@@ -25,9 +31,8 @@ interface EventFiltersProps {
 const initialFilters: EventFilters = DEFAULT_EVENT_FILTERS;
 
 function formatDay(dateStr: string, locale: string): string {
-  const dateLocale = locale === 'et' ? 'et-EE' : 'en-US';
   const date = new Date(dateStr + 'T12:00:00');
-  return getDateFormatter(dateLocale, {
+  return getDateFormatter(getDateLocale(locale), {
     month: 'short',
     day: 'numeric',
     timeZone: TIMEZONE,
@@ -64,16 +69,6 @@ function formatDateShort(
     return `${formatDay(start, locale)} – ${formatDay(end, locale)}`;
   }
   return formatDay(start || end!, locale);
-}
-
-function getLocalizedWeekdays(locale: string): string[] {
-  const dateLocale = locale === 'et' ? 'et-EE' : 'en-US';
-  const fmt = getDateFormatter(dateLocale, { weekday: 'narrow' });
-  const weekdays: string[] = [];
-  for (let i = 0; i < 7; i++) {
-    weekdays.push(fmt.format(new Date(2025, 0, 6 + i)).toUpperCase());
-  }
-  return weekdays;
 }
 
 function BottomSheet({
@@ -203,8 +198,7 @@ function DateRangeCalendar({
   const firstDayOfMonth = new Date(year, month, 1).getDay();
   const startOffset = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
 
-  const dateLocale = locale === 'et' ? 'et-EE' : 'en-US';
-  const monthName = getDateFormatter(dateLocale, {
+  const monthName = getDateFormatter(getDateLocale(locale), {
     month: 'long',
     year: 'numeric',
     timeZone: TIMEZONE,
@@ -498,9 +492,20 @@ export default function EventFiltersComponent({
         setVenueDropdownOpen(false);
       }
     };
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      setDatePickerOpen(false);
+      setVenueDropdownOpen(false);
+      setMobileDateSheetOpen(false);
+      setMobileVenueSheetOpen(false);
+    };
 
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKey);
+    };
   }, []);
 
   useEffect(() => {

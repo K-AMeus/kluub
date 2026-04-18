@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useMounted } from '@/lib/hooks';
 import { useTranslations, useLocale } from 'next-intl';
 import { useBackstage } from '@/components/backstage/BackstageProvider';
-import { getDateFormatter } from '@/lib/date-utils';
+import { getDateFormatter, getDateLocale } from '@/lib/date-utils';
 
 interface HostAnalyticsItem {
   host: { id: string; name: string };
@@ -230,8 +230,9 @@ export default function AnalyticsPage() {
               <BarGraph
                 data={viewsByWeekday}
                 labels={(() => {
-                  const dateLocale = locale === 'et' ? 'et-EE' : 'en-US';
-                  const fmt = getDateFormatter(dateLocale, { weekday: 'short' });
+                  const fmt = getDateFormatter(getDateLocale(locale), {
+                    weekday: 'short',
+                  });
                   return Array.from({ length: 7 }, (_, i) =>
                     fmt.format(new Date(2025, 0, 6 + i)),
                   );

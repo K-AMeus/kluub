@@ -3,8 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { createBrowserSupabaseClient } from '@/supabase/client';
-import { useRouter } from 'next/navigation';
+import { signOutAction } from '@/lib/auth-actions';
 
 interface BackstageSidebarProps {
   isOpen: boolean;
@@ -15,13 +14,10 @@ export default function BackstageSidebar({ isOpen, onClose }: BackstageSidebarPr
   const pathname = usePathname();
   const locale = useLocale();
   const t = useTranslations('backstage');
-  const router = useRouter();
-  const supabase = createBrowserSupabaseClient();
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push('/backstage');
     onClose();
+    await signOutAction(locale);
   };
 
   const navItems = [

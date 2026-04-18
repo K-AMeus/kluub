@@ -70,6 +70,22 @@ interface EventDbRow {
   venues: { name: string } | null;
 }
 
+const EVENT_SELECT = `
+  id,
+  title,
+  description,
+  price,
+  host_id,
+  venue_id,
+  city,
+  top_pick,
+  image_url,
+  facebook_url,
+  start_time,
+  end_time,
+  venues (name)
+` as const;
+
 function transformEvent(row: EventDbRow): Event {
   return {
     id: row.id,
@@ -102,23 +118,7 @@ async function fetchEvents(
 
   let query = supabase
     .from('events')
-    .select(
-      `
-      id,
-      title,
-      description,
-      price,
-      host_id,
-      venue_id,
-      city,
-      top_pick,
-      image_url,
-      facebook_url,
-      start_time,
-      end_time,
-      venues (name)
-    `,
-    )
+    .select(EVENT_SELECT)
     .eq('city', city)
     .gte('start_time', new Date().toISOString())
     .order('start_time', { ascending: true });
@@ -185,23 +185,7 @@ async function fetchTopPicks(city: City): Promise<Event[]> {
 
   const { data, error } = await supabase
     .from('events')
-    .select(
-      `
-      id,
-      title,
-      description,
-      price,
-      host_id,
-      venue_id,
-      city,
-      top_pick,
-      image_url,
-      facebook_url,
-      start_time,
-      end_time,
-      venues (name)
-    `,
-    )
+    .select(EVENT_SELECT)
     .eq('city', city)
     .eq('top_pick', true)
     .gte('start_time', new Date().toISOString())
@@ -229,23 +213,7 @@ async function fetchEventById(id: string): Promise<Event | null> {
 
   const { data, error } = await supabase
     .from('events')
-    .select(
-      `
-      id,
-      title,
-      description,
-      price,
-      host_id,
-      venue_id,
-      city,
-      top_pick,
-      image_url,
-      facebook_url,
-      start_time,
-      end_time,
-      venues (name)
-    `,
-    )
+    .select(EVENT_SELECT)
     .eq('id', id)
     .single();
 

@@ -79,9 +79,12 @@ export default function BackstageProvider({
           return;
         }
 
-        const hostsList = (hostUsersResult.data
-          ?.map((hu: any) => hu.hosts as Host | null)
-          .filter(Boolean) || []) as Host[];
+        type HostUserRow = { host_id: string; hosts: Host | Host[] | null };
+        const hostsList: Host[] = ((hostUsersResult.data ?? []) as HostUserRow[])
+          .flatMap((hu) =>
+            Array.isArray(hu.hosts) ? hu.hosts : hu.hosts ? [hu.hosts] : [],
+          )
+          .filter((h): h is Host => Boolean(h));
 
         setHosts(hostsList);
 
