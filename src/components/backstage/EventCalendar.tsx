@@ -3,7 +3,12 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { TIMEZONE } from '@/lib/date-utils';
+import {
+  TIMEZONE,
+  getDateFormatter,
+  getTallinnDateString,
+  getTodayInTallinn,
+} from '@/lib/date-utils';
 
 interface CalendarEvent {
   id: string;
@@ -17,12 +22,10 @@ interface EventCalendarProps {
 
 function getLocalizedWeekdays(locale: string): string[] {
   const dateLocale = locale === 'et' ? 'et-EE' : 'en-US';
+  const fmt = getDateFormatter(dateLocale, { weekday: 'narrow' });
   const weekdays: string[] = [];
   for (let i = 0; i < 7; i++) {
-    const date = new Date(2025, 0, 6 + i);
-    weekdays.push(
-      date.toLocaleDateString(dateLocale, { weekday: 'narrow' }).toUpperCase()
-    );
+    weekdays.push(fmt.format(new Date(2025, 0, 6 + i)).toUpperCase());
   }
   return weekdays;
 }
@@ -31,18 +34,21 @@ export default function EventCalendar({ events }: EventCalendarProps) {
   const locale = useLocale();
   const router = useRouter();
   const [currentDate, setCurrentDate] = useState(() => new Date());
-  const [popover, setPopover] = useState<{ day: number; events: CalendarEvent[] } | null>(null);
+  const [popover, setPopover] = useState<{
+    day: number;
+    events: CalendarEvent[];
+  } | null>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
   const dateLocale = locale === 'et' ? 'et-EE' : 'en-US';
-  const monthLabel = currentDate.toLocaleDateString(dateLocale, {
+  const monthLabel = getDateFormatter(dateLocale, {
     month: 'long',
     year: 'numeric',
     timeZone: TIMEZONE,
-  });
+  }).format(currentDate);
 
   const weekdays = getLocalizedWeekdays(locale);
 
@@ -50,11 +56,12 @@ export default function EventCalendar({ events }: EventCalendarProps) {
   const eventsByDay = useMemo(() => {
     const map = new Map<number, CalendarEvent[]>();
     for (const event of events) {
-      const d = new Date(event.startTime);
-      const eventYear = parseInt(d.toLocaleDateString('en-CA', { timeZone: TIMEZONE, year: 'numeric' }));
-      const eventMonth = parseInt(d.toLocaleDateString('en-CA', { timeZone: TIMEZONE, month: 'numeric' })) - 1;
-      const eventDay = parseInt(d.toLocaleDateString('en-CA', { timeZone: TIMEZONE, day: 'numeric' }));
-      if (eventYear === year && eventMonth === month) {
+      const [eventYear, eventMonth, eventDay] = getTallinnDateString(
+        new Date(event.startTime),
+      )
+        .split('-')
+        .map(Number);
+      if (eventYear === year && eventMonth - 1 === month) {
         const existing = map.get(eventDay) || [];
         existing.push(event);
         map.set(eventDay, existing);
@@ -64,9 +71,18 @@ export default function EventCalendar({ events }: EventCalendarProps) {
   }, [events, year, month]);
 
   // Calendar grid
-  const firstDayOfMonth = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(
-    new Intl.DateTimeFormat('en-US', { weekday: 'short', timeZone: TIMEZONE })
-      .format(new Date(`${year}-${String(month + 1).padStart(2, '0')}-01T12:00:00Z`))
+  const firstDayOfMonth = [
+    'Sun',
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat',
+  ].indexOf(
+    getDateFormatter('en-US', { weekday: 'short', timeZone: TIMEZONE }).format(
+      new Date(`${year}-${String(month + 1).padStart(2, '0')}-01T12:00:00Z`),
+    ),
   );
   const startOffset = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -77,7 +93,7 @@ export default function EventCalendar({ events }: EventCalendarProps) {
   // Pad to 6 rows (42 cells) so the calendar height never changes
   while (days.length < 42) days.push(null);
 
-  const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: TIMEZONE });
+  const todayStr = getTodayInTallinn();
   const formatDayToString = (day: number): string => {
     const m = String(month + 1).padStart(2, '0');
     const d = String(day).padStart(2, '0');
@@ -110,7 +126,10 @@ export default function EventCalendar({ events }: EventCalendarProps) {
   // Close popover on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
+      if (
+        popoverRef.current &&
+        !popoverRef.current.contains(e.target as Node)
+      ) {
         setPopover(null);
       }
     };
@@ -130,17 +149,39 @@ export default function EventCalendar({ events }: EventCalendarProps) {
             onClick={prevMonth}
             className='p-1.5 text-white/50 hover:text-[#E4DD3B] transition-colors cursor-pointer'
           >
-            <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
-              <path strokeLinecap='round' strokeLinejoin='round' d='M15.75 19.5L8.25 12l7.5-7.5' />
+            <svg
+              className='w-4 h-4'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                d='M15.75 19.5L8.25 12l7.5-7.5'
+              />
             </svg>
           </button>
-          <span className='text-white font-medium text-sm capitalize'>{monthLabel}</span>
+          <span className='text-white font-medium text-sm capitalize'>
+            {monthLabel}
+          </span>
           <button
             onClick={nextMonth}
             className='p-1.5 text-white/50 hover:text-[#E4DD3B] transition-colors cursor-pointer'
           >
-            <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24' strokeWidth={2}>
-              <path strokeLinecap='round' strokeLinejoin='round' d='M8.25 4.5l7.5 7.5-7.5 7.5' />
+            <svg
+              className='w-4 h-4'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                d='M8.25 4.5l7.5 7.5-7.5 7.5'
+              />
             </svg>
           </button>
         </div>
@@ -148,7 +189,10 @@ export default function EventCalendar({ events }: EventCalendarProps) {
         {/* Weekday headers */}
         <div className='grid grid-cols-7 gap-1 mb-2'>
           {weekdays.map((day, i) => (
-            <div key={i} className='text-center text-[10px] text-white/40 font-semibold py-1'>
+            <div
+              key={i}
+              className='text-center text-[10px] text-white/40 font-semibold py-1'
+            >
               {day}
             </div>
           ))}
@@ -183,7 +227,10 @@ export default function EventCalendar({ events }: EventCalendarProps) {
                 {hasEvents && !isSelected && (
                   <div className='absolute bottom-0.5 flex gap-0.5'>
                     {dayEvents.slice(0, 3).map((_, j) => (
-                      <div key={j} className='w-1 h-1 rounded-full bg-[#E4DD3B]' />
+                      <div
+                        key={j}
+                        className='w-1 h-1 rounded-full bg-[#E4DD3B]'
+                      />
                     ))}
                   </div>
                 )}
@@ -208,14 +255,16 @@ export default function EventCalendar({ events }: EventCalendarProps) {
                 onClick={() => handleEventClick(event.id)}
                 className='w-full text-left px-3 py-2.5 hover:bg-white/5 transition-colors duration-75 cursor-pointer border-b border-white/5 last:border-b-0'
               >
-                <p className='text-white text-sm font-medium truncate'>{event.title}</p>
+                <p className='text-white text-sm font-medium truncate'>
+                  {event.title}
+                </p>
                 <p className='text-white/40 text-xs mt-0.5'>
-                  {new Date(event.startTime).toLocaleTimeString(dateLocale, {
+                  {getDateFormatter(dateLocale, {
                     timeZone: TIMEZONE,
                     hour: '2-digit',
                     minute: '2-digit',
                     hour12: false,
-                  })}
+                  }).format(new Date(event.startTime))}
                 </p>
               </button>
             ))}

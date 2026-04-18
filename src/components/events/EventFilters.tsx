@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, ReactNode } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { City, DEFAULT_EVENT_FILTERS, VenueOption } from '@/lib/types';
-import { TIMEZONE, getTodayInTallinn } from '@/lib/date-utils';
+import { TIMEZONE, getTodayInTallinn, getDateFormatter } from '@/lib/date-utils';
 import { ChevronDownIcon, CloseIcon } from '@/components/shared/icons';
 import { getVenuesByCity } from '@/lib/db';
 
@@ -27,11 +27,11 @@ const initialFilters: EventFilters = DEFAULT_EVENT_FILTERS;
 function formatDay(dateStr: string, locale: string): string {
   const dateLocale = locale === 'et' ? 'et-EE' : 'en-US';
   const date = new Date(dateStr + 'T12:00:00');
-  return date.toLocaleDateString(dateLocale, {
+  return getDateFormatter(dateLocale, {
     month: 'short',
     day: 'numeric',
     timeZone: TIMEZONE,
-  });
+  }).format(date);
 }
 
 function formatDateDisplay(
@@ -68,12 +68,10 @@ function formatDateShort(
 
 function getLocalizedWeekdays(locale: string): string[] {
   const dateLocale = locale === 'et' ? 'et-EE' : 'en-US';
+  const fmt = getDateFormatter(dateLocale, { weekday: 'narrow' });
   const weekdays: string[] = [];
   for (let i = 0; i < 7; i++) {
-    const date = new Date(2025, 0, 6 + i);
-    weekdays.push(
-      date.toLocaleDateString(dateLocale, { weekday: 'narrow' }).toUpperCase()
-    );
+    weekdays.push(fmt.format(new Date(2025, 0, 6 + i)).toUpperCase());
   }
   return weekdays;
 }
@@ -206,11 +204,11 @@ function DateRangeCalendar({
   const startOffset = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
 
   const dateLocale = locale === 'et' ? 'et-EE' : 'en-US';
-  const monthName = viewDate.toLocaleDateString(dateLocale, {
+  const monthName = getDateFormatter(dateLocale, {
     month: 'long',
     year: 'numeric',
     timeZone: TIMEZONE,
-  });
+  }).format(viewDate);
 
   const weekdays = getLocalizedWeekdays(locale);
 

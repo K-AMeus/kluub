@@ -9,6 +9,7 @@ import { useBackstage } from '@/components/backstage/BackstageProvider';
 import EventEditModal from '@/components/backstage/EventEditModal';
 import type { Event } from '@/lib/types';
 import { formatDateTimeWithYear } from '@/lib/event-utils';
+import { getDateFormatter } from '@/lib/date-utils';
 
 interface EventAnalyticsData {
   detailViews: number;
@@ -271,7 +272,7 @@ export default function MyEventsPage() {
                         <div className={`flex items-center gap-3 ${index > 0 ? 'mt-6' : ''} mb-3`}>
                           <div className='h-px flex-1 bg-[#E4DD3B]/15' />
                           <span className='text-[#E4DD3B]/70 text-xs font-bold uppercase tracking-widest'>
-                            {eventDate.toLocaleDateString(locale, { month: 'long', year: 'numeric' })}
+                            {getDateFormatter(locale, { month: 'long', year: 'numeric' }).format(eventDate)}
                           </span>
                           <div className='h-px flex-1 bg-[#E4DD3B]/15' />
                         </div>
@@ -287,7 +288,7 @@ export default function MyEventsPage() {
                             {/* Date badge */}
                             <div className='hidden sm:flex flex-col items-center justify-center w-12 h-12 bg-white/5 group-hover:bg-[#E4DD3B]/8 shrink-0 transition-colors duration-75 hover:duration-0'>
                               <span className='text-[10px] font-semibold text-white/50 uppercase leading-none'>
-                                {new Date(event.startTime).toLocaleDateString(locale, { month: 'short' })}
+                                {getDateFormatter(locale, { month: 'short' }).format(new Date(event.startTime))}
                               </span>
                               <span className='text-lg font-bold text-white leading-tight'>
                                 {new Date(event.startTime).getDate()}

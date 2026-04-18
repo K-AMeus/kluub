@@ -1,5 +1,5 @@
 import EventsHoneycombPattern from './EventsHoneycombPattern';
-import EventsParticleField from './EventsParticleField';
+import ParticleField from '@/components/shared/ParticleField';
 
 export default function EventsBackground() {
   return (
@@ -28,7 +28,7 @@ export default function EventsBackground() {
       <EventsHoneycombPattern />
 
       {/* Floating particles */}
-      <EventsParticleField />
+      <ParticleField variant='events' />
 
       {/* Grain texture overlay */}
       <div className='absolute inset-0 opacity-[0.02] bg-grain' />

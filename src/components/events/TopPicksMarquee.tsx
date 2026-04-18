@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Marquee from 'react-fast-marquee';
 import { Link } from '@/i18n/navigation';
 import { Event } from '@/lib/types';
-import { TIMEZONE } from '@/lib/date-utils';
+import { TIMEZONE, getDateFormatter } from '@/lib/date-utils';
 import { DEFAULT_EVENT_IMAGE } from '@/lib/constants';
 import { useTranslations } from 'next-intl';
 
@@ -13,12 +13,11 @@ interface TopPicksMarqueeProps {
 }
 
 function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
+  return getDateFormatter('en-US', {
     month: 'short',
     day: 'numeric',
     timeZone: TIMEZONE,
-  });
+  }).format(new Date(dateString));
 }
 
 function TopPickCard({ event }: { event: Event }) {
