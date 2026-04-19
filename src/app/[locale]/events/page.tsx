@@ -1,5 +1,10 @@
-import { redirect } from "next/navigation";
+import { redirect } from 'next/navigation';
 
-export default function EventsRedirect() {
-  redirect("/events/tartu");
+export default async function EventsRedirect({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  redirect(`/${locale}/events/tartu`);
 }
