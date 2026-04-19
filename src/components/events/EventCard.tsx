@@ -36,13 +36,11 @@ export default function EventCard({ event, translations }: EventCardProps) {
       <div className='hidden md:block absolute inset-0 bg-[#E4DD3B] translate-x-2 translate-y-2 transition-transform duration-200 group-hover:translate-x-0 group-hover:translate-y-0' />
 
       {event.topPick && (
-        <div className='absolute -top-2 right-3 md:right-4 z-30 bg-[#E4DD3B] text-black px-2.5 py-1 text-[10px] md:text-[11px] font-sans font-bold uppercase tracking-wider flex items-center gap-1 shadow-[0_2px_8px_rgba(228,221,59,0.3)]'>
+        <div className='absolute -top-1.5 md:-top-2 right-3 md:right-4 z-30 bg-[#E4DD3B] text-black px-1.5 py-0.5 md:px-2.5 md:py-1 text-[9px] md:text-[11px] font-sans font-bold uppercase tracking-wider flex items-center gap-1 shadow-[0_2px_8px_rgba(228,221,59,0.3)]'>
           <svg
-            width='12'
-            height='12'
             viewBox='0 0 24 24'
             fill='currentColor'
-            className='shrink-0'
+            className='shrink-0 w-2.5 h-2.5 md:w-3 md:h-3'
           >
             <path d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z' />
           </svg>
@@ -71,7 +69,7 @@ export default function EventCard({ event, translations }: EventCardProps) {
         </div>
 
         {/* Main Content */}
-        <div className='flex-1 flex flex-col justify-between min-w-0 py-4 pr-4 md:p-5 lg:p-8'>
+        <div className='flex-1 flex flex-col md:justify-between min-w-0 py-4 pr-4 md:p-5 lg:p-8'>
           <div>
             <h3 className='text-white font-display text-base md:text-lg lg:text-xl uppercase tracking-wide line-clamp-2 md:group-hover:text-[#E4DD3B] transition-colors'>
               {event.title}
@@ -95,27 +93,11 @@ export default function EventCard({ event, translations }: EventCardProps) {
                   {formatTime(event.startTime)} – {formatTime(event.endTime)}
                 </span>
               </div>
+              <div className='flex items-center gap-2 text-xs text-white/95'>
+                <TicketIcon size={14} className='text-[#E4DD3B] shrink-0' />
+                <span>{priceDisplay}</span>
+              </div>
             </div>
-          </div>
-
-          {/* Bottom row - mobile */}
-          <div className='md:hidden flex items-center justify-between mt-2'>
-            <div className='flex items-center gap-2 text-xs'>
-              <TicketIcon size={14} className='text-[#E4DD3B]' />
-              <span className='text-white/95'>{priceDisplay}</span>
-            </div>
-            {event.facebookUrl && (
-              <FacebookEventLink
-                href={event.facebookUrl}
-                eventId={event.id}
-                eventTitle={event.title}
-                venueId={event.venueId}
-                aria-label={translations.facebookEvent}
-                className='relative z-20 inline-flex items-center justify-center w-8 h-8 border border-[#E4DD3B]/40 hover:border-[#E4DD3B] hover:bg-[#E4DD3B]/10 text-[#E4DD3B] transition-colors'
-              >
-                <FacebookIcon size={14} />
-              </FacebookEventLink>
-            )}
           </div>
 
           {/* Read more - desktop only */}
@@ -124,6 +106,20 @@ export default function EventCard({ event, translations }: EventCardProps) {
             <ChevronRightIcon size={16} />
           </span>
         </div>
+
+        {/* Facebook button - mobile only (absolute, doesn't affect row heights) */}
+        {event.facebookUrl && (
+          <FacebookEventLink
+            href={event.facebookUrl}
+            eventId={event.id}
+            eventTitle={event.title}
+            venueId={event.venueId}
+            className='md:hidden absolute bottom-3 right-3 z-20 inline-flex items-center gap-1 px-1.5 py-1 border border-[#E4DD3B]/40 hover:border-[#E4DD3B] hover:bg-[#E4DD3B]/10 text-[#E4DD3B] font-sans text-[9px] font-semibold uppercase tracking-wider transition-colors'
+          >
+            <FacebookIcon size={11} />
+            <span>{translations.facebookEvent}</span>
+          </FacebookEventLink>
+        )}
 
         {/* Side Info - desktop only */}
         <div className='hidden md:flex w-56 lg:w-64 flex-col justify-center gap-3 p-5 lg:p-6 border-l border-white/10'>
