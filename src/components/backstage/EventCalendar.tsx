@@ -29,7 +29,15 @@ export default function EventCalendar({ events }: EventCalendarProps) {
   const [popover, setPopover] = useState<{
     day: number;
     events: CalendarEvent[];
-  } | null>(null);
+  } | null>(() => {
+    const today = getTodayInTallinn();
+    const [, , todayDay] = today.split('-').map(Number);
+    const todayEvents = events.filter(
+      (event) => getTallinnDateString(new Date(event.startTime)) === today,
+    );
+    if (todayEvents.length === 0) return null;
+    return { day: todayDay, events: todayEvents };
+  });
   const popoverRef = useRef<HTMLDivElement>(null);
 
   const year = currentDate.getFullYear();
