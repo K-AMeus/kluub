@@ -123,7 +123,7 @@ async function fetchEvents(
     .from('events')
     .select(EVENT_SELECT)
     .eq('city', city)
-    .gte('start_time', new Date().toISOString())
+    .gte('end_time', new Date().toISOString())
     .order('start_time', { ascending: true });
 
   if (filters.topPicks) {
@@ -191,7 +191,7 @@ async function fetchTopPicks(city: City): Promise<Event[]> {
     .select(EVENT_SELECT)
     .eq('city', city)
     .eq('top_pick', true)
-    .gte('start_time', new Date().toISOString())
+    .gte('end_time', new Date().toISOString())
     .order('start_time', { ascending: true });
 
   if (error) {
@@ -309,8 +309,9 @@ async function fetchVenuesByCity(city: City): Promise<VenueOption[]> {
 
   const { data, error } = await supabase
     .from('venues')
-    .select('id, name')
+    .select('id, name, events!inner(id)')
     .eq('city', city)
+    .gte('events.end_time', new Date().toISOString())
     .order('name', { ascending: true });
 
   if (error) {
@@ -318,12 +319,12 @@ async function fetchVenuesByCity(city: City): Promise<VenueOption[]> {
     return [];
   }
 
-  return data ?? [];
+  return (data ?? []).map(({ id, name }) => ({ id, name }));
 }
 
 export async function getVenuesByCity(city: City) {
   return unstable_cache(fetchVenuesByCity, ['venues-by-city', city], {
     revalidate: CACHE_REVALIDATE_SECONDS,
-    tags: ['venues'],
+    tags: ['venues', 'events'],
   })(city);
 }
