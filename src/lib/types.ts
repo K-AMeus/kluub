@@ -18,6 +18,7 @@ export interface Event {
   price: string;
   hostId: string;
   host: string;
+  hostWebsiteUrl: string | null;
   venueId: string;
   venue: string;
   city: City;

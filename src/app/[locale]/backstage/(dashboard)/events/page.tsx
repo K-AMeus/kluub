@@ -59,7 +59,7 @@ export default function MyEventsPage() {
           start_time,
           end_time,
           venues (name),
-          hosts (name)
+          hosts (name, website_url)
         `
         )
         .in('host_id', hostIds)
@@ -89,8 +89,8 @@ export default function MyEventsPage() {
         facebook_url: string | null;
         start_time: string;
         end_time: string;
-        venues: { name: string } | { name: string }[] | null;
-        hosts: { name: string } | { name: string }[] | null;
+        venues: { name: string } | null;
+        hosts: { name: string; website_url: string | null } | null;
       };
 
       ((eventsData ?? []) as unknown as MyEventRow[]).forEach((row) => {
@@ -100,13 +100,10 @@ export default function MyEventsPage() {
           description: row.description,
           price: row.price,
           hostId: row.host_id,
-          host: Array.isArray(row.hosts)
-            ? row.hosts[0]?.name ?? ''
-            : row.hosts?.name ?? '',
+          host: row.hosts?.name ?? '',
+          hostWebsiteUrl: row.hosts?.website_url ?? null,
           venueId: row.venue_id,
-          venue: Array.isArray(row.venues)
-            ? row.venues[0]?.name ?? ''
-            : row.venues?.name ?? '',
+          venue: row.venues?.name ?? '',
           city: row.city,
           topPick: row.top_pick,
           imageUrl: row.image_url,

@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidateTag, unstable_cache } from 'next/cache';
+import { revalidatePath, revalidateTag, unstable_cache } from 'next/cache';
 import { createClient, createStaticClient } from '@/supabase/server';
 import cloudinary, { parseCloudinaryPublicId } from '@/lib/cloudinary';
 import {
@@ -68,7 +68,7 @@ interface EventDbRow {
   start_time: string;
   end_time: string;
   venues: { name: string } | null;
-  hosts: { name: string } | null;
+  hosts: { name: string; website_url: string | null } | null;
 }
 
 const EVENT_SELECT = `
@@ -85,7 +85,7 @@ const EVENT_SELECT = `
   start_time,
   end_time,
   venues (name),
-  hosts (name)
+  hosts (name, website_url)
 ` as const;
 
 function transformEvent(row: EventDbRow): Event {
@@ -96,6 +96,7 @@ function transformEvent(row: EventDbRow): Event {
     price: row.price,
     hostId: row.host_id,
     host: row.hosts?.name ?? '',
+    hostWebsiteUrl: row.hosts?.website_url ?? null,
     venueId: row.venue_id,
     venue: row.venues?.name ?? 'Unknown Venue',
     city: row.city,
@@ -239,6 +240,9 @@ export async function getEventById(id: string) {
 
 export async function revalidateEvents() {
   revalidateTag('events', 'max');
+  revalidatePath('/[locale]/events/[city]', 'page');
+  revalidatePath('/[locale]/events/[city]/[eventId]', 'page');
+  revalidatePath('/[locale]', 'page');
 }
 
 export type DeleteEventResult =
