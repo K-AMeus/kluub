@@ -17,6 +17,7 @@ export interface Event {
   description: string;
   price: string;
   hostId: string;
+  host: string;
   venueId: string;
   venue: string;
   city: City;

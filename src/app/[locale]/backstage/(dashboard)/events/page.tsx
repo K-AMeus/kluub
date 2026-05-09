@@ -58,7 +58,8 @@ export default function MyEventsPage() {
           facebook_url,
           start_time,
           end_time,
-          venues (name)
+          venues (name),
+          hosts (name)
         `
         )
         .in('host_id', hostIds)
@@ -89,6 +90,7 @@ export default function MyEventsPage() {
         start_time: string;
         end_time: string;
         venues: { name: string } | { name: string }[] | null;
+        hosts: { name: string } | { name: string }[] | null;
       };
 
       ((eventsData ?? []) as unknown as MyEventRow[]).forEach((row) => {
@@ -98,6 +100,9 @@ export default function MyEventsPage() {
           description: row.description,
           price: row.price,
           hostId: row.host_id,
+          host: Array.isArray(row.hosts)
+            ? row.hosts[0]?.name ?? ''
+            : row.hosts?.name ?? '',
           venueId: row.venue_id,
           venue: Array.isArray(row.venues)
             ? row.venues[0]?.name ?? ''

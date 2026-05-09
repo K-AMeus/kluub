@@ -59,6 +59,10 @@ export default async function EventDetailPage({
     free: t('free'),
     facebookEvent: t('facebookEvent'),
     backToEvents: tDetail('backToEvents'),
+    venueLabel: tDetail('venueLabel'),
+    timeLabel: tDetail('timeLabel'),
+    priceLabel: tDetail('priceLabel'),
+    hostedBy: tDetail('hostedBy'),
   };
 
   const numericPrice =

@@ -7,7 +7,7 @@ import {
   TicketIcon,
   FacebookIcon,
   ArrowLeftIcon,
-  ChevronRightIcon,
+  UserIcon,
 } from '@/components/shared/icons';
 import { DEFAULT_EVENT_IMAGE } from '@/lib/constants';
 import {
@@ -23,12 +23,42 @@ interface EventDetailTranslations {
   free: string;
   facebookEvent: string;
   backToEvents: string;
+  venueLabel: string;
+  timeLabel: string;
+  priceLabel: string;
+  hostedBy: string;
 }
 
 interface EventDetailProps {
   event: Event;
   translations: EventDetailTranslations;
   locale: string;
+}
+
+function MetaField({
+  icon,
+  label,
+  value,
+  className = '',
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  className?: string;
+}) {
+  return (
+    <div className={`min-w-0 ${className}`}>
+      <div className='flex items-center gap-2'>
+        <span className='text-[#E4DD3B] shrink-0'>{icon}</span>
+        <p className='text-white/40 font-sans text-[10px] font-semibold uppercase tracking-[0.2em]'>
+          {label}
+        </p>
+      </div>
+      <p className='text-white font-sans text-sm md:text-base mt-1.5 wrap-break-word'>
+        {value}
+      </p>
+    </div>
+  );
 }
 
 function formatDateBubble(
@@ -122,37 +152,46 @@ export default function EventDetail({
             </div>
 
             <div className='p-4 md:p-6 lg:p-8'>
-              <h1 className='text-white font-display text-xl md:text-2xl lg:text-3xl uppercase tracking-wide mb-4 md:mb-6'>
+              <h1 className='text-white font-display text-xl md:text-2xl lg:text-3xl uppercase tracking-wide'>
                 {event.title}
               </h1>
 
-              <div className='space-y-2.5 md:grid md:grid-cols-3 md:gap-4 md:space-y-0 mb-4 md:mb-6 pb-4 md:pb-6 border-b border-white/10'>
-                <div className='flex items-center gap-2.5 md:gap-3'>
-                  <LocationIcon
-                    size={18}
-                    className='text-[#E4DD3B] shrink-0'
-                  />
-                  <span className='text-white/95 font-sans text-sm'>
-                    {event.venue}
-                  </span>
-                </div>
-                <div className='flex items-center gap-2.5 md:gap-3'>
-                  <CalendarIcon
-                    size={18}
-                    className='text-[#E4DD3B] shrink-0'
-                  />
-                  <span className='text-white/95 font-sans text-sm'>
-                    {formatTime(event.startTime)} –{' '}
-                    {formatTime(event.endTime)}
-                  </span>
-                </div>
-                <div className='flex items-center gap-2.5 md:gap-3'>
-                  <TicketIcon size={18} className='text-[#E4DD3B] shrink-0' />
-                  <span className='text-white/95 font-sans text-sm'>
-                    {priceDisplay}
-                  </span>
-                </div>
-              </div>
+              {(() => {
+                const hasHost =
+                  Boolean(event.host) && event.host !== event.venue;
+                return (
+                  <div
+                    className={`grid grid-cols-2 gap-x-5 gap-y-4 md:gap-0 mt-4 md:mt-6 mb-4 md:mb-6 pb-4 md:pb-6 border-b border-white/10 ${hasHost ? 'md:grid-cols-4' : 'md:grid-cols-3'}`}
+                  >
+                    <MetaField
+                      icon={<LocationIcon size={18} />}
+                      label={translations.venueLabel}
+                      value={event.venue}
+                      className='md:pr-6'
+                    />
+                    <MetaField
+                      icon={<CalendarIcon size={18} />}
+                      label={translations.timeLabel}
+                      value={`${formatTime(event.startTime)} – ${formatTime(event.endTime)}`}
+                      className='md:px-6 md:border-l md:border-white/10'
+                    />
+                    <MetaField
+                      icon={<TicketIcon size={18} />}
+                      label={translations.priceLabel}
+                      value={priceDisplay}
+                      className={`md:border-l md:border-white/10 ${hasHost ? 'md:px-6' : 'md:pl-6'}`}
+                    />
+                    {hasHost && (
+                      <MetaField
+                        icon={<UserIcon size={18} />}
+                        label={translations.hostedBy}
+                        value={event.host as string}
+                        className='md:pl-6 md:border-l md:border-white/10'
+                      />
+                    )}
+                  </div>
+                );
+              })()}
 
               <p className='text-white/95 font-sans text-sm md:text-base leading-relaxed whitespace-pre-line'>
                 {event.description}
@@ -165,14 +204,10 @@ export default function EventDetail({
                     eventId={event.id}
                     eventTitle={event.title}
                     venueId={event.venueId}
-                    className='group inline-flex items-center gap-2 md:gap-2.5 text-[#E4DD3B] hover:text-[#E4DD3B]/80 transition-colors font-sans text-sm'
+                    className='inline-flex items-center justify-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 md:py-2.5 border border-[#E4DD3B]/40 hover:border-[#E4DD3B] hover:bg-[#E4DD3B]/10 text-[#E4DD3B] font-sans text-[11px] md:text-xs font-semibold uppercase tracking-wider transition-colors'
                   >
-                    <FacebookIcon size={18} />
+                    <FacebookIcon size={12} className='md:w-3.5 md:h-3.5' />
                     <span>{translations.facebookEvent}</span>
-                    <ChevronRightIcon
-                      size={16}
-                      className='transition-transform group-hover:translate-x-1'
-                    />
                   </FacebookEventLink>
                 </div>
               )}
