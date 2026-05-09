@@ -45,7 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const { data: events } = await supabase
       .from('events')
       .select('id, city, start_time')
-      .gte('start_time', now.toISOString())
+      .gte('end_time', now.toISOString())
       .order('start_time', { ascending: true })
       .limit(500);
 
