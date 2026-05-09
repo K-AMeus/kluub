@@ -39,11 +39,13 @@ function MetaField({
   icon,
   label,
   value,
+  href,
   className = '',
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
+  href?: string;
   className?: string;
 }) {
   return (
@@ -54,9 +56,20 @@ function MetaField({
           {label}
         </p>
       </div>
-      <p className='text-white font-sans text-sm md:text-base mt-1.5 wrap-break-word'>
-        {value}
-      </p>
+      {href ? (
+        <a
+          href={href}
+          target='_blank'
+          rel='noopener noreferrer'
+          className='text-white font-sans text-sm md:text-base mt-1.5 wrap-break-word hover:text-[#E4DD3B] transition-colors underline underline-offset-2 decoration-white/30 hover:decoration-[#E4DD3B] inline-block'
+        >
+          {value}
+        </a>
+      ) : (
+        <p className='text-white font-sans text-sm md:text-base mt-1.5 wrap-break-word'>
+          {value}
+        </p>
+      )}
     </div>
   );
 }
@@ -186,6 +199,7 @@ export default function EventDetail({
                         icon={<UserIcon size={18} />}
                         label={translations.hostedBy}
                         value={event.host as string}
+                        href={event.hostWebsiteUrl ?? undefined}
                         className='md:pl-6 md:border-l md:border-white/10'
                       />
                     )}
