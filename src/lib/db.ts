@@ -68,6 +68,7 @@ interface EventDbRow {
   start_time: string;
   end_time: string;
   venues: { name: string } | null;
+  hosts: { name: string } | null;
 }
 
 const EVENT_SELECT = `
@@ -83,7 +84,8 @@ const EVENT_SELECT = `
   facebook_url,
   start_time,
   end_time,
-  venues (name)
+  venues (name),
+  hosts (name)
 ` as const;
 
 function transformEvent(row: EventDbRow): Event {
@@ -93,6 +95,7 @@ function transformEvent(row: EventDbRow): Event {
     description: row.description,
     price: row.price,
     hostId: row.host_id,
+    host: row.hosts?.name ?? '',
     venueId: row.venue_id,
     venue: row.venues?.name ?? 'Unknown Venue',
     city: row.city,
