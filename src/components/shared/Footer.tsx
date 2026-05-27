@@ -1,19 +1,15 @@
 import { useTranslations } from 'next-intl';
-import { InstagramIcon, FacebookFIcon, TikTokIcon } from './icons';
+import { Link } from '@/i18n/navigation';
+import { InstagramIcon, TikTokIcon } from './icons';
 
 const SOCIAL_LINKS = [
   {
-    href: 'https://instagram.com',
+    href: 'https://www.instagram.com/kluub.ee_',
     Icon: InstagramIcon,
     label: 'Instagram',
   },
   {
-    href: 'https://facebook.com',
-    Icon: FacebookFIcon,
-    label: 'Facebook',
-  },
-  {
-    href: 'https://tiktok.com',
+    href: 'https://www.tiktok.com/@kluub.ee_',
     Icon: TikTokIcon,
     label: 'TikTok',
   },
@@ -55,12 +51,12 @@ export default function Footer() {
 
           <div className='flex items-center gap-3 text-xs md:text-sm text-white/40'>
             <span>© Kluub {year}</span>
-            <a
-              href='#'
+            <Link
+              href='/privacy'
               className='hover:text-[#E4DD3B] transition-colors duration-300'
             >
               {t('privacy')}
-            </a>
+            </Link>
           </div>
         </div>
       </div>

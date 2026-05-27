@@ -88,6 +88,24 @@
     "ctaEmail": "info@kluub.ee",
     "joinNow": "Liitu kohe"
   },
+  "privacyPage": {
+    "title": "Privaatsuspoliitika",
+    "lastUpdated": "Viimati uuendatud: 27. mai 2026",
+    "introTitle": "Sissejuhatus",
+    "introBody": "Kluub.ee („Kluub\", „meie\") austab sinu privaatsust ning kaitseb sinu isikuandmeid. Käesolev privaatsuspoliitika selgitab, millist teavet me kogume, kuidas seda kasutame ja kuidas seda kaitseme, kui külastad kluub.ee veebisaiti või kasutad meie teenuseid. Veebisaiti kasutades nõustud allpool kirjeldatud tingimustega.",
+    "dataCollectedTitle": "Millist teavet me kogume",
+    "dataCollectedBody": "Kogume ainult sellist teavet, mis on vajalik platvormi toimimiseks ja parendamiseks:\n• Vabatahtlikult edastatud kontaktandmed, näiteks e-posti aadress, mille saadad meile kirjutades või asutuse registreerimisel.\n• Kasutusandmed, näiteks milliseid üritusi vaatad, anonüümne lehekülastuste statistika ning ligikaudne seadme ja brauseri teave.\n• Backstage'i kasutavate asutuste kontoinfo (e-post, parooli räsi, seos asutusega).",
+    "dataUseTitle": "Kuidas me sinu andmeid kasutame",
+    "dataUseBody": "Andmeid kasutame teenuse pakkumiseks ja arendamiseks, sinu päringutele vastamiseks, sulle sobivate ürituste kuvamiseks ning selleks, et aidata asutustel mõista, kui suur huvi nende ürituste vastu on. Me ei müü sinu isikuandmeid kolmandatele osapooltele.",
+    "cookiesTitle": "Küpsised ja sarnased tehnoloogiad",
+    "cookiesBody": "Kasutame veebisaidi toimimiseks vajalikke küpsiseid (näiteks selleks, et hoida sind Backstage'is sisse logituna) ning analüütikaküpsiseid, mis aitavad mõista, kuidas külastajad lehte kasutavad. Küpsiseid saad hallata oma brauseri seadetest, kuid vajalike küpsiste keelamine võib mõjutada veebisaidi tööd.",
+    "thirdPartyTitle": "Kolmandate osapoolte teenused",
+    "thirdPartyBody": "Kasutame usaldusväärseid teenusepakkujaid veebisaidi majutamiseks, andmete säilitamiseks ja analüütikaks. Need pakkujad töötlevad andmeid meie nimel ning järgivad oma privaatsus- ja turvanõudeid. Veebisaidil võib olla ka linke välistele lehtedele (näiteks Facebook'i ürituste lehed), mille suhtes kehtivad nende endi privaatsuspoliitikad.",
+    "rightsTitle": "Sinu õigused",
+    "rightsBody": "Sul on õigus pääseda ligi sinu kohta käivatele andmetele, neid parandada või paluda nende kustutamist, samuti vastu vaielda teatud töötlemisele või seda piirata. Nende õiguste kasutamiseks võta meiega ühendust allpool toodud kontaktidel ning vastame sulle mõistliku aja jooksul.",
+    "contactTitle": "Võta ühendust",
+    "contactBody": "Kui sul on küsimusi käesoleva privaatsuspoliitika või sinu andmete käitlemise kohta, kirjuta meile aadressil info@kluub.ee."
+  },
   "backstage": {
     "title": "Backstage",
     "subtitle": "Ürituste haldusportaal",
