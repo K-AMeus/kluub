@@ -88,6 +88,24 @@
     "ctaEmail": "info@kluub.ee",
     "joinNow": "Join now"
   },
+  "privacyPage": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: 27 May 2026",
+    "introTitle": "Introduction",
+    "introBody": "Kluub.ee (\"Kluub\", \"we\", \"us\", or \"our\") respects your privacy and is committed to protecting your personal data. This Privacy Policy explains how we collect, use, and safeguard information when you visit kluub.ee or interact with our services. By using the site, you agree to the terms described below.",
+    "dataCollectedTitle": "Information we collect",
+    "dataCollectedBody": "We collect only the information necessary to operate and improve the platform:\n• Contact information you provide voluntarily, such as your email address when you write to us or register a venue.\n• Usage data such as which events you view, anonymous analytics on page visits, and approximate device and browser details.\n• Account information for venue owners using the Backstage dashboard (email, password hash, host association).",
+    "dataUseTitle": "How we use your information",
+    "dataUseBody": "Your data is used to provide and improve the service, respond to your inquiries, show you relevant events, and help venue owners understand interest in their events. We do not sell your personal data to third parties.",
+    "cookiesTitle": "Cookies and similar technologies",
+    "cookiesBody": "We use essential cookies required for the site to function (for example, to keep you logged into Backstage) and analytics cookies that help us understand how visitors use the site. You can control cookies through your browser settings, though disabling essential cookies may affect site functionality.",
+    "thirdPartyTitle": "Third-party services",
+    "thirdPartyBody": "We rely on trusted third-party providers to host the site, store data, and provide analytics. These providers process data on our behalf under their own privacy and security commitments. We may also link to external sites (such as event pages on Facebook or social platforms); their privacy policies govern those pages.",
+    "rightsTitle": "Your rights",
+    "rightsBody": "You have the right to access, correct, or request deletion of personal data we hold about you, and to object to or restrict certain processing. To exercise any of these rights, contact us using the details below and we will respond within a reasonable timeframe.",
+    "contactTitle": "Contact us",
+    "contactBody": "If you have any questions about this Privacy Policy or how your data is handled, reach out to us at info@kluub.ee."
+  },
   "backstage": {
     "title": "Backstage",
     "subtitle": "Event management portal",
